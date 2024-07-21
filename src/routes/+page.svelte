@@ -18,6 +18,7 @@
 
 	let autoRefresh = true;
 	let timer: ReturnType<typeof setInterval> | null = null;
+	let count = 0;
 
 	$: version = data.version;
 	$: stats = data.stats;
@@ -36,8 +37,13 @@
 			clearInterval(timer);
 		}
 		if (autoRefresh) {
-			timer = setInterval(() => invalidate('stats'), 1000);
+			timer = setInterval(refresh, 2000);
 		}
+	}
+
+	function refresh() {
+		count = count + 1;
+		invalidate('stats');
 	}
 </script>
 
@@ -54,8 +60,11 @@
 				/>
 			</label>
 
-			<button class="btn p-2 ms-4" onclick={() => invalidate('stats')}>
-				<i class="fa-solid fa-arrows-rotate"></i>
+			<button class="btn p-2 ms-4" onclick={refresh}>
+				<i
+					class="fa-solid fa-arrows-rotate transition-transform duration-500 ease-in-out rotate-180"
+					style="transform: rotate({count * 360}deg);"
+				></i>
 			</button>
 		</div>
 	</div>
