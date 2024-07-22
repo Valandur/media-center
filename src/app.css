@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	html::before {
+		content: '';
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 100%;
+		z-index: -500;
+		background: linear-gradient(180deg, rgba(50, 70, 80, 0.9) 0%, rgba(13, 16, 27, 1) 100%);
+	}
+	html::after {
+		content: '';
+		position: fixed;
+		top: 0;
+		height: 100%;
+		left: 0;
+		right: 0;
+		z-index: -1000;
+		background-color: #1d2835;
+		background-image: linear-gradient(180deg, rgba(50, 70, 80, 0.9) 0%, rgba(13, 16, 27, 1) 100%);
+		background-image: url('/img/cover.jpg');
+		background-repeat: no-repeat;
+		background-position: center;
+		background-attachment: initial;
+		height: 100%;
+		transition: background 0.2s linear;
+		background-size: cover;
+	}
+
+	body {
+		@apply text-primary/75;
+	}
+
+	body::before {
+		content: '';
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 100%;
+		background-attachment: initial;
+		background-color: transparent;
+		background-image: url('/img/pattern.png');
+		background-size: 5rem;
+		background-repeat: repeat;
+		background-attachment: initial;
+		z-index: -500;
+	}
+
+	header {
+		background-color: rgba(29, 40, 53, 0.95);
+	}
+}
+
+@layer components {
+	.btn {
+		@apply rounded-lg px-4 py-3 text-primary;
+	}
+	.btn-primary {
+		@apply bg-accent;
+	}
+
+	.switch {
+		@apply bg-secondary;
+
+		background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='white'/></svg>");
+		background-position-x: 0%;
+		background-position-y: 50%;
+		transition-duration: 0.2s;
+		transition-property: background-position;
+		transition-timing-function: ease-in-out;
+
+		&:checked {
+			@apply bg-accent;
+			background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='white'/></svg>");
+			background-position-x: 100%;
+		}
+	}
+
+	.spinner {
+		@apply border-2 border-r-[transparent] rounded-full border-accent animate-spin w-4 h-4;
+	}
+}

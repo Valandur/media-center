@@ -16,7 +16,7 @@
 
 	export let data: PageServerData;
 
-	let autoRefresh = true;
+	let autoRefresh = false;
 	let timer: ReturnType<typeof setInterval> | null = null;
 	let count = 0;
 
@@ -47,59 +47,52 @@
 	}
 </script>
 
-<main class="main-content w-full px-[var(--margin-x)] pb-4 flex flex-col overflow-y-auto">
-	<div class="mt-5 flex items-center justify-between">
-		<h3 class="text-lg font-medium text-slate-700 line-clamp-1 dark:text-navy-50">Dashboard</h3>
-		<div class="flex">
-			<label class="inline-flex items-center space-x-2">
-				<span>Auto Refresh</span>
-				<input
-					class="form-switch is-outline h-5 w-10 rounded-full border border-slate-400/70 bg-transparent before:rounded-full before:bg-slate-300 checked:border-primary checked:before:bg-primary dark:border-navy-400 dark:before:bg-navy-300 dark:checked:border-accent dark:checked:before:bg-accent"
-					type="checkbox"
-					bind:checked={autoRefresh}
-				/>
-			</label>
+<div class="flex items-center justify-between">
+	<h3 class="text-lg font-medium">Dashboard</h3>
+	<div class="flex">
+		<label class="inline-flex items-center space-x-2">
+			<span>Auto Refresh</span>
+			<input
+				type="checkbox"
+				bind:checked={autoRefresh}
+				class="appearance-none w-10 h-6 rounded-full bg-no-repeat switch"
+			/>
+		</label>
 
-			<button class="btn p-2 ms-4" onclick={refresh}>
-				<i
-					class="fa-solid fa-arrows-rotate transition-transform duration-500 ease-in-out rotate-180"
-					style="transform: rotate({count * 360}deg);"
-				></i>
-			</button>
-		</div>
+		<button class="ms-4" on:click={refresh}>
+			<i
+				class="fa-solid fa-arrows-rotate transition-transform duration-500 ease-in-out rotate-180"
+				style="transform: rotate({count * 360}deg);"
+			></i>
+		</button>
+	</div>
+</div>
+
+<div class="flex-1 overflow-auto">
+	<div
+		class="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4"
+	>
+		<StatCard label="Version" value={version.version} />
+		<StatCard label="Uptime" value={uptime} />
+		<SizeStatCard label="Discovered Size" bytes={stats.totalBytes} />
+		<SizeStatCard label="Transferred Size" bytes={stats.bytes} />
+		<SizeStatCard label="Speed" bytes={stats.speed} unitSuffix="/s" />
+		<StatCard label="Errors" value={stats.errors} />
+		<StatCard label="Checks" value={stats.checks} />
+		<StatCard label="Transfers" value={stats.transfers} />
+		<StatCard label="Deletes" value={stats.deletes} />
+		<StatCard label="Renames" value={stats.renames} />
+		{#if stats.transferring && eta}
+			<StatCard label="ETA" value={eta} class="sm:col-span-2" />
+		{/if}
 	</div>
 
-	<div class="mt-4 grid grid-cols-12 gap-4 sm:mt-5 sm:gap-5 lg:mt-6 lg:gap-6">
-		<StatCard label="Version" value={version.version} type="info" />
-
-		<StatCard label="Uptime" value={uptime} type="success" />
-
-		<SizeStatCard label="Discovered Size" bytes={stats.totalBytes} />
-
-		<SizeStatCard label="Transferred Size" bytes={stats.bytes} />
-
-		<SizeStatCard label="Speed" bytes={stats.speed} unitSuffix="/s" />
-
-		<StatCard label="Errors" value={stats.errors} type="error" />
-
-		<StatCard label="Checks" value={stats.checks} />
-
-		<StatCard label="Transfers" value={stats.transfers} />
-
-		<StatCard label="Deletes" value={stats.deletes} />
-
-		<StatCard label="Renames" value={stats.renames} />
-
-		{#if stats.transferring && eta}
-			<StatCard label="ETA" value={eta} type="secondary" wide />
-		{/if}
-
-		<div class="col-span-12"></div>
-
+	<div
+		class="mt-16 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4"
+	>
 		{#if transferring}
 			{#each transferring as transfer (transfer.name)}
 				<div
-					class="col-span-12 md:col-span-6 lg:col-span-4 xl:col-span-3"
 					style="order: {transfer.id};"
 					in:scale={{ delay: 250, duration: 200, easing: cubicInOut }}
 					out:scale={{ duration: 200, easing: cubicInOut }}
@@ -110,4 +103,4 @@
 			{/each}
 		{/if}
 	</div>
-</main>
+</div>

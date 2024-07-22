@@ -10,4 +10,4 @@
 	$: [size, unit] = getSize(bytes);
 </script>
 
-<StatCard {label} value={size} suffix="{unit}{unitSuffix}" type="secondary" />
+<StatCard {label} value={size} suffix="{unit}{unitSuffix}" />

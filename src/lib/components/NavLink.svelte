@@ -7,6 +7,6 @@
 	$: isActive = exact ? $page.url.pathname === path : $page.url.pathname.startsWith(path);
 </script>
 
-<a href={path} class="nav-link {isActive ? 'active' : ''}">
+<a href={path} class={isActive ? 'text-primary' : 'text-secondary'}>
 	<slot />
 </a>

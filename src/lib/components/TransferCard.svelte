@@ -2,51 +2,53 @@
 	import { isInProgress, type Transfer } from '$lib/models/transfer';
 	import { formatEta, formatSize, formatSpeed } from '$lib/util';
 
+	import Card from './Card.svelte';
+
 	export let transfer: Transfer;
 
 	$: lastSeperator = transfer.name.lastIndexOf('/');
 	$: fileName = transfer.name.substring(lastSeperator + 1);
-	$: pathParts = transfer.name.substring(0, lastSeperator).split('/');
 </script>
 
-<div class="card shadow-none h-64">
-	<div class="flex flex-1 flex-col justify-between rounded-lg p-4 sm:p-5">
-		<div>
-			<h3 class="font-medium text-white line-clamp-2">
+<Card class="w-full h-full">
+	<div class="flex flex-1 flex-col justify-between">
+		<div class="flex flex-row items-center justify-between gap-x-2">
+			<h3 class="flex-1 text-primary text-xl overflow-hidden text-nowrap text-ellipsis">
 				{fileName}
 			</h3>
+			<p class="flex-shrink-0">
+				{formatSize(transfer.size)}
+			</p>
 		</div>
-		<div class="mt-4">
+
+		<div class="mt-4 text-secondary">
 			<i class="fa-solid fa-hard-drive me-2"></i>
 			{transfer.srcFs}
 		</div>
-		<div class="">
+
+		<div class="text-secondary">
 			<i class="fa-solid fa-cloud me-2"></i>
 			{transfer.dstFs}
 		</div>
+
 		<div class="flex-1"></div>
+
 		{#if isInProgress(transfer)}
-			<div class="mt-4">
-				<div class="mt-4">
-					<div class="flex flex-row justify-between">
-						<p class="text-xs+ text-white">{formatEta(transfer.eta)}</p>
-						<p class="text-xs+ text-white">{formatSpeed(transfer.speedAvg)}</p>
+			<div class="mt-8">
+				<div class="">
+					<div class="flex flex-row justify-between mb-1">
+						<p class="text-primary">{formatEta(transfer.eta)}</p>
+						<p>{formatSpeed(transfer.speedAvg)}</p>
 					</div>
-					<div class="progress my-2 h-1.5 bg-white/30">
+					<div class="w-full relative h-4 rounded-md bg-primary/15">
 						<span
-							class="rounded-full bg-white transition-[width] duration-500 ease-in-out"
+							class="absolute top-0 bottom-0 left-0 rounded-md bg-accent transition-[width] duration-500 ease-in-out"
 							style:width="{transfer.percentage}%"
 						></span>
 					</div>
-					<p class="text-right text-xs+ font-medium text-white">{transfer.percentage}%</p>
-				</div>
-
-				<div class="mt-4 flex items-center justify-between space-x-2">
-					<div class="badge h-5.5 rounded-full bg-black/20 px-2 text-xs+ text-white">
-						{formatSize(transfer.size)}
-					</div>
+					<p class="text-right mt-1">{transfer.percentage}%</p>
 				</div>
 			</div>
 		{/if}
 	</div>
-</div>
+</Card>
