@@ -1,7 +1,6 @@
 import { env } from '$env/dynamic/private';
 
 import type { About } from '$lib/models/about';
-import type { Config } from '$lib/models/config';
 import type { ListEntry } from '$lib/models/list';
 import type { Stats } from '$lib/models/stats';
 import type { Version } from '$lib/models/version';
@@ -11,7 +10,7 @@ type Fetch = typeof fetch;
 const AUTH = btoa(`${env.RCLONE_USERNAME}:${env.RCLONE_PASSWORD}`);
 const HEADERS = { Authorization: `Basic ${AUTH}`, 'Content-Type': 'application/json' };
 
-export async function getVersion(fetch: Fetch): Promise<Version> {
+export async function coreVersion(fetch: Fetch): Promise<Version> {
 	const res = await fetch(`${env.RCLONE_URL}/core/version`, {
 		method: 'POST',
 		headers: HEADERS,
@@ -20,7 +19,7 @@ export async function getVersion(fetch: Fetch): Promise<Version> {
 	return res.json();
 }
 
-export async function getStats(fetch: Fetch): Promise<Stats> {
+export async function coreStats(fetch: Fetch): Promise<Stats> {
 	const res = await fetch(`${env.RCLONE_URL}/core/stats`, {
 		method: 'POST',
 		headers: HEADERS,
@@ -29,7 +28,17 @@ export async function getStats(fetch: Fetch): Promise<Stats> {
 	return res.json();
 }
 
-export async function listRemotes(fetch: Fetch): Promise<string[]> {
+export async function jobList(fetch: Fetch): Promise<number[]> {
+	const res = await fetch(`${env.RCLONE_URL}/job/list`, {
+		method: 'POST',
+		headers: HEADERS,
+		body: JSON.stringify({})
+	});
+	const data = await res.json();
+	return data.jobids;
+}
+
+export async function configListRemotes(fetch: Fetch): Promise<string[]> {
 	const res = await fetch(`${env.RCLONE_URL}/config/listremotes`, {
 		method: 'POST',
 		headers: HEADERS,
@@ -68,14 +77,4 @@ export async function opList(
 		throw new Error('Could not get about: ' + data.error);
 	}
 	return data.list;
-}
-
-export async function listConfigs(fetch: Fetch): Promise<Config[]> {
-	const res = await fetch(`${env.RCLONE_URL}/config/dump`, {
-		method: 'POST',
-		headers: HEADERS,
-		body: JSON.stringify({})
-	});
-	const data = await res.json();
-	return Object.keys(data).map((key) => ({ name: key, type: data[key].type }));
 }

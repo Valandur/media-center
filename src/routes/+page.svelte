@@ -90,7 +90,7 @@
 
 		<StatCard label="Renames" value={stats.renames} />
 
-		{#if eta}
+		{#if stats.transferring && eta}
 			<StatCard label="ETA" value={eta} type="secondary" wide />
 		{/if}
 

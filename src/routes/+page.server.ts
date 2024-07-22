@@ -1,5 +1,5 @@
 import type { Version } from '$lib/models/version';
-import { getStats, getVersion } from '$lib/server/rclone';
+import { coreStats, coreVersion, jobList } from '$lib/server/rclone';
 
 import type { PageServerLoad } from './$types';
 
@@ -10,12 +10,12 @@ let version: Version | null = null;
 
 export const load: PageServerLoad = async ({ fetch, depends }) => {
 	if (!version) {
-		version = await getVersion(fetch);
+		version = await coreVersion(fetch);
 	}
 
 	depends('stats');
 
-	const stats = await getStats(fetch);
+	const stats = await coreStats(fetch);
 	if (stats.transferring) {
 		for (const transfer of stats.transferring) {
 			let id = map.get(transfer.name);
@@ -27,5 +27,7 @@ export const load: PageServerLoad = async ({ fetch, depends }) => {
 		}
 	}
 
-	return { version, stats };
+	const jobs = await jobList(fetch);
+
+	return { version, stats, jobs };
 };
