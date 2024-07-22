@@ -1,5 +1,6 @@
 import type { Version } from '$lib/models/version';
-import { coreStats, coreVersion, jobList } from '$lib/server/rclone';
+import { getSmartDevices } from '$lib/server/omv';
+import { coreStats, coreVersion } from '$lib/server/rclone';
 
 import type { PageServerLoad } from './$types';
 
@@ -15,6 +16,10 @@ export const load: PageServerLoad = async ({ fetch, depends }) => {
 
 	depends('stats');
 
+	const devices = getSmartDevices().then((devices) =>
+		devices.sort((a, b) => a.devicename.localeCompare(b.devicename))
+	);
+
 	const stats = await coreStats(fetch);
 	if (stats.transferring) {
 		for (const transfer of stats.transferring) {
@@ -27,7 +32,5 @@ export const load: PageServerLoad = async ({ fetch, depends }) => {
 		}
 	}
 
-	const jobs = await jobList(fetch);
-
-	return { version, stats, jobs };
+	return { version, stats, devices };
 };

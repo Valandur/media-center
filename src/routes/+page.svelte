@@ -9,19 +9,22 @@
 	import { onMount } from 'svelte';
 
 	import { formatEta } from '$lib/util';
+	import Card from '$lib/components/Card.svelte';
+	import DeviceCard from '$lib/components/DeviceCard.svelte';
 	import SizeStatCard from '$lib/components/SizeStatCard.svelte';
 	import StatCard from '$lib/components/StatCard.svelte';
 	import TransferCard from '$lib/components/TransferCard.svelte';
+	import PageTitle from '$lib/components/PageTitle.svelte';
 
 	import type { PageServerData } from './$types';
-	import PageTitle from '$lib/components/PageTitle.svelte';
 
 	export let data: PageServerData;
 
-	let autoRefresh = true;
+	let autoRefresh = false;
 	let timer: ReturnType<typeof setInterval> | null = null;
 	let count = 0;
 
+	$: devicesProm = data.devices;
 	$: version = data.version;
 	$: stats = data.stats;
 	$: uptime = formatDistanceToNowStrict(sub(new Date(), { seconds: stats.elapsedTime }));
@@ -59,7 +62,7 @@
 	}
 </script>
 
-<PageTitle title="Dashboard">
+<PageTitle title="Dashboard" class="mb-4">
 	<label class="inline-flex items-center space-x-2">
 		<span>Auto Refresh</span>
 		<input
@@ -77,9 +80,26 @@
 	</button>
 </PageTitle>
 
+<PageTitle title="OMV" class="mb-4" />
+
 <div class="flex-1 overflow-auto">
+	<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+		{#await devicesProm}
+			<div class="spinner"></div>
+		{:then devices}
+			{#each devices as device}
+				<DeviceCard {device} class="" />
+			{/each}
+		{:catch err}
+			<Card>
+				<p class="text-xl text-error">{err.message}</p>
+			</Card>
+		{/await}
+	</div>
+
+	<PageTitle title="rclone" class="mt-8 mb-4" />
 	<div
-		class="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4"
+		class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 mb-4"
 	>
 		<StatCard label="Version" value={version.version} />
 		<StatCard label="Uptime" value={uptime} />
@@ -95,10 +115,7 @@
 			<StatCard label="ETA" value={eta} class="sm:col-span-2" />
 		{/if}
 	</div>
-
-	<div
-		class="mt-16 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4"
-	>
+	<div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4">
 		{#if transferring}
 			{#each transferring as transfer (transfer.name)}
 				<div
