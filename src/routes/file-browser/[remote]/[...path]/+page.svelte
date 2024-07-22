@@ -3,6 +3,7 @@
 	import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
 
 	import FileTreeNode from '$lib/components/FileTreeLevel.svelte';
+	import PageTitle from '$lib/components/PageTitle.svelte';
 	import { formatSize } from '$lib/util';
 
 	import type { PageServerData } from './$types';
@@ -18,9 +19,7 @@
 	$: pathParts = path.split('/');
 </script>
 
-<div class="flex items-center justify-between">
-	<h3 class="text-lg font-medium">File Browser - {remote}</h3>
-</div>
+<PageTitle title="File Browser - {remote}" />
 
 <div class="mt-8 flex-1 grid grid-cols-4 overflow-hidden">
 	<div class="flex flex-col overflow-hidden">

@@ -15,6 +15,7 @@
 		<nav class="hidden lg:flex flex-col gap-y-4 px-4 py-8">
 			<NavLink path="/" exact>Dashboard</NavLink>
 			<NavLink path="/file-browser">File Browser</NavLink>
+			<NavLink path="/jobs">Jobs</NavLink>
 		</nav>
 
 		<main class="flex-1 p-4 flex flex-col overflow-hidden">

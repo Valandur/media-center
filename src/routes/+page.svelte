@@ -6,6 +6,7 @@
 	import { sub } from 'date-fns/sub';
 	import { invalidate } from '$app/navigation';
 	import { browser } from '$app/environment';
+	import { onMount } from 'svelte';
 
 	import { formatEta } from '$lib/util';
 	import SizeStatCard from '$lib/components/SizeStatCard.svelte';
@@ -13,10 +14,11 @@
 	import TransferCard from '$lib/components/TransferCard.svelte';
 
 	import type { PageServerData } from './$types';
+	import PageTitle from '$lib/components/PageTitle.svelte';
 
 	export let data: PageServerData;
 
-	let autoRefresh = false;
+	let autoRefresh = true;
 	let timer: ReturnType<typeof setInterval> | null = null;
 	let count = 0;
 
@@ -28,6 +30,15 @@
 
 	$: autoRefresh, setupAutoRefresh();
 
+	onMount(() => {
+		return () => {
+			if (timer !== null) {
+				clearInterval(timer);
+				timer = null;
+			}
+		};
+	});
+
 	function setupAutoRefresh() {
 		if (!browser) {
 			return;
@@ -35,6 +46,7 @@
 
 		if (timer !== null) {
 			clearInterval(timer);
+			timer = null;
 		}
 		if (autoRefresh) {
 			timer = setInterval(refresh, 2000);
@@ -47,26 +59,23 @@
 	}
 </script>
 
-<div class="flex items-center justify-between">
-	<h3 class="text-lg font-medium">Dashboard</h3>
-	<div class="flex">
-		<label class="inline-flex items-center space-x-2">
-			<span>Auto Refresh</span>
-			<input
-				type="checkbox"
-				bind:checked={autoRefresh}
-				class="appearance-none w-10 h-6 rounded-full bg-no-repeat switch"
-			/>
-		</label>
+<PageTitle title="Dashboard">
+	<label class="inline-flex items-center space-x-2">
+		<span>Auto Refresh</span>
+		<input
+			type="checkbox"
+			bind:checked={autoRefresh}
+			class="appearance-none w-10 h-6 rounded-full bg-no-repeat switch"
+		/>
+	</label>
 
-		<button class="ms-4" on:click={refresh}>
-			<i
-				class="fa-solid fa-arrows-rotate transition-transform duration-500 ease-in-out rotate-180"
-				style="transform: rotate({count * 360}deg);"
-			></i>
-		</button>
-	</div>
-</div>
+	<button class="ms-4" on:click={refresh}>
+		<i
+			class="fa-solid fa-arrows-rotate transition-transform duration-500 ease-in-out rotate-180"
+			style="transform: rotate({count * 360}deg);"
+		></i>
+	</button>
+</PageTitle>
 
 <div class="flex-1 overflow-auto">
 	<div

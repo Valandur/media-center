@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { typewriter } from '$lib/transitions/typewriter';
+	import { onMount } from 'svelte';
 
 	import Card from './Card.svelte';
 
@@ -22,5 +23,5 @@
 			<p class="text-sm">{suffix}</p>
 		{/if}
 	</div>
-	<p class="text-sm">{label}</p>
+	<p class="text-sm text-secondary">{label}</p>
 </Card>
