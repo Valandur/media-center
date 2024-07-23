@@ -85,6 +85,6 @@
 	}
 
 	.spinner {
-		@apply border-2 border-r-[transparent] rounded-full border-accent animate-spin w-4 h-4;
+		@apply border-2 rounded-full border-accent border-r-[transparent] animate-spin w-4 h-4;
 	}
 }

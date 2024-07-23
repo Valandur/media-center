@@ -1,7 +1,4 @@
 <script lang="ts">
-	import { cubicInOut } from 'svelte/easing';
-	import { scale } from 'svelte/transition';
-	import { flip } from 'svelte/animate';
 	import { formatDistanceToNowStrict } from 'date-fns/formatDistanceToNowStrict';
 	import { sub } from 'date-fns/sub';
 	import { invalidate } from '$app/navigation';
@@ -9,11 +6,10 @@
 	import { onMount } from 'svelte';
 
 	import { formatEta } from '$lib/util';
-	import Card from '$lib/components/Card.svelte';
-	import DeviceCard from '$lib/components/DeviceCard.svelte';
+	import TransferCardList from '$lib/components/TransferCardList.svelte';
+	import DeviceCardList from '$lib/components/DeviceCardList.svelte';
 	import SizeStatCard from '$lib/components/SizeStatCard.svelte';
 	import StatCard from '$lib/components/StatCard.svelte';
-	import TransferCard from '$lib/components/TransferCard.svelte';
 	import PageTitle from '$lib/components/PageTitle.svelte';
 
 	import type { PageServerData } from './$types';
@@ -24,12 +20,12 @@
 	let timer: ReturnType<typeof setInterval> | null = null;
 	let count = 0;
 
-	$: devicesProm = data.devices;
-	$: version = data.version;
-	$: stats = data.stats;
-	$: uptime = formatDistanceToNowStrict(sub(new Date(), { seconds: stats.elapsedTime }));
-	$: eta = formatEta(stats.eta);
-	$: transferring = stats.transferring;
+	$: devicesProm = data.omv.devices;
+	$: smartDevicesProm = data.omv.smartDevices;
+	$: fileSystemsProm = data.omv.fileSystems;
+	$: containersProm = data.omv.containers;
+	$: versionProm = data.rclone.version;
+	$: statsProm = data.rclone.stats;
 
 	$: autoRefresh, setupAutoRefresh();
 
@@ -60,6 +56,10 @@
 		count = count + 1;
 		invalidate('stats');
 	}
+
+	function formatUptime(elapsedSeconds: number) {
+		return formatDistanceToNowStrict(sub(new Date(), { seconds: elapsedSeconds }));
+	}
 </script>
 
 <PageTitle title="Dashboard" class="mb-4">
@@ -80,53 +80,34 @@
 	</button>
 </PageTitle>
 
-<PageTitle title="OMV" class="mb-4" />
-
 <div class="flex-1 overflow-auto">
-	<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-		{#await devicesProm}
-			<div class="spinner"></div>
-		{:then devices}
-			{#each devices as device}
-				<DeviceCard {device} class="" />
-			{/each}
-		{:catch err}
-			<Card>
-				<p class="text-xl text-error">{err.message}</p>
-			</Card>
-		{/await}
-	</div>
+	<PageTitle title="OMV" class="mb-4" />
+	<DeviceCardList
+		devices={devicesProm}
+		smartDevices={smartDevicesProm}
+		fileSystems={fileSystemsProm}
+	/>
 
 	<PageTitle title="rclone" class="mt-8 mb-4" />
 	<div
 		class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 mb-4"
 	>
-		<StatCard label="Version" value={version.version} />
-		<StatCard label="Uptime" value={uptime} />
-		<SizeStatCard label="Discovered Size" bytes={stats.totalBytes} />
-		<SizeStatCard label="Transferred Size" bytes={stats.bytes} />
-		<SizeStatCard label="Speed" bytes={stats.speed} unitSuffix="/s" />
-		<StatCard label="Errors" value={stats.errors} />
-		<StatCard label="Checks" value={stats.checks} />
-		<StatCard label="Transfers" value={stats.transfers} />
-		<StatCard label="Deletes" value={stats.deletes} />
-		<StatCard label="Renames" value={stats.renames} />
-		{#if stats.transferring && eta}
-			<StatCard label="ETA" value={eta} class="sm:col-span-2" />
-		{/if}
+		<StatCard label="Version" value={versionProm.then((v) => v.version)} />
+		<StatCard label="Uptime" value={statsProm.then((s) => formatUptime(s.elapsedTime))} />
+		<SizeStatCard label="Discovered Size" bytes={statsProm.then((s) => s.totalBytes)} />
+		<SizeStatCard label="Transferred Size" bytes={statsProm.then((s) => s.bytes)} />
+		<SizeStatCard label="Speed" bytes={statsProm.then((s) => s.speed)} unitSuffix="/s" />
+		<StatCard label="Errors" value={statsProm.then((s) => s.errors)} />
+		<StatCard label="Checks" value={statsProm.then((s) => s.checks)} />
+		<StatCard label="Transfers" value={statsProm.then((s) => s.transfers)} />
+		<StatCard label="Deletes" value={statsProm.then((s) => s.deletes)} />
+		<StatCard label="Renames" value={statsProm.then((s) => s.renames)} />
+		<StatCard
+			label="ETA"
+			value={statsProm.then((s) => (s.transferring ? formatEta(s.eta) : '- No transfers -'))}
+			class="sm:col-span-2"
+		/>
 	</div>
-	<div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4">
-		{#if transferring}
-			{#each transferring as transfer (transfer.name)}
-				<div
-					style="order: {transfer.id};"
-					in:scale={{ delay: 250, duration: 200, easing: cubicInOut }}
-					out:scale={{ duration: 200, easing: cubicInOut }}
-					animate:flip={{ delay: 250, duration: 200, easing: cubicInOut }}
-				>
-					<TransferCard {transfer} />
-				</div>
-			{/each}
-		{/if}
-	</div>
+
+	<TransferCardList stats={statsProm} />
 </div>

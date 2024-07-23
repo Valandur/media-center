@@ -12,13 +12,20 @@ type Fetch = typeof fetch;
 const AUTH = btoa(`${env.RCLONE_USERNAME}:${env.RCLONE_PASSWORD}`);
 const HEADERS = { Authorization: `Basic ${AUTH}`, 'Content-Type': 'application/json' };
 
+let version: Version | null = null;
 export async function coreVersion(fetch: Fetch): Promise<Version> {
+	if (version) {
+		return version;
+	}
+
 	const res = await fetch(`${env.RCLONE_URL}/core/version`, {
 		method: 'POST',
 		headers: HEADERS,
 		body: JSON.stringify({})
 	});
-	return res.json();
+	const newVersion = await res.json();
+	version = newVersion;
+	return newVersion;
 }
 
 export async function coreStats(fetch: Fetch): Promise<Stats> {
