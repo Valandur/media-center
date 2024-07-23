@@ -7,6 +7,7 @@ import type { SmartDevice } from '$lib/models/smart';
 import type { Container } from '$lib/models/docker';
 import type { FileSystem } from '$lib/models/file-system';
 import type { Device } from '$lib/models/device';
+import type { Output } from '$lib/models/output';
 
 const cookieJar = new CookieJar();
 const fetchWithCookies = makeFetchCookie(fetch, cookieJar);
@@ -29,18 +30,18 @@ export async function getDevices(): Promise<Device[]> {
 }
 
 export async function getSmartDevices(): Promise<SmartDevice[]> {
-	const res = await request<{ data: SmartDevice[] }>({
+	const res = await requestAsync<{ data: SmartDevice[] }>({
 		service: 'Smart',
-		method: 'getList',
+		method: 'getListBg',
 		params: { start: 0, limit: -1 }
 	});
 	return res.data;
 }
 
 export async function getFileSystems(): Promise<FileSystem[]> {
-	const res = await request<{ data: FileSystem[] }>({
+	const res = await requestAsync<{ data: FileSystem[] }>({
 		service: 'FileSystemMgmt',
-		method: 'getList',
+		method: 'getListBg',
 		params: { start: 0, limit: -1 }
 	});
 	return res.data;
@@ -84,6 +85,37 @@ async function request<T>(body: Record<string, unknown>, retry = true): Promise<
 	}
 
 	return wrapper.response;
+}
+
+async function requestAsync<T>(body: Record<string, unknown>) {
+	const filename = await request<string>(body);
+	const res = await waitForOutput<T>(filename);
+	return res;
+}
+
+async function waitForOutput<T>(filename: string): Promise<T> {
+	let output: T | null = null;
+	let i = 0;
+	while (output === null) {
+		await new Promise((resolve) => setTimeout(resolve, 1000));
+		const res = await request<Output>({
+			service: 'Exec',
+			method: 'getOutput',
+			params: { filename, pos: 0 }
+		});
+		if (!res.running && !res.pendingOutput) {
+			output = JSON.parse(res.output);
+			break;
+		}
+		i++;
+		if (i >= 10) {
+			throw new Error('Timed out waiting for output result');
+		}
+	}
+	if (output === null) {
+		throw new Error('Could not get output');
+	}
+	return output;
 }
 
 let authPending = false;

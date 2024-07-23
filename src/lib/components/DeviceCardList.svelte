@@ -70,7 +70,7 @@
 	}
 </script>
 
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
 	{#each devicesWithExtra as device (device?.devicename)}
 		<div
 			in:scale={{ delay: 250, duration: 200, easing: cubicInOut }}
@@ -79,11 +79,19 @@
 		>
 			{#if !device}
 				<Card class="w-full h-full flex flex-col justify-between transition-colors">
-					<div class="flex flex-row items-center">
-						<div class="spinner"></div>
-						<div class="text-xl">&nbsp;</div>
+					<div class="flex flex-row items-center justify-between">
+						<h3 class="flex-1 text-primary text-xl overflow-hidden text-nowrap text-ellipsis">
+							...
+						</h3>
+						<div class="flex-shrink-0 spinner"></div>
 					</div>
-					<div>&nbsp;</div>
+
+					<div class="flex flex-row items-center justify-between mb-4">
+						<div class="text-secondary">&nbsp;</div>
+						<div class="text-secondary">&nbsp;</div>
+					</div>
+
+					<h3 class="text-primary text-sm mb-1">&nbsp;</h3>
 				</Card>
 			{:else}
 				<DeviceCard {device} smart={device.smart} fileSystems={device.fs} />
