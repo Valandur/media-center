@@ -1,10 +1,4 @@
-import {
-	getComposeContainers,
-	getDevices,
-	getFileSystems,
-	getSmartDevices,
-	getZfsPools
-} from '$lib/server/omv';
+import { getComposeContainers, getDevices, getFileSystems, getSmartDevices } from '$lib/server/omv';
 import { coreStats, coreVersion } from '$lib/server/rclone';
 
 import type { PageServerLoad } from './$types';
@@ -19,7 +13,6 @@ export const load: PageServerLoad = async ({ fetch, depends }) => {
 	const devices = getDevices();
 	const smartDevices = getSmartDevices();
 	const fileSystems = getFileSystems();
-	const zfs = getZfsPools();
 
 	const containers = getComposeContainers();
 
@@ -44,7 +37,6 @@ export const load: PageServerLoad = async ({ fetch, depends }) => {
 			devices,
 			smartDevices,
 			fileSystems,
-			zfs,
 			containers
 		},
 		rclone: {

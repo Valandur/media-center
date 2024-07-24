@@ -60,6 +60,10 @@
 }
 
 @layer components {
+	.grid-data {
+		@apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4;
+	}
+
 	.btn {
 		@apply rounded-lg px-4 py-3 text-primary;
 	}
@@ -86,5 +90,9 @@
 
 	.spinner {
 		@apply border-2 rounded-full border-accent border-r-[transparent] animate-spin w-4 h-4;
+	}
+
+	.badge {
+		@apply rounded-md text-primary text-xs px-1;
 	}
 }

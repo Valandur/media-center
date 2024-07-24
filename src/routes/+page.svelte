@@ -6,26 +6,26 @@
 	import { onMount } from 'svelte';
 
 	import { formatEta } from '$lib/util';
+	import ContainersCard from '$lib/components/ContainersCard.svelte';
+	import FileSystemsCard from '$lib/components/FileSystemsCard.svelte';
 	import TransferCardList from '$lib/components/TransferCardList.svelte';
-	import DeviceCardList from '$lib/components/DeviceCardList.svelte';
+	import DevicesCard from '$lib/components/DevicesCard.svelte';
 	import SizeStatCard from '$lib/components/SizeStatCard.svelte';
 	import StatCard from '$lib/components/StatCard.svelte';
 	import PageTitle from '$lib/components/PageTitle.svelte';
 
 	import type { PageServerData } from './$types';
-	import FileSystemCardList from '$lib/components/FileSystemCardList.svelte';
 
 	export let data: PageServerData;
 
-	let autoRefresh = false;
+	let autoRefresh = true;
 	let timer: ReturnType<typeof setInterval> | null = null;
 	let count = 0;
 
-	$: devicesProm = data.omv.devices;
-	$: smartDevicesProm = data.omv.smartDevices;
-	$: fileSystemsProm = data.omv.fileSystems;
-	$: zfsPoolsProm = data.omv.zfs;
-	$: containersProm = data.omv.containers;
+	$: devicesPromise = data.omv.devices;
+	$: smartDevicesPromise = data.omv.smartDevices;
+	$: fileSystemsPromise = data.omv.fileSystems;
+	$: containersPromise = data.omv.containers;
 	$: versionProm = data.rclone.version;
 	$: statsProm = data.rclone.stats;
 
@@ -64,7 +64,7 @@
 	}
 </script>
 
-<PageTitle title="Dashboard" class="mb-4">
+<PageTitle title="Dashboard" class="mb-2">
 	<label class="inline-flex items-center space-x-2">
 		<span>Auto Refresh</span>
 		<input
@@ -83,14 +83,15 @@
 </PageTitle>
 
 <div class="flex-1 overflow-auto">
-	<PageTitle title="OMV" class="mb-4" />
-	<DeviceCardList devices={devicesProm} smartDevices={smartDevicesProm} class="mb-4" />
-	<FileSystemCardList fileSystems={fileSystemsProm} />
+	<PageTitle title="OMV" class="mb-2" />
+	<div class="grid-data mb-4">
+		<DevicesCard {devicesPromise} {smartDevicesPromise} />
+		<FileSystemsCard {fileSystemsPromise} />
+		<ContainersCard {containersPromise} />
+	</div>
 
-	<PageTitle title="rclone" class="mt-8 mb-4" />
-	<div
-		class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 mb-4"
-	>
+	<PageTitle title="rclone" class="mb-2" />
+	<div class="grid-data mb-4">
 		<StatCard label="Version" value={versionProm.then((v) => v.version)} />
 		<StatCard label="Uptime" value={statsProm.then((s) => formatUptime(s.elapsedTime))} />
 		<SizeStatCard label="Discovered Size" bytes={statsProm.then((s) => s.totalBytes)} />
