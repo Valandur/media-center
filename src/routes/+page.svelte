@@ -15,10 +15,11 @@
 	import PageTitle from '$lib/components/PageTitle.svelte';
 
 	import type { PageServerData } from './$types';
+	import Card from '$lib/components/Card.svelte';
 
 	export let data: PageServerData;
 
-	let autoRefresh = true;
+	let autoRefresh = false;
 	let timer: ReturnType<typeof setInterval> | null = null;
 	let count = 0;
 
@@ -28,6 +29,7 @@
 	$: containersPromise = data.omv.containers;
 	$: versionProm = data.rclone.version;
 	$: statsProm = data.rclone.stats;
+	$: jobsPromise = data.arm.jobs;
 
 	$: autoRefresh, setupAutoRefresh();
 
@@ -108,6 +110,21 @@
 			class="sm:col-span-2"
 		/>
 	</div>
-
 	<TransferCardList stats={statsProm} />
+
+	<PageTitle title="ARM" class="mb-2" />
+	<div class="grid-data mb-4">
+		<Card>
+			{#await jobsPromise}
+				<div class="spinner"></div>
+			{:then jobs}
+				{#each jobs as job}
+					<img src={job.poster_url} alt="Poster" />
+					<div>{job.title}</div>
+					<div>{job.status}</div>
+					<div>{job.stage}</div>
+				{/each}
+			{/await}
+		</Card>
+	</div>
 </div>

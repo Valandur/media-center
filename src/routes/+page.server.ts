@@ -1,3 +1,4 @@
+import { getJobList } from '$lib/server/arm';
 import { getComposeContainers, getDevices, getFileSystems, getSmartDevices } from '$lib/server/omv';
 import { coreStats, coreVersion } from '$lib/server/rclone';
 
@@ -32,6 +33,9 @@ export const load: PageServerLoad = async ({ fetch, depends }) => {
 		return stats;
 	});
 
+	// ARM
+	const jobs = getJobList();
+
 	return {
 		omv: {
 			devices,
@@ -42,6 +46,9 @@ export const load: PageServerLoad = async ({ fetch, depends }) => {
 		rclone: {
 			version,
 			stats
+		},
+		arm: {
+			jobs
 		}
 	};
 };
