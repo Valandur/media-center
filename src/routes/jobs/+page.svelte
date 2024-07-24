@@ -14,7 +14,7 @@
 <PageTitle title="Jobs" />
 
 <div
-	class="grid grid-rows-none auto-rows-auto items-stretch grid-cols-[1fr_repeat(6,auto)] overflow-x-hidden overflow-y-scroll"
+	class="grid grid-rows-none auto-rows-auto items-stretch grid-cols-[1fr_repeat(6,auto)] overflow-auto"
 >
 	<div class="text-primary p-2">File</div>
 	<div class="text-primary p-2">Size</div>
@@ -22,7 +22,7 @@
 	<div class="text-primary p-2">To</div>
 	<div class="text-primary p-2">Time</div>
 	<div class="p-2">Checked</div>
-	<div class="break-all p-2">Error</div>
+	<div class="p-2">Error</div>
 
 	{#each jobs as job, i}
 		<div class="text-ellipsis p-2 {i % 2 === 0 ? 'bg-secondary/50' : ''}">
@@ -47,7 +47,7 @@
 				<i class="fa-solid fa-xmark fa-xl font-extrabold text-error"></i>
 			{/if}
 		</div>
-		<div class="break-all p-2 {i % 2 === 0 ? 'bg-secondary/50' : ''}">
+		<div class="p-2 {i % 2 === 0 ? 'bg-secondary/50' : ''}">
 			{#if job.error}
 				<i class="fa-solid fa-xmark fa-xl font-extrabold text-error"></i>
 			{:else}

@@ -3,9 +3,9 @@
 
 	import type { TreeNode } from '$lib/models/tree';
 
-	export let basePath: string;
 	export let node: TreeNode;
-	export let current: string | null;
+	export let basePath: string;
+	export let currentPath: string | null;
 
 	let isExpanded = false;
 	let isLoading = false;
@@ -13,7 +13,7 @@
 	let subTree: TreeNode[] = [];
 
 	$: {
-		if (current && (current === node.path || current.startsWith(node.path + '/'))) {
+		if (currentPath && (currentPath === node.path || currentPath.startsWith(node.path + '/'))) {
 			onExpand(true);
 		}
 	}
@@ -62,7 +62,7 @@
 		<div class="ps-4" transition:slide>
 			<ul>
 				{#each subTree as node}
-					<svelte:self {basePath} {node} {current} />
+					<svelte:self {basePath} {node} current={currentPath} />
 				{/each}
 			</ul>
 		</div>

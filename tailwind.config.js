@@ -14,7 +14,8 @@ export default {
 			success: 'rgb(20, 137, 34)',
 			info: 'rgb(0, 155, 227)',
 			error: 'rgb(224, 0, 0)',
-			warning: 'rgb(255, 159, 12)'
+			warning: 'rgb(255, 159, 12)',
+			dark: 'rgb(29, 40, 53)'
 		}
 	},
 	plugins: []

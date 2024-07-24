@@ -1,91 +1,113 @@
 <script lang="ts">
 	import { parseISO } from 'date-fns/parseISO';
 	import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
+	import { slide } from 'svelte/transition';
 
-	import FileTreeNode from '$lib/components/FileTreeLevel.svelte';
 	import PageTitle from '$lib/components/PageTitle.svelte';
 	import { formatSize } from '$lib/util';
 
+	import About from './About.svelte';
+	import FileTreeLevel from './FileTreeNode.svelte';
 	import type { PageServerData } from './$types';
 
 	export let data: PageServerData;
 
+	let showTree = false;
+
 	$: remote = data.remote;
 	$: tree = data.tree;
 	$: about = data.about;
-	$: path = data.path;
+	$: currentPath = data.path;
 	$: files = data.files;
+	$: basePath = `/file-browser/${remote}`;
+	$: pathParts = currentPath.split('/');
 
-	$: pathParts = path.split('/');
+	function toggle() {
+		showTree = !showTree;
+	}
 </script>
 
 <PageTitle title="File Browser - {remote}" />
 
-<div class="mt-8 flex-1 grid grid-cols-4 overflow-hidden">
-	<div class="flex flex-col overflow-hidden">
-		<div class="flex-1 overflow-y-auto p-2 border border-primary/30">
-			<ul class="space-y-1 text-sm">
-				{#await tree}
-					<li class="px-2 py-1">
-						<div class="spinner"></div>
-					</li>
-				{:then nodes}
-					{#each nodes as node}
-						<FileTreeNode {node} current={path} basePath="/file-browser/{remote}" />
-					{/each}
-				{/await}
-			</ul>
-		</div>
+<div class="relative mt-8 flex-1 grid grid-cols-4 overflow-hidden">
+	<div class="contents md:hidden">
+		{#if showTree}
+			<div
+				class="absolute top-0 left-0 bottom-0 right-0 bg-dark flex flex-col overflow-hidden"
+				transition:slide={{ axis: 'x' }}
+			>
+				<div class="flex-1 overflow-y-auto p-2 border border-primary/30">
+					<div class="absolute top-2 right-3">
+						<button on:click={toggle} class="text-primary">
+							<i class="fa-solid fa-xmark"></i>
+						</button>
+					</div>
 
-		{#if about}
-			<div class="flex flex-col p-4 border border-t-0 border-primary/30">
-				<div class="flex items-center justify-between mb-2">
-					<p>
-						<span class="text-primary">{formatSize(about.used)} </span>
-						<span class="text-secondary">used of</span>
-						<span class="text-primary">{formatSize(about.total)}</span>
-					</p>
+					<ul class="space-y-1 text-sm">
+						{#each tree as node}
+							<FileTreeLevel {node} {currentPath} {basePath} />
+						{/each}
+					</ul>
 				</div>
-				<div class="w-full relative h-4 rounded-md bg-primary/15">
-					<span
-						class="absolute top-0 bottom-0 left-0 rounded-md bg-accent transition-[width] duration-500 ease-in-out"
-						style:width="{(about.used / about.total) * 100}%"
-					></span>
-				</div>
+
+				<About {about} />
 			</div>
 		{/if}
 	</div>
+	<div class="hidden md:contents">
+		<div class="relative flex flex-col overflow-hidden" transition:slide={{ axis: 'x' }}>
+			<div class="flex-1 overflow-y-auto p-2 border border-primary/30">
+				<ul class="space-y-1 text-sm">
+					{#each tree as node}
+						<FileTreeLevel {node} {currentPath} {basePath} />
+					{/each}
+				</ul>
+			</div>
 
-	<div class="col-span-3 flex flex-col overflow-hidden p-2 border border-l-0 border-primary/30">
-		<ul class="flex flex-wrap space-x-2">
-			<li class="flex items-center space-x-2">
-				{#if path}
-					<a class="transition-colors hover:text-accent" href="/file-browser/{remote}">
-						{remote}
-					</a>
-					<span class="text-secondary">/</span>
-				{:else}
-					<p class="text-primary">{remote}</p>
-				{/if}
-			</li>
-			{#each pathParts as part, index}
+			<About {about} />
+		</div>
+	</div>
+
+	<div
+		class="col-span-4 md:col-span-3 flex flex-col overflow-hidden p-2 border md:border-l-0 border-primary/30"
+	>
+		<div class="flex flex-row items-start justify-between">
+			<ul class="flex flex-wrap space-x-2">
 				<li class="flex items-center space-x-2">
-					{#if index < pathParts.length - 1}
-						<a
-							class="transition-colors hover:text-accent"
-							href="/file-browser/{remote}/{pathParts.slice(0, index + 1).join('/')}"
-						>
-							{part}
+					{#if currentPath}
+						<a class="transition-colors hover:text-accent" href="/file-browser/{remote}">
+							{remote}
 						</a>
-					{:else}
-						<p class="text-primary">{part}</p>
-					{/if}
-					{#if index < pathParts.length - 1}
 						<span class="text-secondary">/</span>
+					{:else}
+						<p class="text-primary">{remote}</p>
 					{/if}
 				</li>
-			{/each}
-		</ul>
+				{#each pathParts as part, index}
+					<li class="flex items-center space-x-2">
+						{#if index < pathParts.length - 1}
+							<a
+								class="transition-colors hover:text-accent"
+								href="/file-browser/{remote}/{pathParts.slice(0, index + 1).join('/')}"
+							>
+								{part}
+							</a>
+						{:else}
+							<p class="text-primary">{part}</p>
+						{/if}
+						{#if index < pathParts.length - 1}
+							<span class="text-secondary">/</span>
+						{/if}
+					</li>
+				{/each}
+			</ul>
+
+			{#if !showTree}
+				<button on:click={toggle} class="text-primary md:hidden me-1">
+					<i class="fa-solid fa-folder-tree"></i>
+				</button>
+			{/if}
+		</div>
 
 		<div class="card mt-3 overflow-y-auto">
 			<table class="is-hoverable w-full text-left">
