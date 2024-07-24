@@ -13,6 +13,7 @@
 	import PageTitle from '$lib/components/PageTitle.svelte';
 
 	import type { PageServerData } from './$types';
+	import FileSystemCardList from '$lib/components/FileSystemCardList.svelte';
 
 	export let data: PageServerData;
 
@@ -23,6 +24,7 @@
 	$: devicesProm = data.omv.devices;
 	$: smartDevicesProm = data.omv.smartDevices;
 	$: fileSystemsProm = data.omv.fileSystems;
+	$: zfsPoolsProm = data.omv.zfs;
 	$: containersProm = data.omv.containers;
 	$: versionProm = data.rclone.version;
 	$: statsProm = data.rclone.stats;
@@ -82,11 +84,8 @@
 
 <div class="flex-1 overflow-auto">
 	<PageTitle title="OMV" class="mb-4" />
-	<DeviceCardList
-		devices={devicesProm}
-		smartDevices={smartDevicesProm}
-		fileSystems={fileSystemsProm}
-	/>
+	<DeviceCardList devices={devicesProm} smartDevices={smartDevicesProm} class="mb-4" />
+	<FileSystemCardList fileSystems={fileSystemsProm} />
 
 	<PageTitle title="rclone" class="mt-8 mb-4" />
 	<div

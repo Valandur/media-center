@@ -8,6 +8,7 @@ import type { Container } from '$lib/models/docker';
 import type { FileSystem } from '$lib/models/file-system';
 import type { Device } from '$lib/models/device';
 import type { Output } from '$lib/models/output';
+import type { ZfsPool } from '$lib/models/zfs';
 
 const cookieJar = new CookieJar();
 const fetchWithCookies = makeFetchCookie(fetch, cookieJar);
@@ -53,6 +54,15 @@ export async function getComposeContainers(): Promise<Container[]> {
 		method: 'getContainers'
 	});
 	return res;
+}
+
+export async function getZfsPools(): Promise<ZfsPool[]> {
+	const res = await requestAsync<{ data: ZfsPool[] }>({
+		service: 'Zfs',
+		method: 'listPoolsBg',
+		params: { start: 0, limit: -1 }
+	});
+	return res.data;
 }
 
 async function request<T>(body: Record<string, unknown>, retry = true): Promise<T> {
