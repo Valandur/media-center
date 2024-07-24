@@ -3,6 +3,7 @@
 
 	import type { Device } from '$lib/models/device';
 	import type { SmartDevice } from '$lib/models/smart';
+	import { typewriter } from '$lib/transitions/typewriter';
 	import { formatSize } from '$lib/util';
 
 	import Card from './Card.svelte';
@@ -46,6 +47,7 @@
 			{#each devices as device (device.devicename)}
 				{@const smart = smartDevicesMap.get(device.canonicaldevicefile)}
 				{@const bg = smart ? (smart.overallstatus === 'GOOD' ? 'bg-success' : 'bg-warning') : ''}
+				{@const temp = device.temperature ? device.temperature + '°C' : '---'}
 
 				<div class="text-nowrap" transition:slide>
 					{device.devicename}
@@ -54,7 +56,11 @@
 					{device.model}
 				</div>
 				<div class="text-nowrap text-right" transition:slide>
-					{device.temperature ? device.temperature + '°C' : '---'}
+					{#key temp}
+						<div in:typewriter={{ speed: 2 }}>
+							{temp}
+						</div>
+					{/key}
 				</div>
 				<div class="text-nowrap text-right" transition:slide>
 					{formatSize(Number(device.size))}

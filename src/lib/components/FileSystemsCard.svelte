@@ -32,7 +32,7 @@
 				<div class="spinner"></div>
 			{/if}
 			{#each fileSystems as fs (fs.devicename)}
-				{@const used = Number(fs.size) - Number(fs.available)}
+				{@const used = formatSize(Number(fs.size) - Number(fs.available))}
 				<div class="text-nowrap text-ellipsis overflow-hidden" transition:slide>
 					{fs.devicename}
 				</div>
@@ -42,7 +42,7 @@
 				<div class="text-nowrap text-right" transition:slide>
 					{#key used}
 						<div in:typewriter={{ speed: 2 }}>
-							{formatSize(used)}
+							{used}
 						</div>
 					{/key}
 				</div>
