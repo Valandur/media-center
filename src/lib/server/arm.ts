@@ -7,7 +7,7 @@ import type { Title } from '$lib/models/title';
 
 const LOGIN_URL = `${env.ARM_URL}/login`;
 const JOB_LIST_URL = `${env.ARM_URL}/json?mode=joblist`;
-const SET_TITLE_URL = `${env.ARM_URL}/updatetitle?`;
+const SET_TITLE_URL = `${env.ARM_URL}/updatetitle`;
 const CSRF_REGEX = /name="csrf_token" type="hidden" value="(.*?)"/i;
 
 const cookieJar = new CookieJar();
@@ -28,8 +28,10 @@ export async function setTitle(id: string, title: Title) {
 	params.set('type', title.Type);
 	params.set('poster', title.Poster);
 	params.set('job_id', id);
-	const url = `${SET_TITLE_URL}?${params.toString()}}`;
-	await request(url);
+	const url = `${SET_TITLE_URL}?${params.toString()}`;
+	console.log(url);
+	const res = await request(url);
+	console.log(await res.text());
 }
 
 async function request(url: string, retry = true) {

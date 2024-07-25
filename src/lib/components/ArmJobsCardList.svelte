@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { invalidate } from '$app/navigation';
 	import { fade, scale } from 'svelte/transition';
 	import { cubicInOut } from 'svelte/easing';
 	import { flip } from 'svelte/animate';
@@ -28,18 +29,24 @@
 	async function onSubmit(event: SubmitEvent) {
 		if (event.target instanceof HTMLFormElement) {
 			const form = new FormData(event.target);
-			fetch('/api/omdb', { method: 'POST', body: form })
-				.then((res) => res.json())
-				.then((data) => (titles = data))
-				.catch((err) => console.error(err));
+			try {
+				const res = await fetch('/api/omdb', { method: 'POST', body: form });
+				const data = await res.json();
+				titles = data;
+			} catch (err) {
+				console.error(err);
+			}
 		}
 	}
 
 	async function onSelect(title: Title) {
-		fetch('/api/arm', {
-			method: 'POST',
-			body: JSON.stringify({ ...title, selectedId })
-		}).catch((err) => console.error(err));
+		try {
+			await fetch('/api/arm', { method: 'POST', body: JSON.stringify({ ...title, selectedId }) });
+			selectedId = '';
+			invalidate('mc:stats');
+		} catch (err) {
+			console.error(err);
+		}
 	}
 </script>
 
@@ -82,7 +89,11 @@
 			<div class="border border-primary/75 bg-dark">
 				<div class="border-b border-primary/75 p-4 uppercase">Find movie / show by title</div>
 				<div class="p-4">
-					<form method="post" action="/api/omdb" on:submit|preventDefault={onSubmit}>
+					<form
+						method="post"
+						action="/api/omdb"
+						on:submit|preventDefault|stopPropagation={onSubmit}
+					>
 						<input type="text" name="title" placeholder="Title" class="input me-2" />
 						<button type="submit" class="btn btn-primary">Search</button>
 					</form>
@@ -91,7 +102,9 @@
 							{#each titles as title}
 								<div class="flex flex-row items-center gap-4">
 									<div class="basis-1/6 flex-grow">
-										<img src={title.Poster} alt="Poster" class="w-24" />
+										{#if title.Poster !== 'N/A'}
+											<img src={title.Poster} alt="Poster" class="w-24" />
+										{/if}
 									</div>
 									<div class="basis-3/6 flex-grow text-2xl">{title.Title}</div>
 									<div class="basis-1/6 flex-grow text-2xl">{title.Year}</div>
