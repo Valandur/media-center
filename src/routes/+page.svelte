@@ -6,15 +6,15 @@
 	import { formatEta } from '$lib/util';
 	import ArmJobsCardList from '$lib/components/ArmJobsCardList.svelte';
 	import ContainersCard from '$lib/components/ContainersCard.svelte';
-	import FileSystemsCard from '$lib/components/FileSystemsCard.svelte';
-	import TransfersCardList from '$lib/components/TransfersCardList.svelte';
 	import DevicesCard from '$lib/components/DevicesCard.svelte';
+	import FileSystemsCard from '$lib/components/FileSystemsCard.svelte';
+	import PageTitle from '$lib/components/PageTitle.svelte';
 	import SizeStatCard from '$lib/components/SizeStatCard.svelte';
 	import StatCard from '$lib/components/StatCard.svelte';
-	import PageTitle from '$lib/components/PageTitle.svelte';
+	import TorrentsCard from '$lib/components/TorrentsCard.svelte';
+	import TransfersCardList from '$lib/components/TransfersCardList.svelte';
 
 	import type { PageServerData } from './$types';
-	import TorrentsCard from '$lib/components/TorrentsCard.svelte';
 
 	export let data: PageServerData;
 
