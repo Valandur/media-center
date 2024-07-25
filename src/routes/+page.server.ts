@@ -9,7 +9,7 @@ let index = 0;
 const map: Map<string, number> = new Map();
 
 export const load: PageServerLoad = async ({ fetch, depends }) => {
-	depends('stats');
+	depends('mc:stats');
 
 	// OMV
 	const devices = getDevices();

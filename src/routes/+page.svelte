@@ -65,7 +65,7 @@
 
 	function refresh() {
 		count = count + 1;
-		invalidate('stats');
+		invalidate('mc:stats');
 	}
 </script>
 
