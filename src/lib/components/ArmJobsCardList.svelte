@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { scale } from 'svelte/transition';
+	import { cubicInOut } from 'svelte/easing';
+	import { flip } from 'svelte/animate';
 
 	import type { ArmJob } from '$lib/models/arm';
 
 	import Card from './Card.svelte';
 	import Progress from './Progress.svelte';
-	import { cubicInOut } from 'svelte/easing';
-	import { flip } from 'svelte/animate';
 
 	export let jobsPromise: Promise<ArmJob[]>;
 

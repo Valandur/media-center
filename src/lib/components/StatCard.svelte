@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { typewriter } from '$lib/transitions/typewriter';
+	import { fade } from 'svelte/transition';
 
 	import Card from './Card.svelte';
 
@@ -40,7 +40,7 @@
 <Card class={$$props.class ?? ''}>
 	<div class="flex items-baseline space-x-2">
 		{#key val}
-			<div class="text-2xl font-semibold text-primary whitespace-pre-wrap" in:typewriter>
+			<div class="text-2xl font-semibold text-primary whitespace-pre-wrap" in:fade>
 				{#if loading}
 					...
 				{:else if typeof val !== 'undefined'}

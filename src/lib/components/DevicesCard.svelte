@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { slide } from 'svelte/transition';
+	import { fade, slide } from 'svelte/transition';
 
 	import type { Device } from '$lib/models/device';
 	import type { SmartDevice } from '$lib/models/smart';
-	import { typewriter } from '$lib/transitions/typewriter';
 	import { formatSize } from '$lib/util';
 
 	import Card from './Card.svelte';
@@ -57,7 +56,7 @@
 				</div>
 				<div class="text-nowrap text-right" transition:slide>
 					{#key temp}
-						<div in:typewriter>
+						<div in:fade>
 							{temp}
 						</div>
 					{/key}

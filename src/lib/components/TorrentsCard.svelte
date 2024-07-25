@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { slide } from 'svelte/transition';
+	import { fade, slide } from 'svelte/transition';
 
 	import type { Torrent } from '$lib/models/transmission';
-	import { typewriter } from '$lib/transitions/typewriter';
 	import { formatEta, formatSize, formatSpeed } from '$lib/util';
 
 	import Card from './Card.svelte';
@@ -41,7 +40,7 @@
 					{:else}
 						{@const conns = `${torrent.peersSendingToUs} / ${torrent.peersConnected}`}
 						{#key conns}
-							<span in:typewriter>
+							<span in:fade>
 								{conns}
 							</span>
 						{/key}
@@ -53,7 +52,7 @@
 					{:else}
 						{@const eta = formatEta(torrent.eta)}
 						{#key eta}
-							<span in:typewriter>
+							<span in:fade>
 								{eta}
 							</span>
 						{/key}
@@ -65,7 +64,7 @@
 					{:else}
 						{@const speed = formatSpeed(torrent.rateDownload)}
 						{#key speed}
-							<span in:typewriter>
+							<span in:fade>
 								{speed}
 							</span>
 						{/key}

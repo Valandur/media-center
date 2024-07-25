@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { slide } from 'svelte/transition';
+	import { fade, fly, slide } from 'svelte/transition';
 
 	import { isInProgress, type Transfer } from '$lib/models/transfer';
 	import { formatEta, formatSize, formatSpeed } from '$lib/util';
-	import { typewriter } from '$lib/transitions/typewriter';
 
 	import Card from './Card.svelte';
 	import Progress from './Progress.svelte';
@@ -41,7 +40,7 @@
 				<div class="text-nowrap text-ellipsis overflow-hidden" transition:slide>
 					{#if isInProgress(transfer)}
 						{@const eta = formatEta(transfer.eta)}
-						<div class="text-nowrap text-ellipsis overflow-hidden" in:typewriter>
+						<div class="text-nowrap text-ellipsis overflow-hidden" in:fade>
 							{eta}
 						</div>
 					{/if}
@@ -50,7 +49,7 @@
 					{#if isInProgress(transfer)}
 						{@const speed = formatSpeed(transfer.speedAvg)}
 						{#key speed}
-							<div class="text-nowrap text-right" in:typewriter>{speed}</div>
+							<div class="text-nowrap text-right" in:fade>{speed}</div>
 						{/key}
 					{/if}
 				</div>

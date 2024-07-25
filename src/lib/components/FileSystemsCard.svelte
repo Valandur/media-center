@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { slide } from 'svelte/transition';
+	import { fade, slide } from 'svelte/transition';
 
 	import type { FileSystem } from '$lib/models/file-system';
 	import { formatSize } from '$lib/util';
 
 	import Card from './Card.svelte';
 	import Progress from './Progress.svelte';
-	import { typewriter } from '$lib/transitions/typewriter';
 
 	export let fileSystemsPromise: Promise<FileSystem[]>;
 
@@ -41,7 +40,7 @@
 				</div>
 				<div class="text-nowrap text-right" transition:slide>
 					{#key used}
-						<div in:typewriter>
+						<div in:fade>
 							{used}
 						</div>
 					{/key}
