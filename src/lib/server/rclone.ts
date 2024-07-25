@@ -10,7 +10,7 @@ import type { Version } from '$lib/models/version';
 type Fetch = typeof fetch;
 
 const AUTH = btoa(`${env.RCLONE_USERNAME}:${env.RCLONE_PASSWORD}`);
-const HEADERS = { Authorization: `Basic ${AUTH}`, 'Content-Type': 'application/json' };
+const HEADERS = { Authorization: `Basic ${AUTH}`, 'content-type': 'application/json' };
 
 let version: Version | null = null;
 export async function coreVersion(fetch: Fetch): Promise<Version> {

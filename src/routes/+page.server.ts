@@ -1,6 +1,7 @@
 import { getJobList } from '$lib/server/arm';
 import { getComposeContainers, getDevices, getFileSystems, getSmartDevices } from '$lib/server/omv';
 import { coreStats } from '$lib/server/rclone';
+import { getTorrents } from '$lib/server/transmission';
 
 import type { PageServerLoad } from './$types';
 
@@ -35,6 +36,9 @@ export const load: PageServerLoad = async ({ fetch, depends }) => {
 	// ARM
 	const jobs = getJobList();
 
+	// Transmission
+	const torrents = getTorrents(fetch);
+
 	return {
 		omv: {
 			devices,
@@ -47,6 +51,9 @@ export const load: PageServerLoad = async ({ fetch, depends }) => {
 		},
 		arm: {
 			jobs
+		},
+		transmission: {
+			torrents
 		}
 	};
 };

@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { formatDistanceToNowStrict } from 'date-fns/formatDistanceToNowStrict';
-	import { sub } from 'date-fns/sub';
 	import { invalidate } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
@@ -16,10 +14,15 @@
 	import PageTitle from '$lib/components/PageTitle.svelte';
 
 	import type { PageServerData } from './$types';
+	import TorrentsCard from '$lib/components/TorrentsCard.svelte';
 
 	export let data: PageServerData;
 
-	let autoRefresh = false;
+	let autoRefresh = browser
+		? localStorage
+			? localStorage.getItem('auto-refresh') === 'true'
+			: false
+		: true;
 	let timer: ReturnType<typeof setInterval> | null = null;
 	let count = 0;
 
@@ -29,6 +32,7 @@
 	$: containersPromise = data.omv.containers;
 	$: statsProm = data.rclone.stats;
 	$: jobsPromise = data.arm.jobs;
+	$: torrentsPromise = data.transmission.torrents;
 
 	$: autoRefresh, setupAutoRefresh();
 
@@ -46,6 +50,10 @@
 			return;
 		}
 
+		if (localStorage) {
+			localStorage.setItem('auto-refresh', autoRefresh ? 'true' : 'false');
+		}
+
 		if (timer !== null) {
 			clearInterval(timer);
 			timer = null;
@@ -58,10 +66,6 @@
 	function refresh() {
 		count = count + 1;
 		invalidate('stats');
-	}
-
-	function formatUptime(elapsedSeconds: number) {
-		return formatDistanceToNowStrict(sub(new Date(), { seconds: elapsedSeconds }));
 	}
 </script>
 
@@ -102,6 +106,8 @@
 			value={statsProm.then((s) => (s.transferring ? formatEta(s.eta) : '- No transfers -'))}
 			class="sm:col-span-2"
 		/>
+
+		<TorrentsCard {torrentsPromise} />
 	</div>
 
 	<TransfersCardList stats={statsProm} />

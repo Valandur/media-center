@@ -41,7 +41,7 @@
 				</div>
 				<div class="text-nowrap text-right" transition:slide>
 					{#key used}
-						<div in:typewriter={{ speed: 2 }}>
+						<div in:typewriter>
 							{used}
 						</div>
 					{/key}

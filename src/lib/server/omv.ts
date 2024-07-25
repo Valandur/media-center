@@ -68,7 +68,7 @@ export async function getZfsPools(): Promise<ZfsPool[]> {
 async function request<T>(body: Record<string, unknown>, retry = true): Promise<T> {
 	const res = await fetchWithCookies(env.OMV_RPC, {
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
+		headers: { 'content-type': 'application/json' },
 		body: JSON.stringify(body),
 		credentials: 'include'
 	});
@@ -140,7 +140,7 @@ async function auth() {
 	authPending = true;
 	const res = await fetchWithCookies(env.OMV_RPC, {
 		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
+		headers: { 'content-type': 'application/json' },
 		body: JSON.stringify({
 			service: 'Session',
 			method: 'login',

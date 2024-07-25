@@ -17,7 +17,6 @@
 
 	function setup() {
 		jobsPromise.then((newJobs) => {
-			console.log(newJobs);
 			jobs = newJobs;
 			loading = false;
 		});
