@@ -29,7 +29,6 @@
 	$: fileSystemsPromise = data.omv.fileSystems;
 	$: containersPromise = data.omv.containers;
 	$: transfersPromise = data.rclone.stats.then((s) => s.transferring ?? []);
-	$: checkingPromise = data.rclone.stats.then((s) => s.checking ?? []);
 	$: jobsPromise = data.arm.jobs;
 	$: torrentsPromise = data.transmission.torrents;
 
@@ -106,14 +105,14 @@
 
 		<div class="flex flex-row gap-4">
 			<StatCard
-				label="Total Checked"
-				value={data.rclone.stats.then((s) => s.checks)}
+				label="Total Checks"
+				value={data.rclone.stats.then((s) => s.totalChecks)}
 				right
 				class="flex-1"
 			/>
 			<StatCard
-				label="Checking"
-				value={checkingPromise.then((s) => s.length)}
+				label="Total Transfers"
+				value={data.rclone.stats.then((s) => s.totalTransfers)}
 				right
 				class="flex-1"
 			/>
