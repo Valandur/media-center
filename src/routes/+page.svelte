@@ -12,7 +12,7 @@
 	import SizeStatCard from '$lib/components/SizeStatCard.svelte';
 	import StatCard from '$lib/components/StatCard.svelte';
 	import TorrentsCard from '$lib/components/TorrentsCard.svelte';
-	import TransfersCardList from '$lib/components/TransfersCardList.svelte';
+	import TransfersCard from '$lib/components/TransfersCard.svelte';
 
 	import type { PageServerData } from './$types';
 
@@ -30,7 +30,7 @@
 	$: smartDevicesPromise = data.omv.smartDevices;
 	$: fileSystemsPromise = data.omv.fileSystems;
 	$: containersPromise = data.omv.containers;
-	$: statsProm = data.rclone.stats;
+	$: transfersPromise = data.rclone.stats.then((s) => s.transferring ?? []);
 	$: jobsPromise = data.arm.jobs;
 	$: torrentsPromise = data.transmission.torrents;
 
@@ -93,9 +93,9 @@
 	>
 		<TorrentsCard {torrentsPromise} class="col-span-4" />
 
-		<ArmJobsCardList {jobsPromise} class="row-span-2" />
+		<TransfersCard {transfersPromise} class="col-span-4" />
 
-		<TransfersCardList stats={statsProm} />
+		<ArmJobsCardList {jobsPromise} class="row-span-2" />
 	</div>
 
 	<div class="flex-grow basis-1/3 flex flex-col gap-4">

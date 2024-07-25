@@ -2,11 +2,11 @@
 	import { slide } from 'svelte/transition';
 
 	import type { Torrent } from '$lib/models/transmission';
+	import { typewriter } from '$lib/transitions/typewriter';
 	import { formatEta, formatSize, formatSpeed } from '$lib/util';
 
 	import Card from './Card.svelte';
 	import Progress from './Progress.svelte';
-	import { typewriter } from '$lib/transitions/typewriter';
 
 	export let torrentsPromise: Promise<Torrent[]>;
 
@@ -16,8 +16,8 @@
 	$: torrentsPromise, setup();
 
 	function setup() {
-		torrentsPromise.then((newContainers) => {
-			torrents = newContainers;
+		torrentsPromise.then((newTorrents) => {
+			torrents = newTorrents;
 			loading = false;
 		});
 	}
@@ -27,17 +27,27 @@
 	<svelte:fragment slot="header">Torrents</svelte:fragment>
 
 	<div class="flex flex-col">
-		<div class="grid grid-cols-[3fr_1fr_1fr_2fr_auto] items-center gap-x-4">
+		<div class="grid grid-cols-[4fr_1fr_2fr_2fr_3fr_auto] items-center gap-x-4">
 			{#if loading}
 				<div class="spinner"></div>
 			{/if}
 			{#each torrents as torrent (torrent.id)}
 				<div class="text-nowrap text-ellipsis overflow-hidden" transition:slide>
 					{torrent.name}
-					{torrent.isStalled}
-					{torrent.peersSendingToUs} / {torrent.peersConnected}
 				</div>
-				<div class="text-nowrap">
+				<div class="text-nowrap text-ellipsis overflow-hidden" transition:slide>
+					{#if torrent.isFinished || torrent.isStalled}
+						---
+					{:else}
+						{@const conns = `${torrent.peersSendingToUs} / ${torrent.peersConnected}`}
+						{#key conns}
+							<span in:typewriter>
+								{conns}
+							</span>
+						{/key}
+					{/if}
+				</div>
+				<div class="text-nowrap text-ellipsis overflow-hidden" transition:slide>
 					{#if torrent.isFinished || torrent.isStalled}
 						---
 					{:else}
@@ -49,7 +59,7 @@
 						{/key}
 					{/if}
 				</div>
-				<div class="text-nowrap">
+				<div class="text-right text-nowrap text-ellipsis overflow-hidden" transition:slide>
 					{#if torrent.isFinished || torrent.isStalled}
 						---
 					{:else}
