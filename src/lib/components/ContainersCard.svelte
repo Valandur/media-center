@@ -20,7 +20,7 @@
 	}
 </script>
 
-<Card class="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-2 {$$props.class}">
+<Card class="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-2 row-span-2 {$$props.class}">
 	<svelte:fragment slot="header">Docker Containers</svelte:fragment>
 
 	<div class="flex flex-col">

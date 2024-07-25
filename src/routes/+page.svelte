@@ -6,16 +6,16 @@
 	import { onMount } from 'svelte';
 
 	import { formatEta } from '$lib/util';
+	import ArmJobsCardList from '$lib/components/ArmJobsCardList.svelte';
 	import ContainersCard from '$lib/components/ContainersCard.svelte';
 	import FileSystemsCard from '$lib/components/FileSystemsCard.svelte';
-	import TransferCardList from '$lib/components/TransferCardList.svelte';
+	import TransfersCardList from '$lib/components/TransfersCardList.svelte';
 	import DevicesCard from '$lib/components/DevicesCard.svelte';
 	import SizeStatCard from '$lib/components/SizeStatCard.svelte';
 	import StatCard from '$lib/components/StatCard.svelte';
 	import PageTitle from '$lib/components/PageTitle.svelte';
 
 	import type { PageServerData } from './$types';
-	import Card from '$lib/components/Card.svelte';
 
 	export let data: PageServerData;
 
@@ -27,7 +27,6 @@
 	$: smartDevicesPromise = data.omv.smartDevices;
 	$: fileSystemsPromise = data.omv.fileSystems;
 	$: containersPromise = data.omv.containers;
-	$: versionProm = data.rclone.version;
 	$: statsProm = data.rclone.stats;
 	$: jobsPromise = data.arm.jobs;
 
@@ -85,17 +84,11 @@
 </PageTitle>
 
 <div class="flex-1 overflow-auto">
-	<PageTitle title="OMV" class="mb-2" />
 	<div class="grid-data mb-4">
 		<DevicesCard {devicesPromise} {smartDevicesPromise} />
 		<FileSystemsCard {fileSystemsPromise} />
 		<ContainersCard {containersPromise} />
-	</div>
 
-	<PageTitle title="rclone" class="mb-2" />
-	<div class="grid-data mb-4">
-		<StatCard label="Version" value={versionProm.then((v) => v.version)} />
-		<StatCard label="Uptime" value={statsProm.then((s) => formatUptime(s.elapsedTime))} />
 		<SizeStatCard label="Discovered Size" bytes={statsProm.then((s) => s.totalBytes)} />
 		<SizeStatCard label="Transferred Size" bytes={statsProm.then((s) => s.bytes)} />
 		<SizeStatCard label="Speed" bytes={statsProm.then((s) => s.speed)} unitSuffix="/s" />
@@ -110,21 +103,8 @@
 			class="sm:col-span-2"
 		/>
 	</div>
-	<TransferCardList stats={statsProm} />
 
-	<PageTitle title="ARM" class="mb-2" />
-	<div class="grid-data mb-4">
-		<Card>
-			{#await jobsPromise}
-				<div class="spinner"></div>
-			{:then jobs}
-				{#each jobs as job}
-					<img src={job.poster_url} alt="Poster" />
-					<div>{job.title}</div>
-					<div>{job.status}</div>
-					<div>{job.stage}</div>
-				{/each}
-			{/await}
-		</Card>
-	</div>
+	<TransfersCardList stats={statsProm} />
+
+	<ArmJobsCardList {jobsPromise} />
 </div>

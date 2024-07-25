@@ -1,6 +1,6 @@
 import { getJobList } from '$lib/server/arm';
 import { getComposeContainers, getDevices, getFileSystems, getSmartDevices } from '$lib/server/omv';
-import { coreStats, coreVersion } from '$lib/server/rclone';
+import { coreStats } from '$lib/server/rclone';
 
 import type { PageServerLoad } from './$types';
 
@@ -18,7 +18,6 @@ export const load: PageServerLoad = async ({ fetch, depends }) => {
 	const containers = getComposeContainers();
 
 	// rclone
-	const version = coreVersion(fetch);
 	const stats = coreStats(fetch).then((stats) => {
 		if (stats.transferring) {
 			for (const transfer of stats.transferring) {
@@ -44,7 +43,6 @@ export const load: PageServerLoad = async ({ fetch, depends }) => {
 			containers
 		},
 		rclone: {
-			version,
 			stats
 		},
 		arm: {
