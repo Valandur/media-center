@@ -6,6 +6,7 @@
 	export let label: string;
 	export let value: string | number | Promise<string | number>;
 	export let suffix: string | undefined = undefined;
+	export let right: boolean = false;
 
 	let timer: ReturnType<typeof setInterval> | null = null;
 	let loading = typeof value === 'object';
@@ -38,7 +39,7 @@
 </script>
 
 <Card class={$$props.class ?? ''}>
-	<div class="flex items-baseline space-x-2">
+	<div class="flex items-baseline space-x-2" class:justify-end={right}>
 		{#key val}
 			<div class="text-2xl font-semibold text-primary whitespace-pre-wrap" in:fade>
 				{#if loading}
@@ -54,5 +55,5 @@
 			<div class="text-sm">{suffix}</div>
 		{/if}
 	</div>
-	<div class="text-sm text-secondary">{label}</div>
+	<div class="text-sm text-secondary" class:text-right={right}>{label}</div>
 </Card>

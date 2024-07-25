@@ -108,9 +108,15 @@
 			<StatCard
 				label="Total Checked"
 				value={data.rclone.stats.then((s) => s.checks)}
+				right
 				class="flex-1"
 			/>
-			<StatCard label="Checking" value={checkingPromise.then((s) => s.length)} class="flex-1" />
+			<StatCard
+				label="Checking"
+				value={checkingPromise.then((s) => s.length)}
+				right
+				class="flex-1"
+			/>
 		</div>
 	</div>
 </div>
