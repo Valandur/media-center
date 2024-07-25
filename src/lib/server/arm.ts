@@ -29,9 +29,10 @@ export async function setTitle(id: string, title: Title) {
 	params.set('poster', title.Poster);
 	params.set('job_id', id);
 	const url = `${SET_TITLE_URL}?${params.toString()}`;
-	console.log(url);
 	const res = await request(url);
-	console.log(await res.text());
+	if (res.status !== 200) {
+		throw new Error('Could not set title: ' + res.status);
+	}
 }
 
 async function request(url: string, retry = true) {
