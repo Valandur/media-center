@@ -23,13 +23,11 @@
 	}
 </script>
 
-<Card
-	class="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-4 xl:col-span-6 row-span-2 {$$props.class}"
->
+<Card class={$$props.class ?? ''}>
 	<svelte:fragment slot="header">Torrents</svelte:fragment>
 
 	<div class="flex flex-col">
-		<div class="grid grid-cols-[4fr_1fr_1fr_3fr_auto] items-center gap-x-4">
+		<div class="grid grid-cols-[3fr_1fr_1fr_2fr_auto] items-center gap-x-4">
 			{#if loading}
 				<div class="spinner"></div>
 			{/if}
@@ -39,7 +37,7 @@
 					{torrent.isStalled}
 					{torrent.peersSendingToUs} / {torrent.peersConnected}
 				</div>
-				<div>
+				<div class="text-nowrap">
 					{#if torrent.isFinished || torrent.isStalled}
 						---
 					{:else}
@@ -51,7 +49,7 @@
 						{/key}
 					{/if}
 				</div>
-				<div>
+				<div class="text-nowrap">
 					{#if torrent.isFinished || torrent.isStalled}
 						---
 					{:else}
@@ -66,7 +64,7 @@
 				<div class="text-nowrap text-right" transition:slide>
 					<Progress total={1} progress={torrent.percentDone} class="w-full" />
 				</div>
-				<div>
+				<div class="text-nowrap">
 					{formatSize(torrent.sizeWhenDone)}
 				</div>
 			{/each}

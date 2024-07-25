@@ -36,7 +36,7 @@
 	}
 </script>
 
-<Card class="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-2 {$$props.class}">
+<Card class={$$props.class ?? ''}>
 	<svelte:fragment slot="header">Devices</svelte:fragment>
 
 	<div class="flex flex-col">

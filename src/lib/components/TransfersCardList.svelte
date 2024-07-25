@@ -9,6 +9,7 @@
 
 	import Card from './Card.svelte';
 	import Progress from './Progress.svelte';
+	import { typewriter } from '$lib/transitions/typewriter';
 
 	export let stats: Promise<Stats>;
 
@@ -25,44 +26,34 @@
 	}
 </script>
 
-<div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4">
-	{#if loading}
-		<div
-			style="order: 0;"
-			in:scale={{ delay: 250, duration: 200, easing: cubicInOut }}
-			out:scale={{ duration: 200, easing: cubicInOut }}
-		>
-			<Card>
-				<div class="spinner"></div>
-			</Card>
-		</div>
-	{/if}
-	{#each txs as transfer (transfer.name)}
-		{@const lastSeperator = transfer.name.lastIndexOf('/')}
-		{@const fileName = transfer.name.substring(lastSeperator + 1)}
+{#each txs as transfer (transfer.name)}
+	{@const lastSeperator = transfer.name.lastIndexOf('/')}
+	{@const fileName = transfer.name.substring(lastSeperator + 1)}
 
-		<div
-			style="order: {transfer.id};"
-			in:scale={{ delay: 250, duration: 200, easing: cubicInOut }}
-			out:scale={{ duration: 200, easing: cubicInOut }}
-			animate:flip={{ delay: 250, duration: 200, easing: cubicInOut }}
-		>
-			<Card class="w-full h-full flex flex-col justify-between">
-				<div class="flex flex-row items-center justify-between gap-x-2">
-					<h3 class="flex-1 text-primary text-xl overflow-hidden text-nowrap text-ellipsis">
-						{fileName}
-					</h3>
-					<div class="flex-shrink-0">
-						{formatSize(transfer.size)}
-					</div>
+	<div
+		class={$$props.class ?? ''}
+		style="order: {1000000 + transfer.id};"
+		in:scale={{ delay: 250, duration: 200, easing: cubicInOut }}
+		out:scale={{ duration: 200, easing: cubicInOut }}
+		animate:flip={{ delay: 250, duration: 200, easing: cubicInOut }}
+	>
+		<Card class="w-full h-full">
+			<svelte:fragment slot="header">
+				{fileName}
+			</svelte:fragment>
+
+			<div class="flex flex-col justify-between w-full h-full">
+				<div class="mb-2 text-secondary">
+					<i class="fa-solid fa-file me-2"></i>
+					{formatSize(transfer.size)}
 				</div>
 
-				<div class="mt-4 text-secondary">
+				<div class="mb-2 text-secondary">
 					<i class="fa-solid fa-hard-drive me-2"></i>
 					{transfer.srcFs}
 				</div>
 
-				<div class="text-secondary">
+				<div class="mb-2 text-secondary">
 					<i class="fa-solid fa-cloud me-2"></i>
 					{transfer.dstFs}
 				</div>
@@ -70,17 +61,24 @@
 				<div class="flex-1"></div>
 
 				{#if isInProgress(transfer)}
-					<div class="mt-8">
-						<div class="">
-							<div class="flex flex-row justify-between mb-1">
-								<div class="text-primary">{formatEta(transfer.eta)}</div>
-								<div>{formatSpeed(transfer.speedAvg)}</div>
-							</div>
-							<Progress total={transfer.size} progress={transfer.bytes} class="w-full" />
+					{@const speed = formatSpeed(transfer.speedAvg)}
+					{@const eta = formatEta(transfer.eta)}
+
+					<div class="mt-4">
+						<div class="flex flex-row justify-between mb-1">
+							{#key eta}
+								<div class="text-nowrap text-ellipsis overflow-hidden text-primary" in:typewriter>
+									{eta}
+								</div>
+							{/key}
+							{#key speed}
+								<div class="text-nowrap text-right" in:typewriter>{speed}</div>
+							{/key}
 						</div>
+						<Progress total={transfer.size} progress={transfer.bytes} class="w-full" />
 					</div>
 				{/if}
-			</Card>
-		</div>
-	{/each}
-</div>
+			</div>
+		</Card>
+	</div>
+{/each}

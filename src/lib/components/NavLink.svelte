@@ -12,7 +12,7 @@
 
 <a
 	href={path}
-	class="{isActive ? 'text-primary' : 'text-secondary'} {$$props.class} text-nowrap"
+	class="{isActive ? 'text-primary' : 'text-secondary'} {$$props.class ?? ''} text-nowrap"
 	on:click={() => dispatch('click')}
 >
 	<slot />

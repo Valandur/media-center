@@ -37,7 +37,7 @@
 	}
 </script>
 
-<Card class={$$props.class}>
+<Card class={$$props.class ?? ''}>
 	<div class="flex items-baseline space-x-2">
 		{#key val}
 			<div class="text-2xl font-semibold text-primary whitespace-pre-wrap" in:typewriter>

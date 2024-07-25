@@ -87,30 +87,36 @@
 	</button>
 </PageTitle>
 
-<div class="flex-1 overflow-auto">
-	<div class="grid-data mb-4">
-		<DevicesCard {devicesPromise} {smartDevicesPromise} />
-		<FileSystemsCard {fileSystemsPromise} />
-		<ContainersCard {containersPromise} />
+<div class="flex-1 flex flex-row gap-4 overflow-auto">
+	<div
+		class="flex-grow basis-2/3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 auto-rows-max gap-4"
+	>
+		<TorrentsCard {torrentsPromise} class="col-span-4" />
 
-		<SizeStatCard label="Discovered Size" bytes={statsProm.then((s) => s.totalBytes)} />
-		<SizeStatCard label="Transferred Size" bytes={statsProm.then((s) => s.bytes)} />
-		<SizeStatCard label="Speed" bytes={statsProm.then((s) => s.speed)} unitSuffix="/s" />
-		<StatCard label="Errors" value={statsProm.then((s) => s.errors)} />
-		<StatCard label="Checks" value={statsProm.then((s) => s.checks)} />
-		<StatCard label="Transfers" value={statsProm.then((s) => s.transfers)} />
-		<StatCard label="Deletes" value={statsProm.then((s) => s.deletes)} />
-		<StatCard label="Renames" value={statsProm.then((s) => s.renames)} />
-		<StatCard
-			label="ETA"
-			value={statsProm.then((s) => (s.transferring ? formatEta(s.eta) : '- No transfers -'))}
-			class="sm:col-span-2"
-		/>
+		<ArmJobsCardList {jobsPromise} class="row-span-2" />
 
-		<TorrentsCard {torrentsPromise} />
+		<TransfersCardList stats={statsProm} />
 	</div>
 
-	<TransfersCardList stats={statsProm} />
-
-	<ArmJobsCardList {jobsPromise} />
+	<div class="flex-grow basis-1/3 flex flex-col gap-4">
+		<ContainersCard {containersPromise} />
+		<FileSystemsCard {fileSystemsPromise} />
+		<DevicesCard {devicesPromise} {smartDevicesPromise} />
+	</div>
 </div>
+
+<!--
+<SizeStatCard label="Discovered Size" bytes={statsProm.then((s) => s.totalBytes)} />
+<SizeStatCard label="Transferred Size" bytes={statsProm.then((s) => s.bytes)} />
+<SizeStatCard label="Speed" bytes={statsProm.then((s) => s.speed)} unitSuffix="/s" />
+<StatCard label="Errors" value={statsProm.then((s) => s.errors)} />
+<StatCard label="Checks" value={statsProm.then((s) => s.checks)} />
+<StatCard label="Transfers" value={statsProm.then((s) => s.transfers)} />
+<StatCard label="Deletes" value={statsProm.then((s) => s.deletes)} />
+<StatCard label="Renames" value={statsProm.then((s) => s.renames)} />
+<StatCard
+	label="ETA"
+	value={statsProm.then((s) => (s.transferring ? formatEta(s.eta) : '- No transfers -'))}
+	class="sm:col-span-2"
+/>
+-->

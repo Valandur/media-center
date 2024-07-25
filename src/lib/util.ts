@@ -32,7 +32,7 @@ export function formatSpeed(bytesPerSecond: number, decimals = 2) {
 
 export function formatEta(seconds: number | null) {
 	return typeof seconds === 'number'
-		? seconds === 0
+		? seconds <= 5
 			? 'now'
 			: formatDistanceToNow(add(new Date(), { seconds }), { includeSeconds: true })
 		: 'unknown';
