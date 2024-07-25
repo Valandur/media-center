@@ -92,7 +92,7 @@
 	>
 		<TorrentsCard {torrentsPromise} class="col-span-4" />
 
-		<TransfersCard {transfersPromise} class="col-span-3" />
+		<TransfersCard {transfersPromise} class="col-span-4" />
 
 		<ArmJobsCardList {jobsPromise} class="row-span-2" />
 	</div>

@@ -19,14 +19,16 @@
 
 <div class="flex flex-col h-screen w-screen overflow-hidden">
 	{#if !showFullscreen}
-		<header class="flex flex-row justify-between items-center py-2 px-4">
+		<header class="flex flex-row items-center py-2 px-4">
 			<div class="font-extrabold text-primary text-xl">Media Center</div>
+
+			<div class="flex-1"></div>
 
 			<button on:click={toggleFullscreen} class="text-primary">
 				<i class="fa-solid fa-expand"></i>
 			</button>
 
-			<button on:click={toggleMenu} class="text-primary lg:hidden">
+			<button on:click={toggleMenu} class="text-primary ms-4 lg:hidden">
 				<i class="fa-solid fa-bars fa-lg transition-transform" class:rotate-90={showMenu}></i>
 			</button>
 		</header>

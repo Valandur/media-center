@@ -8,7 +8,7 @@ import type { PageServerLoad } from './$types';
 let index = 0;
 const map: Map<string, number> = new Map();
 
-export const load: PageServerLoad = async ({ fetch, depends }) => {
+export const load: PageServerLoad = async ({ depends }) => {
 	depends('mc:stats');
 
 	// OMV
@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ fetch, depends }) => {
 	const containers = getComposeContainers();
 
 	// rclone
-	const stats = coreStats(fetch).then((stats) => {
+	const stats = coreStats().then((stats) => {
 		if (stats.transferring) {
 			for (const transfer of stats.transferring) {
 				let id = map.get(transfer.name);
@@ -37,7 +37,7 @@ export const load: PageServerLoad = async ({ fetch, depends }) => {
 	const jobs = getJobList();
 
 	// Transmission
-	const torrents = getTorrents(fetch);
+	const torrents = getTorrents();
 
 	return {
 		omv: {

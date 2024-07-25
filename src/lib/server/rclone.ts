@@ -7,13 +7,11 @@ import type { Stats } from '$lib/models/stats';
 import type { CompletedTransfer } from '$lib/models/transfer';
 import type { Version } from '$lib/models/version';
 
-type Fetch = typeof fetch;
-
 const AUTH = btoa(`${env.RCLONE_USERNAME}:${env.RCLONE_PASSWORD}`);
 const HEADERS = { Authorization: `Basic ${AUTH}`, 'content-type': 'application/json' };
 
 let version: Version | null = null;
-export async function coreVersion(fetch: Fetch): Promise<Version> {
+export async function coreVersion(): Promise<Version> {
 	if (version) {
 		return version;
 	}
@@ -28,7 +26,7 @@ export async function coreVersion(fetch: Fetch): Promise<Version> {
 	return newVersion;
 }
 
-export async function coreStats(fetch: Fetch): Promise<Stats> {
+export async function coreStats(): Promise<Stats> {
 	const res = await fetch(`${env.RCLONE_URL}/core/stats`, {
 		method: 'POST',
 		headers: HEADERS,
@@ -38,7 +36,7 @@ export async function coreStats(fetch: Fetch): Promise<Stats> {
 	return data;
 }
 
-export async function coreTransferred(fetch: Fetch): Promise<CompletedTransfer[]> {
+export async function coreTransferred(): Promise<CompletedTransfer[]> {
 	const res = await fetch(`${env.RCLONE_URL}/core/transferred`, {
 		method: 'POST',
 		headers: HEADERS,
@@ -48,7 +46,7 @@ export async function coreTransferred(fetch: Fetch): Promise<CompletedTransfer[]
 	return data.transferred;
 }
 
-export async function jobList(fetch: Fetch): Promise<number[]> {
+export async function jobList(): Promise<number[]> {
 	const res = await fetch(`${env.RCLONE_URL}/job/list`, {
 		method: 'POST',
 		headers: HEADERS,
@@ -58,7 +56,7 @@ export async function jobList(fetch: Fetch): Promise<number[]> {
 	return data.jobids;
 }
 
-export async function jobStatus(fetch: Fetch, jobId: number): Promise<unknown[]> {
+export async function jobStatus(jobId: number): Promise<unknown[]> {
 	const res = await fetch(`${env.RCLONE_URL}/job/status`, {
 		method: 'POST',
 		headers: HEADERS,
@@ -68,7 +66,7 @@ export async function jobStatus(fetch: Fetch, jobId: number): Promise<unknown[]>
 	return data;
 }
 
-export async function configListRemotes(fetch: Fetch): Promise<string[]> {
+export async function configListRemotes(): Promise<string[]> {
 	const res = await fetch(`${env.RCLONE_URL}/config/listremotes`, {
 		method: 'POST',
 		headers: HEADERS,
@@ -78,7 +76,7 @@ export async function configListRemotes(fetch: Fetch): Promise<string[]> {
 	return data.remotes;
 }
 
-export async function opFsInfo(fetch: Fetch, fs: string): Promise<FsInfo> {
+export async function opFsInfo(fs: string): Promise<FsInfo> {
 	const res = await fetch(`${env.RCLONE_URL}/operations/fsinfo`, {
 		method: 'POST',
 		headers: HEADERS,
@@ -91,7 +89,7 @@ export async function opFsInfo(fetch: Fetch, fs: string): Promise<FsInfo> {
 	return data;
 }
 
-export async function opAbout(fetch: Fetch, fs: string): Promise<About> {
+export async function opAbout(fs: string): Promise<About> {
 	const res = await fetch(`${env.RCLONE_URL}/operations/about`, {
 		method: 'POST',
 		headers: HEADERS,
@@ -105,7 +103,6 @@ export async function opAbout(fetch: Fetch, fs: string): Promise<About> {
 }
 
 export async function opList(
-	fetch: Fetch,
 	fs: string,
 	dir: string,
 	options?: { recurse?: boolean; dirsOnly?: boolean; filesOnly?: boolean }

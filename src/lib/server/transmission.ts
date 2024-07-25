@@ -1,12 +1,10 @@
 import { env } from '$env/dynamic/private';
 import type { Torrent } from '$lib/models/transmission';
 
-type Fetch = typeof fetch;
-
 let sessionId = '';
 
-export async function getTorrents(fetch: Fetch): Promise<Torrent[]> {
-	const res = await request(fetch, {
+export async function getTorrents(): Promise<Torrent[]> {
+	const res = await request({
 		arguments: {
 			fields: [
 				'id',
@@ -27,7 +25,7 @@ export async function getTorrents(fetch: Fetch): Promise<Torrent[]> {
 	return res.arguments.torrents;
 }
 
-async function request(fetch: Fetch, body: Record<string, unknown>, retry = true) {
+async function request(body: Record<string, unknown>, retry = true) {
 	const res = await fetch(env.TRANSMISSION_URL, {
 		method: 'POST',
 		headers: {
@@ -38,7 +36,7 @@ async function request(fetch: Fetch, body: Record<string, unknown>, retry = true
 	});
 	if (res.status === 409 && retry) {
 		sessionId = res.headers.get('x-transmission-session-id') ?? '';
-		return request(fetch, body, false);
+		return request(body, false);
 	}
 	if (res.status !== 200) {
 		throw new Error('Invalid transmission response: ' + res.status);

@@ -13,6 +13,6 @@ export const GET: RequestHandler = async ({ params, url }) => {
 		error(400, 'Invalid path');
 	}
 
-	const dirs = await opList(fetch, remote, path, { dirsOnly: true });
+	const dirs = await opList(remote, path, { dirsOnly: true });
 	return json(dirs.map(formatNode));
 };

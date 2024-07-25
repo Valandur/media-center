@@ -3,9 +3,11 @@ import { CookieJar } from 'tough-cookie';
 import { env } from '$env/dynamic/private';
 
 import type { ArmJob, ArmResult } from '$lib/models/arm';
+import type { Title } from '$lib/models/title';
 
 const LOGIN_URL = `${env.ARM_URL}/login`;
 const JOB_LIST_URL = `${env.ARM_URL}/json?mode=joblist`;
+const SET_TITLE_URL = `${env.ARM_URL}/updatetitle?`;
 const CSRF_REGEX = /name="csrf_token" type="hidden" value="(.*?)"/i;
 
 const cookieJar = new CookieJar();
@@ -16,6 +18,18 @@ export async function getJobList(): Promise<ArmJob[]> {
 	const data: ArmResult = await res.json();
 	const jobs = Object.keys(data.results).map((key) => data.results[key]);
 	return jobs;
+}
+
+export async function setTitle(id: string, title: Title) {
+	const params = new URLSearchParams();
+	params.set('title', title.Title);
+	params.set('year', title.Year);
+	params.set('imdbID', title.imdbID);
+	params.set('type', title.Type);
+	params.set('poster', title.Poster);
+	params.set('job_id', id);
+	const url = `${SET_TITLE_URL}?${params.toString()}}`;
+	await request(url);
 }
 
 async function request(url: string, retry = true) {
@@ -118,3 +132,5 @@ async function auth() {
 // 	"method": "GET",
 // 	"mode": "cors"
 // });
+
+// updatetitle?title=7th Heaven&year=1996–2007&imdbID=tt0115083&type=series&poster=https://m.media-amazon.com/images/M/MV5BZGEzZDJiYjUtMjU3Yy00YjBmLWE4OWQtYjM4ZDhlZTg3Zjk0XkEyXkFqcGdeQXVyNjU2NjA5NjM@._V1_SX300.jpg&job_id=20

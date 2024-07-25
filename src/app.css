@@ -61,7 +61,7 @@
 
 @layer components {
 	.btn {
-		@apply rounded-lg px-4 py-3 text-primary;
+		@apply rounded-lg px-4 py-2 text-primary;
 	}
 	.btn-primary {
 		@apply bg-accent;
@@ -90,5 +90,9 @@
 
 	.badge {
 		@apply rounded-md text-primary text-xs px-1;
+	}
+
+	.input {
+		@apply appearance-none bg-[transparent] border border-secondary/30 rounded py-2 px-3;
 	}
 }
