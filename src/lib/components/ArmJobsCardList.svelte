@@ -44,25 +44,26 @@
 </script>
 
 {#each jobs as job (job.job_id)}
-	<button
+	<div
 		class={$$props.class ?? ''}
 		style="order: {job.job_id};"
 		in:scale={{ delay: 250, duration: 200, easing: cubicInOut }}
 		out:scale={{ duration: 200, easing: cubicInOut }}
 		animate:flip={{ delay: 250, duration: 200, easing: cubicInOut }}
-		on:click={() => (selectedId = job.job_id)}
 	>
 		<Card>
 			<svelte:fragment slot="header">
 				ARM - {job.title}
 			</svelte:fragment>
-			<img src={job.poster_url} alt="Poster" class="mb-2" />
+			<button on:click={() => (selectedId = job.job_id)} class="mb-2">
+				<img src={job.poster_url} alt="Poster" />
+			</button>
 			<div>{job.stage}</div>
 			<div>
 				<Progress total={100} progress={Number(job.progress_round)} />
 			</div>
 		</Card>
-	</button>
+	</div>
 {/each}
 
 {#if selectedId}

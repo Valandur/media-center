@@ -4,7 +4,7 @@
 <div class="relative flex flex-col {$$props.class ?? ''}">
 	{#if $$slots.header}
 		<div
-			class="text-primary bg-primary/5 border-b border-primary/30 py-2 px-4 text-nowrap text-ellipsis overflow-hidden"
+			class="text-primary uppercase font-bold bg-primary/5 border-b border-primary/30 py-2 px-4 text-nowrap text-ellipsis overflow-hidden"
 		>
 			<slot name="header" />
 		</div>
