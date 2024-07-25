@@ -45,3 +45,76 @@ async function auth() {
 
 	await fetchWithCookies(LOGIN_URL, { method: 'POST', body: form });
 }
+
+// Title search
+// await fetch("https://arm.home/titlesearch?csrf_token=ImIyZjA5MzNlZDIxNmIzY2E1YzJlMDhjYzA4YTE0NWQxZDUyMmZkYjYi.ZqJsbA.m0rgtfG85OT1uSEgW-_4SUiDBUg&title=7th+heaven&year=1978%E2%80%93&save=save&job_id=19", {
+// 	"credentials": "include",
+// 	"headers": {
+// 			"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:128.0) Gecko/20100101 Firefox/128.0",
+// 			"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/png,image/svg+xml,*/*;q=0.8",
+// 			"Accept-Language": "en,en-US;q=0.7,de;q=0.3",
+// 			"Upgrade-Insecure-Requests": "1",
+// 			"Sec-Fetch-Dest": "document",
+// 			"Sec-Fetch-Mode": "navigate",
+// 			"Sec-Fetch-Site": "same-origin",
+// 			"Sec-Fetch-User": "?1",
+// 			"Priority": "u=0, i"
+// 	},
+// 	"referrer": "https://arm.home/titlesearch?job_id=19",
+// 	"method": "GET",
+// 	"mode": "cors"
+// });
+
+// await fetch("https://arm.home/list_titles?title=7th+heaven&year=1978%E2%80%93&job_id=19", {
+// 	"credentials": "include",
+// 	"headers": {
+// 			"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:128.0) Gecko/20100101 Firefox/128.0",
+// 			"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/png,image/svg+xml,*/*;q=0.8",
+// 			"Accept-Language": "en,en-US;q=0.7,de;q=0.3",
+// 			"Upgrade-Insecure-Requests": "1",
+// 			"Sec-Fetch-Dest": "document",
+// 			"Sec-Fetch-Mode": "navigate",
+// 			"Sec-Fetch-Site": "same-origin",
+// 			"Sec-Fetch-User": "?1",
+// 			"Priority": "u=0, i"
+// 	},
+// 	"referrer": "https://arm.home/titlesearch?job_id=19",
+// 	"method": "GET",
+// 	"mode": "cors"
+// });
+
+// await fetch("https://arm.home/gettitle?imdbID=tt0115083&job_id=19", {
+// 	"credentials": "include",
+// 	"headers": {
+// 			"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:128.0) Gecko/20100101 Firefox/128.0",
+// 			"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/png,image/svg+xml,*/*;q=0.8",
+// 			"Accept-Language": "en,en-US;q=0.7,de;q=0.3",
+// 			"Upgrade-Insecure-Requests": "1",
+// 			"Sec-Fetch-Dest": "document",
+// 			"Sec-Fetch-Mode": "navigate",
+// 			"Sec-Fetch-Site": "same-origin",
+// 			"Sec-Fetch-User": "?1",
+// 			"Priority": "u=0, i"
+// 	},
+// 	"referrer": "https://arm.home/list_titles?title=7th+heaven&year=1978%E2%80%93&job_id=19",
+// 	"method": "GET",
+// 	"mode": "cors"
+// });
+
+// await fetch("https://arm.home/updatetitle?title=7th%20Heaven&year=1996%E2%80%932007&imdbID=tt0115083&type=series&poster=https://m.media-amazon.com/images/M/MV5BZGEzZDJiYjUtMjU3Yy00YjBmLWE4OWQtYjM4ZDhlZTg3Zjk0XkEyXkFqcGdeQXVyNjU2NjA5NjM@._V1_SX300.jpg&job_id=19", {
+// 	"credentials": "include",
+// 	"headers": {
+// 			"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:128.0) Gecko/20100101 Firefox/128.0",
+// 			"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/png,image/svg+xml,*/*;q=0.8",
+// 			"Accept-Language": "en,en-US;q=0.7,de;q=0.3",
+// 			"Upgrade-Insecure-Requests": "1",
+// 			"Sec-Fetch-Dest": "document",
+// 			"Sec-Fetch-Mode": "navigate",
+// 			"Sec-Fetch-Site": "same-origin",
+// 			"Sec-Fetch-User": "?1",
+// 			"Priority": "u=0, i"
+// 	},
+// 	"referrer": "https://arm.home/gettitle?imdbID=tt0115083&job_id=19",
+// 	"method": "GET",
+// 	"mode": "cors"
+// });

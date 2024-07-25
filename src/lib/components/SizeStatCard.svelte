@@ -18,4 +18,4 @@
 			: getSize(bytes)[0];
 </script>
 
-<StatCard {label} value={size} suffix="{unit}{unitSuffix}" />
+<StatCard {label} value={size} suffix="{unit}{unitSuffix}" class={$$props.class ?? ''} />

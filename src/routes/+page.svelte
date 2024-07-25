@@ -10,6 +10,7 @@
 	import PageTitle from '$lib/components/PageTitle.svelte';
 	import TorrentsCard from '$lib/components/TorrentsCard.svelte';
 	import TransfersCard from '$lib/components/TransfersCard.svelte';
+	import StatCard from '$lib/components/StatCard.svelte';
 
 	import type { PageServerData } from './$types';
 
@@ -28,6 +29,7 @@
 	$: fileSystemsPromise = data.omv.fileSystems;
 	$: containersPromise = data.omv.containers;
 	$: transfersPromise = data.rclone.stats.then((s) => s.transferring ?? []);
+	$: checkingPromise = data.rclone.stats.then((s) => s.checking ?? []);
 	$: jobsPromise = data.arm.jobs;
 	$: torrentsPromise = data.transmission.torrents;
 
@@ -97,8 +99,19 @@
 
 	<div class="flex-grow basis-1/3 flex flex-col gap-4">
 		<ContainersCard {containersPromise} />
+
 		<FileSystemsCard {fileSystemsPromise} />
+
 		<DevicesCard {devicesPromise} {smartDevicesPromise} />
+
+		<div class="flex flex-row gap-4">
+			<StatCard
+				label="Total Checked"
+				value={data.rclone.stats.then((s) => s.checks)}
+				class="flex-1"
+			/>
+			<StatCard label="Checking" value={checkingPromise.then((s) => s.length)} class="flex-1" />
+		</div>
 	</div>
 </div>
 

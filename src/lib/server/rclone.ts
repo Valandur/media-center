@@ -34,7 +34,8 @@ export async function coreStats(fetch: Fetch): Promise<Stats> {
 		headers: HEADERS,
 		body: JSON.stringify({})
 	});
-	return res.json();
+	const data = await res.json();
+	return data;
 }
 
 export async function coreTransferred(fetch: Fetch): Promise<CompletedTransfer[]> {
