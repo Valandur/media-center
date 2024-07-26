@@ -30,7 +30,7 @@
 
 {#if error}
 	<Card>
-		<svelte:fragment slot="header">Error</svelte:fragment>
+		<svelte:fragment slot="header">Transfers Error</svelte:fragment>
 		{error}
 	</Card>
 {/if}

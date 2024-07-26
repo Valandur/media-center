@@ -49,7 +49,7 @@
 
 {#if devError}
 	<Card>
-		<svelte:fragment slot="header">Device Error</svelte:fragment>
+		<svelte:fragment slot="header">Devices Error</svelte:fragment>
 		{devError}
 	</Card>
 {/if}

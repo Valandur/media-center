@@ -28,7 +28,7 @@
 
 {#if error}
 	<Card>
-		<svelte:fragment slot="header">Error</svelte:fragment>
+		<svelte:fragment slot="header">Containers Error</svelte:fragment>
 		{error}
 	</Card>
 {/if}
