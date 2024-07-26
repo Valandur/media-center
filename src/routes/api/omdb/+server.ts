@@ -1,6 +1,6 @@
 import { error, json } from '@sveltejs/kit';
 
-import { search } from '$lib/server/omdb';
+import { omdb } from '$lib/server/omdb';
 
 import type { RequestHandler } from './$types';
 
@@ -12,6 +12,6 @@ export const POST: RequestHandler = async ({ request }) => {
 		error(400, 'Invalid title');
 	}
 
-	const titles = await search(title);
+	const titles = await omdb.search(title);
 	return json(titles);
 };

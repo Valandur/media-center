@@ -14,6 +14,8 @@
 
 	import type { PageServerData } from './$types';
 
+	const AUTO_REFRESH_INTERVAL = 5000;
+
 	export let data: PageServerData;
 
 	let autoRefresh = browser
@@ -57,7 +59,7 @@
 			timer = null;
 		}
 		if (autoRefresh) {
-			timer = setInterval(refresh, 2000);
+			timer = setInterval(refresh, AUTO_REFRESH_INTERVAL);
 		}
 	}
 

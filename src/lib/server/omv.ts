@@ -10,155 +10,175 @@ import type { Device } from '$lib/models/device';
 import type { Output } from '$lib/models/output';
 import type { ZfsPool } from '$lib/models/zfs';
 
-const cookieJar = new CookieJar();
-const fetchWithCookies = makeFetchCookie(fetch, cookieJar);
+import { Service } from './service';
 
-let devUpdate = new Date(0);
-let devCache: Device[] = [];
-export async function getDevices(): Promise<Device[]> {
-	if (devCache && differenceInSeconds(new Date(), devUpdate) < 60) {
-		return devCache;
+const OUTPUT_CHECK_INTERVAL = 1000;
+
+class OMV extends Service {
+	private cookieJar = new CookieJar();
+	private fetch = makeFetchCookie(fetch, this.cookieJar);
+
+	private devUpdate = new Date(0);
+	private devCache: Device[] = [];
+
+	private authPending = false;
+	private authCallbacks: Set<[() => void, (err: Error) => void]> = new Set();
+
+	public constructor() {
+		super('OMV');
 	}
 
-	const res = await request<Device[]>({
-		service: 'DiskMgmt',
-		method: 'enumerateDevices',
-		params: { start: 0, limit: -1 }
-	});
-	devCache = res;
-	devUpdate = new Date();
-	return devCache;
-}
+	public async getDevices(): Promise<Device[]> {
+		if (this.devCache && differenceInSeconds(new Date(), this.devUpdate) < 60) {
+			return this.devCache;
+		}
 
-export async function getSmartDevices(): Promise<SmartDevice[]> {
-	const res = await requestAsync<{ data: SmartDevice[] }>({
-		service: 'Smart',
-		method: 'getListBg',
-		params: { start: 0, limit: -1 }
-	});
-	return res.data;
-}
+		const res = await this.request<Device[]>('DiskMgmt', 'enumerateDevices', {
+			start: 0,
+			limit: -1
+		});
+		this.devCache = res;
+		this.devUpdate = new Date();
+		return this.devCache;
+	}
 
-export async function getFileSystems(): Promise<FileSystem[]> {
-	const res = await requestAsync<{ data: FileSystem[] }>({
-		service: 'FileSystemMgmt',
-		method: 'getListBg',
-		params: { start: 0, limit: -1 }
-	});
-	return res.data;
-}
+	public async getSmartDevices(): Promise<SmartDevice[]> {
+		const res = await this.requestAsync<{ data: SmartDevice[] }>('Smart', 'getListBg', {
+			start: 0,
+			limit: -1
+		});
+		return res.data;
+	}
 
-export async function getComposeContainers(): Promise<Container[]> {
-	const res = await request<Container[]>({
-		service: 'Compose',
-		method: 'getContainers'
-	});
-	return res;
-}
+	public async getFileSystems(): Promise<FileSystem[]> {
+		const res = await this.requestAsync<{ data: FileSystem[] }>('FileSystemMgmt', 'getListBg', {
+			start: 0,
+			limit: -1
+		});
+		return res.data;
+	}
 
-export async function getZfsPools(): Promise<ZfsPool[]> {
-	const res = await requestAsync<{ data: ZfsPool[] }>({
-		service: 'Zfs',
-		method: 'listPoolsBg',
-		params: { start: 0, limit: -1 }
-	});
-	return res.data;
-}
+	public async getComposeContainers(): Promise<Container[]> {
+		const res = await this.request<Container[]>('Compose', 'getContainers');
+		return res;
+	}
 
-async function request<T>(body: Record<string, unknown>, retry = true): Promise<T> {
-	const res = await fetchWithCookies(env.OMV_RPC, {
-		method: 'POST',
-		headers: { 'content-type': 'application/json' },
-		body: JSON.stringify(body),
-		credentials: 'include'
-	});
+	public async getZfsPools(): Promise<ZfsPool[]> {
+		const res = await this.requestAsync<{ data: ZfsPool[] }>('Zfs', 'listPoolsBg', {
+			start: 0,
+			limit: -1
+		});
+		return res.data;
+	}
 
-	const wrapper = await res.json();
+	private async request<T>(
+		service: string,
+		method: string,
+		params?: Record<string, unknown>,
+		retry = true
+	): Promise<T> {
+		let status = 0;
+		const url = env.OMV_RPC;
 
-	if ('error' in wrapper && wrapper.error) {
-		if (typeof wrapper.error === 'object' && 'message' in wrapper.error) {
-			if (wrapper.error.message === 'Session not authenticated.' && retry) {
-				await auth();
-				return request(body, false);
-			} else {
-				console.error(wrapper.error.message);
-				throw new Error(wrapper.error.message);
+		try {
+			const res = await this.fetch(url, {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({
+					service,
+					method,
+					params
+				}),
+				credentials: 'include'
+			});
+			status = res.status;
+
+			const wrapper = await res.json();
+
+			if ('error' in wrapper && wrapper.error) {
+				if (typeof wrapper.error === 'object' && 'message' in wrapper.error) {
+					if (wrapper.error.message === 'Session not authenticated.' && retry) {
+						await this.auth();
+						return this.request(service, method, params, false);
+					} else {
+						console.error(wrapper.error.message);
+						throw new Error(wrapper.error.message);
+					}
+				}
+				console.error(wrapper.error);
+				throw new Error(JSON.stringify(wrapper.error));
+			}
+
+			if (!('response' in wrapper)) {
+				console.error(wrapper);
+				throw new Error('Missing response!');
+			}
+
+			return wrapper.response;
+		} finally {
+			this.logger.debug('GET', url, service, method, status);
+		}
+	}
+
+	private async requestAsync<T>(service: string, method: string, params?: Record<string, unknown>) {
+		const filename = await this.request<string>(service, method, params);
+		const res = await this.waitForOutput<T>(filename);
+		return res;
+	}
+
+	private async waitForOutput<T>(filename: string): Promise<T> {
+		let output: T | null = null;
+		let i = 0;
+		while (output === null) {
+			await new Promise((resolve) => setTimeout(resolve, OUTPUT_CHECK_INTERVAL));
+			const res = await this.request<Output>('Exec', 'getOutput', { filename, pos: 0 });
+			if (!res.running && !res.pendingOutput) {
+				output = JSON.parse(res.output);
+				break;
+			}
+			i++;
+			if (i >= 10) {
+				throw new Error('Timed out waiting for output result');
 			}
 		}
-		console.error(wrapper.error);
-		throw new Error(JSON.stringify(wrapper.error));
-	}
-
-	if (!('response' in wrapper)) {
-		console.error(wrapper);
-		throw new Error('Missing response!');
-	}
-
-	return wrapper.response;
-}
-
-async function requestAsync<T>(body: Record<string, unknown>) {
-	const filename = await request<string>(body);
-	const res = await waitForOutput<T>(filename);
-	return res;
-}
-
-async function waitForOutput<T>(filename: string): Promise<T> {
-	let output: T | null = null;
-	let i = 0;
-	while (output === null) {
-		await new Promise((resolve) => setTimeout(resolve, 1000));
-		const res = await request<Output>({
-			service: 'Exec',
-			method: 'getOutput',
-			params: { filename, pos: 0 }
-		});
-		if (!res.running && !res.pendingOutput) {
-			output = JSON.parse(res.output);
-			break;
+		if (output === null) {
+			throw new Error('Could not get output');
 		}
-		i++;
-		if (i >= 10) {
-			throw new Error('Timed out waiting for output result');
+		return output;
+	}
+
+	private async auth() {
+		if (this.authPending) {
+			return new Promise<void>((resolve, reject) => {
+				this.authCallbacks.add([resolve, reject]);
+			});
 		}
-	}
-	if (output === null) {
-		throw new Error('Could not get output');
-	}
-	return output;
-}
 
-let authPending = false;
-const authCallbacks: Set<[() => void, (err: Error) => void]> = new Set();
-async function auth() {
-	if (authPending) {
-		return new Promise<void>((resolve, reject) => {
-			authCallbacks.add([resolve, reject]);
+		this.authPending = true;
+		const res = await this.fetch(env.OMV_RPC, {
+			method: 'POST',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify({
+				service: 'Session',
+				method: 'login',
+				params: { username: env.OMV_USERNAME, password: env.OMV_PASSWORD }
+			}),
+			credentials: 'include'
 		});
+		const wrapper = await res.json();
+
+		if ('error' in wrapper && wrapper.error) {
+			const err = new Error('Could not authenticate: ' + JSON.stringify(wrapper.error));
+			this.authPending = false;
+			this.authCallbacks.forEach(([, reject]) => reject(err));
+			this.authCallbacks.clear();
+			throw err;
+		}
+
+		this.authPending = false;
+		this.authCallbacks.forEach(([resolve]) => resolve());
+		this.authCallbacks.clear();
 	}
-
-	authPending = true;
-	const res = await fetchWithCookies(env.OMV_RPC, {
-		method: 'POST',
-		headers: { 'content-type': 'application/json' },
-		body: JSON.stringify({
-			service: 'Session',
-			method: 'login',
-			params: { username: env.OMV_USERNAME, password: env.OMV_PASSWORD }
-		}),
-		credentials: 'include'
-	});
-	const wrapper = await res.json();
-
-	if ('error' in wrapper && wrapper.error) {
-		const err = new Error('Could not authenticate: ' + JSON.stringify(wrapper.error));
-		authPending = false;
-		authCallbacks.forEach(([, reject]) => reject(err));
-		authCallbacks.clear();
-		throw err;
-	}
-
-	authPending = false;
-	authCallbacks.forEach(([resolve]) => resolve());
-	authCallbacks.clear();
 }
+
+export const omv = new OMV();

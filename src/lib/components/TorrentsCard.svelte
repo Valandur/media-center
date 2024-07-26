@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fade, slide } from 'svelte/transition';
 
-	import type { Torrent } from '$lib/models/transmission';
+	import type { Torrent } from '$lib/models/torrent';
 	import { formatEta, formatSize, formatSpeed } from '$lib/util';
 
 	import Card from './Card.svelte';

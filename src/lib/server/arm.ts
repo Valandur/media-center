@@ -5,135 +5,81 @@ import { env } from '$env/dynamic/private';
 import type { ArmJob, ArmResult } from '$lib/models/arm';
 import type { Title } from '$lib/models/title';
 
+import { Service } from './service';
+
 const LOGIN_URL = `${env.ARM_URL}/login`;
 const JOB_LIST_URL = `${env.ARM_URL}/json?mode=joblist`;
 const SET_TITLE_URL = `${env.ARM_URL}/updatetitle`;
 const CSRF_REGEX = /name="csrf_token" type="hidden" value="(.*?)"/i;
 
-const cookieJar = new CookieJar();
-const fetchWithCookies = makeFetchCookie(fetch, cookieJar);
+class ARM extends Service {
+	private readonly cookieJar = new CookieJar();
+	private readonly fetch = makeFetchCookie(fetch, this.cookieJar);
 
-export async function getJobList(): Promise<ArmJob[]> {
-	const res = await request(JOB_LIST_URL);
-	const data: ArmResult = await res.json();
-	const jobs = Object.keys(data.results).map((key) => data.results[key]);
-	return jobs;
-}
+	public constructor() {
+		super('ARM');
+	}
 
-export async function setTitle(id: string, title: Title) {
-	const params = new URLSearchParams();
-	params.set('title', title.Title);
-	params.set('year', title.Year);
-	params.set('imdbID', title.imdbID);
-	params.set('type', title.Type);
-	params.set('poster', title.Poster);
-	params.set('job_id', id);
-	const url = `${SET_TITLE_URL}?${params.toString()}`;
-	const res = await request(url);
-	if (res.status !== 200) {
-		throw new Error('Could not set title: ' + res.status);
+	public async getJobList(): Promise<ArmJob[]> {
+		const res = await this.request(JOB_LIST_URL);
+		const data: ArmResult = await res.json();
+		const jobs = Object.keys(data.results).map((key) => data.results[key]);
+		return jobs;
+	}
+
+	public async setTitle(id: string, title: Title) {
+		const params = new URLSearchParams();
+		params.set('title', title.Title);
+		params.set('year', title.Year);
+		params.set('imdbID', title.imdbID);
+		params.set('type', title.Type);
+		params.set('poster', title.Poster);
+		params.set('job_id', id);
+		const url = `${SET_TITLE_URL}?${params.toString()}`;
+		const res = await this.request(url);
+		if (res.status !== 200) {
+			throw new Error('Could not set title: ' + res.status);
+		}
+	}
+
+	private async request(url: string, retry = true): Promise<Response> {
+		let status = 0;
+
+		try {
+			const res = await this.fetch(url);
+			status = res.status;
+
+			if (res.redirected && res.url.endsWith('/login') && retry) {
+				await this.auth();
+				return this.request(url, false);
+			}
+			return res;
+		} finally {
+			this.logger.debug('GET', url, status);
+		}
+	}
+
+	private async auth() {
+		const tokenRes = await this.fetch(LOGIN_URL);
+		const tokenText = await tokenRes.text();
+		const tokenMatch = CSRF_REGEX.exec(tokenText);
+		if (!tokenMatch) {
+			throw new Error('Could not find CSRF token');
+		}
+
+		const token = tokenMatch[1];
+
+		const form = new FormData();
+		form.set('username', env.ARM_USERNAME);
+		form.set('password', env.ARM_PASSWORD);
+		form.set('save', 'save');
+		form.set('csrf_token', token);
+
+		const res = await this.fetch(LOGIN_URL, { method: 'POST', body: form });
+		if (res.status !== 200) {
+			throw new Error('Authentication not successfull: ' + res.status);
+		}
 	}
 }
 
-async function request(url: string, retry = true) {
-	const res = await fetchWithCookies(url);
-	if (res.redirected && res.url.endsWith('/login') && retry) {
-		await auth();
-		return request(url, false);
-	}
-	return res;
-}
-
-async function auth() {
-	const tokenRes = await fetchWithCookies(LOGIN_URL);
-	const tokenText = await tokenRes.text();
-	const tokenMatch = CSRF_REGEX.exec(tokenText);
-	if (!tokenMatch) {
-		throw new Error('Could not find CSRF token');
-	}
-
-	const token = tokenMatch[1];
-
-	const form = new FormData();
-	form.set('username', env.ARM_USERNAME);
-	form.set('password', env.ARM_PASSWORD);
-	form.set('save', 'save');
-	form.set('csrf_token', token);
-
-	await fetchWithCookies(LOGIN_URL, { method: 'POST', body: form });
-}
-
-// Title search
-// await fetch("https://arm.home/titlesearch?csrf_token=ImIyZjA5MzNlZDIxNmIzY2E1YzJlMDhjYzA4YTE0NWQxZDUyMmZkYjYi.ZqJsbA.m0rgtfG85OT1uSEgW-_4SUiDBUg&title=7th+heaven&year=1978%E2%80%93&save=save&job_id=19", {
-// 	"credentials": "include",
-// 	"headers": {
-// 			"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:128.0) Gecko/20100101 Firefox/128.0",
-// 			"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/png,image/svg+xml,*/*;q=0.8",
-// 			"Accept-Language": "en,en-US;q=0.7,de;q=0.3",
-// 			"Upgrade-Insecure-Requests": "1",
-// 			"Sec-Fetch-Dest": "document",
-// 			"Sec-Fetch-Mode": "navigate",
-// 			"Sec-Fetch-Site": "same-origin",
-// 			"Sec-Fetch-User": "?1",
-// 			"Priority": "u=0, i"
-// 	},
-// 	"referrer": "https://arm.home/titlesearch?job_id=19",
-// 	"method": "GET",
-// 	"mode": "cors"
-// });
-
-// await fetch("https://arm.home/list_titles?title=7th+heaven&year=1978%E2%80%93&job_id=19", {
-// 	"credentials": "include",
-// 	"headers": {
-// 			"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:128.0) Gecko/20100101 Firefox/128.0",
-// 			"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/png,image/svg+xml,*/*;q=0.8",
-// 			"Accept-Language": "en,en-US;q=0.7,de;q=0.3",
-// 			"Upgrade-Insecure-Requests": "1",
-// 			"Sec-Fetch-Dest": "document",
-// 			"Sec-Fetch-Mode": "navigate",
-// 			"Sec-Fetch-Site": "same-origin",
-// 			"Sec-Fetch-User": "?1",
-// 			"Priority": "u=0, i"
-// 	},
-// 	"referrer": "https://arm.home/titlesearch?job_id=19",
-// 	"method": "GET",
-// 	"mode": "cors"
-// });
-
-// await fetch("https://arm.home/gettitle?imdbID=tt0115083&job_id=19", {
-// 	"credentials": "include",
-// 	"headers": {
-// 			"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:128.0) Gecko/20100101 Firefox/128.0",
-// 			"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/png,image/svg+xml,*/*;q=0.8",
-// 			"Accept-Language": "en,en-US;q=0.7,de;q=0.3",
-// 			"Upgrade-Insecure-Requests": "1",
-// 			"Sec-Fetch-Dest": "document",
-// 			"Sec-Fetch-Mode": "navigate",
-// 			"Sec-Fetch-Site": "same-origin",
-// 			"Sec-Fetch-User": "?1",
-// 			"Priority": "u=0, i"
-// 	},
-// 	"referrer": "https://arm.home/list_titles?title=7th+heaven&year=1978%E2%80%93&job_id=19",
-// 	"method": "GET",
-// 	"mode": "cors"
-// });
-
-// await fetch("https://arm.home/updatetitle?title=7th%20Heaven&year=1996%E2%80%932007&imdbID=tt0115083&type=series&poster=https://m.media-amazon.com/images/M/MV5BZGEzZDJiYjUtMjU3Yy00YjBmLWE4OWQtYjM4ZDhlZTg3Zjk0XkEyXkFqcGdeQXVyNjU2NjA5NjM@._V1_SX300.jpg&job_id=19", {
-// 	"credentials": "include",
-// 	"headers": {
-// 			"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:128.0) Gecko/20100101 Firefox/128.0",
-// 			"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/png,image/svg+xml,*/*;q=0.8",
-// 			"Accept-Language": "en,en-US;q=0.7,de;q=0.3",
-// 			"Upgrade-Insecure-Requests": "1",
-// 			"Sec-Fetch-Dest": "document",
-// 			"Sec-Fetch-Mode": "navigate",
-// 			"Sec-Fetch-Site": "same-origin",
-// 			"Sec-Fetch-User": "?1",
-// 			"Priority": "u=0, i"
-// 	},
-// 	"referrer": "https://arm.home/gettitle?imdbID=tt0115083&job_id=19",
-// 	"method": "GET",
-// 	"mode": "cors"
-// });
-
-// updatetitle?title=7th Heaven&year=1996–2007&imdbID=tt0115083&type=series&poster=https://m.media-amazon.com/images/M/MV5BZGEzZDJiYjUtMjU3Yy00YjBmLWE4OWQtYjM4ZDhlZTg3Zjk0XkEyXkFqcGdeQXVyNjU2NjA5NjM@._V1_SX300.jpg&job_id=20
+export const arm = new ARM();

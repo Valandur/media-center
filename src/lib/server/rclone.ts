@@ -7,114 +7,110 @@ import type { Stats } from '$lib/models/stats';
 import type { CompletedTransfer } from '$lib/models/transfer';
 import type { Version } from '$lib/models/version';
 
+import { Service } from './service';
+
 const AUTH = btoa(`${env.RCLONE_USERNAME}:${env.RCLONE_PASSWORD}`);
 const HEADERS = { Authorization: `Basic ${AUTH}`, 'content-type': 'application/json' };
 
-let version: Version | null = null;
-export async function coreVersion(): Promise<Version> {
-	if (version) {
-		return version;
+class Rclone extends Service {
+	private version: Version | null = null;
+	private transferIndex = 0;
+	private transferMap: Map<string, number> = new Map();
+
+	public constructor() {
+		super('RCLONE');
 	}
 
-	const res = await fetch(`${env.RCLONE_URL}/core/version`, {
-		method: 'POST',
-		headers: HEADERS,
-		body: JSON.stringify({})
-	});
-	const newVersion = await res.json();
-	version = newVersion;
-	return newVersion;
-}
+	public async coreVersion(): Promise<Version> {
+		if (this.version) {
+			return this.version;
+		}
 
-export async function coreStats(): Promise<Stats> {
-	const res = await fetch(`${env.RCLONE_URL}/core/stats`, {
-		method: 'POST',
-		headers: HEADERS,
-		body: JSON.stringify({})
-	});
-	const data = await res.json();
-	return data;
-}
-
-export async function coreTransferred(): Promise<CompletedTransfer[]> {
-	const res = await fetch(`${env.RCLONE_URL}/core/transferred`, {
-		method: 'POST',
-		headers: HEADERS,
-		body: JSON.stringify({})
-	});
-	const data = await res.json();
-	return data.transferred;
-}
-
-export async function jobList(): Promise<number[]> {
-	const res = await fetch(`${env.RCLONE_URL}/job/list`, {
-		method: 'POST',
-		headers: HEADERS,
-		body: JSON.stringify({})
-	});
-	const data = await res.json();
-	return data.jobids;
-}
-
-export async function jobStatus(jobId: number): Promise<unknown[]> {
-	const res = await fetch(`${env.RCLONE_URL}/job/status`, {
-		method: 'POST',
-		headers: HEADERS,
-		body: JSON.stringify({ jobid: jobId })
-	});
-	const data = await res.json();
-	return data;
-}
-
-export async function configListRemotes(): Promise<string[]> {
-	const res = await fetch(`${env.RCLONE_URL}/config/listremotes`, {
-		method: 'POST',
-		headers: HEADERS,
-		body: JSON.stringify({})
-	});
-	const data = await res.json();
-	return data.remotes;
-}
-
-export async function opFsInfo(fs: string): Promise<FsInfo> {
-	const res = await fetch(`${env.RCLONE_URL}/operations/fsinfo`, {
-		method: 'POST',
-		headers: HEADERS,
-		body: JSON.stringify({ fs: `${fs}:` })
-	});
-	const data = await res.json();
-	if ('error' in data) {
-		throw new Error('Could not get fs info: ' + data.error);
+		const newVersion = await this.request('core/version');
+		this.version = newVersion;
+		return newVersion;
 	}
-	return data;
+
+	public async coreStats(): Promise<Stats> {
+		const data: Stats = await this.request('core/stats');
+		if (data.transferring) {
+			for (const transfer of data.transferring) {
+				let id = this.transferMap.get(transfer.name);
+				if (!id) {
+					id = this.transferIndex++;
+					this.transferMap.set(transfer.name, id);
+				}
+				transfer.id = id;
+			}
+		}
+		return data;
+	}
+
+	public async coreTransferred(): Promise<CompletedTransfer[]> {
+		const data = await this.request('core/transferred');
+		return data.transferred;
+	}
+
+	public async jobList(): Promise<number[]> {
+		const data = await this.request('job/list');
+		return data.jobids;
+	}
+
+	public async jobStatus(jobId: number): Promise<unknown[]> {
+		const data = await this.request('job/status', { jobid: jobId });
+		return data;
+	}
+
+	public async configListRemotes(): Promise<string[]> {
+		const data = await this.request('config/listremotes');
+		return data.remotes;
+	}
+
+	public async opFsInfo(fs: string): Promise<FsInfo> {
+		const data = await this.request('operations/fsinfo', { fs: `${fs}:` });
+		if ('error' in data) {
+			throw new Error('Could not get fs info: ' + data.error);
+		}
+		return data;
+	}
+
+	public async opAbout(fs: string): Promise<About> {
+		const data = await this.request('operations/about', { fs: `${fs}:` });
+		if ('error' in data) {
+			throw new Error('Could not get about: ' + data.error);
+		}
+		return data;
+	}
+
+	public async opList(
+		fs: string,
+		dir: string,
+		options?: { recurse?: boolean; dirsOnly?: boolean; filesOnly?: boolean }
+	): Promise<ListEntry[]> {
+		const data = await this.request('operations/list', { fs: `${fs}:`, remote: dir, opt: options });
+		if ('error' in data) {
+			throw new Error('Could not get about: ' + data.error);
+		}
+		return data.list;
+	}
+
+	private async request(op: string, body?: Record<string, unknown>) {
+		let status = 0;
+		const url = `${env.RCLONE_URL}/${op}`;
+
+		try {
+			const res = await fetch(url, {
+				method: 'POST',
+				headers: HEADERS,
+				body: JSON.stringify(body ?? {})
+			});
+			status = res.status;
+			const data = await res.json();
+			return data;
+		} finally {
+			this.logger.debug('POST', url, JSON.stringify(body), status);
+		}
+	}
 }
 
-export async function opAbout(fs: string): Promise<About> {
-	const res = await fetch(`${env.RCLONE_URL}/operations/about`, {
-		method: 'POST',
-		headers: HEADERS,
-		body: JSON.stringify({ fs: `${fs}:` })
-	});
-	const data = await res.json();
-	if ('error' in data) {
-		throw new Error('Could not get about: ' + data.error);
-	}
-	return data;
-}
-
-export async function opList(
-	fs: string,
-	dir: string,
-	options?: { recurse?: boolean; dirsOnly?: boolean; filesOnly?: boolean }
-): Promise<ListEntry[]> {
-	const res = await fetch(`${env.RCLONE_URL}/operations/list`, {
-		method: 'POST',
-		headers: HEADERS,
-		body: JSON.stringify({ fs: `${fs}:`, remote: dir, opt: options })
-	});
-	const data = await res.json();
-	if ('error' in data) {
-		throw new Error('Could not get about: ' + data.error);
-	}
-	return data.list;
-}
+export const rclone = new Rclone();
