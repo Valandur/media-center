@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fade, slide } from 'svelte/transition';
+	import { fade, scale, slide } from 'svelte/transition';
 
 	import type { FileSystem } from '$lib/models/file-system';
 	import { formatSize } from '$lib/util';
@@ -20,6 +20,7 @@
 			.then((newFileSystems) => {
 				fileSystems = newFileSystems;
 				loading = false;
+				error = '';
 			})
 			.catch((err) => {
 				console.error(err);
@@ -29,10 +30,12 @@
 </script>
 
 {#if error}
-	<Card>
-		<svelte:fragment slot="header">FileSystems Error</svelte:fragment>
-		{error}
-	</Card>
+	<div transition:scale>
+		<Card>
+			<svelte:fragment slot="header">FileSystems Error</svelte:fragment>
+			{error}
+		</Card>
+	</div>
 {/if}
 
 <Card class={$$props.class ?? ''}>

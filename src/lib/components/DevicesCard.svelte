@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fade, slide } from 'svelte/transition';
+	import { fade, scale, slide } from 'svelte/transition';
 
 	import type { Device } from '$lib/models/device';
 	import type { SmartDevice } from '$lib/models/smart';
@@ -25,6 +25,7 @@
 			.then((newDevices) => {
 				devices = newDevices;
 				loading = false;
+				devError = '';
 			})
 			.catch((err) => {
 				console.log(err);
@@ -39,6 +40,7 @@
 				}
 				smartDevicesMap = newSmartDevicesMap;
 				loadingSmart = false;
+				smartDevError = '';
 			})
 			.catch((err) => {
 				console.error(err);
@@ -48,17 +50,21 @@
 </script>
 
 {#if devError}
-	<Card>
-		<svelte:fragment slot="header">Devices Error</svelte:fragment>
-		{devError}
-	</Card>
+	<div transition:scale>
+		<Card>
+			<svelte:fragment slot="header">Devices Error</svelte:fragment>
+			{devError}
+		</Card>
+	</div>
 {/if}
 
 {#if smartDevError}
-	<Card>
-		<svelte:fragment slot="header">S.M.A.R.T. Error</svelte:fragment>
-		{smartDevError}
-	</Card>
+	<div transition:scale>
+		<Card>
+			<svelte:fragment slot="header">S.M.A.R.T. Error</svelte:fragment>
+			{smartDevError}
+		</Card>
+	</div>
 {/if}
 
 <Card class={$$props.class ?? ''}>

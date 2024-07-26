@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fade, slide } from 'svelte/transition';
+	import { fade, scale, slide } from 'svelte/transition';
 
 	import { isInProgress, type Transfer } from '$lib/models/transfer';
 	import { formatEta, formatSize, formatSpeed } from '$lib/util';
@@ -20,6 +20,7 @@
 			.then((newTransfers) => {
 				transfers = newTransfers;
 				loading = false;
+				error = '';
 			})
 			.catch((err) => {
 				console.error(err);
@@ -29,10 +30,12 @@
 </script>
 
 {#if error}
-	<Card>
-		<svelte:fragment slot="header">Transfers Error</svelte:fragment>
-		{error}
-	</Card>
+	<div transition:scale>
+		<Card>
+			<svelte:fragment slot="header">Transfers Error</svelte:fragment>
+			{error}
+		</Card>
+	</div>
 {/if}
 
 <Card class={$$props.class ?? ''}>

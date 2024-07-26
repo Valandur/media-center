@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fade, slide } from 'svelte/transition';
+	import { fade, scale, slide } from 'svelte/transition';
 
 	import type { Torrent } from '$lib/models/torrent';
 	import { formatEta, formatSize, formatSpeed } from '$lib/util';
@@ -20,6 +20,7 @@
 			.then((newTorrents) => {
 				torrents = newTorrents;
 				loading = false;
+				error = '';
 			})
 			.catch((err) => {
 				console.error(err);
@@ -29,10 +30,12 @@
 </script>
 
 {#if error}
-	<Card>
-		<svelte:fragment slot="header">Torrents Error</svelte:fragment>
-		{error}
-	</Card>
+	<div transition:scale>
+		<Card>
+			<svelte:fragment slot="header">Torrents Error</svelte:fragment>
+			{error}
+		</Card>
+	</div>
 {/if}
 
 <Card class={$$props.class ?? ''}>

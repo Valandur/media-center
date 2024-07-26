@@ -58,10 +58,12 @@
 </script>
 
 {#if error}
-	<Card>
-		<svelte:fragment slot="header">ARM Error</svelte:fragment>
-		{error}
-	</Card>
+	<div transition:scale>
+		<Card>
+			<svelte:fragment slot="header">ARM Error</svelte:fragment>
+			{error}
+		</Card>
+	</div>
 {/if}
 
 {#each jobs as job (job.job_id)}
