@@ -11,6 +11,7 @@
 	import TorrentsCard from '$lib/components/TorrentsCard.svelte';
 	import TransfersCard from '$lib/components/TransfersCard.svelte';
 	import StatCard from '$lib/components/StatCard.svelte';
+	import SizeStatCard from '$lib/components/SizeStatCard.svelte';
 
 	import type { PageServerData } from './$types';
 
@@ -93,6 +94,20 @@
 	>
 		<TorrentsCard {torrentsPromise} class="col-span-4" />
 
+		<StatCard label="Total Checks" value={data.rclone.stats.then((s) => s.totalChecks)} right />
+		<StatCard
+			label="Total Transfers"
+			value={data.rclone.stats.then((s) => s.totalTransfers)}
+			right
+		/>
+		<SizeStatCard
+			label="Speed"
+			value={data.rclone.stats.then((s) => s.speed)}
+			unitSuffix="/s"
+			right
+		/>
+		<StatCard label="Errors" value={data.rclone.stats.then((s) => s.errors)} right />
+
 		<TransfersCard {transfersPromise} class="col-span-4" />
 
 		<ArmJobsCardList {jobsPromise} class="row-span-2" />
@@ -104,36 +119,5 @@
 		<FileSystemsCard {fileSystemsPromise} />
 
 		<DevicesCard {devicesPromise} {smartDevicesPromise} />
-
-		<div class="flex flex-row gap-4">
-			<StatCard
-				label="Total Checks"
-				value={data.rclone.stats.then((s) => s.totalChecks)}
-				right
-				class="flex-1"
-			/>
-			<StatCard
-				label="Total Transfers"
-				value={data.rclone.stats.then((s) => s.totalTransfers)}
-				right
-				class="flex-1"
-			/>
-		</div>
 	</div>
 </div>
-
-<!--
-<SizeStatCard label="Discovered Size" bytes={statsProm.then((s) => s.totalBytes)} />
-<SizeStatCard label="Transferred Size" bytes={statsProm.then((s) => s.bytes)} />
-<SizeStatCard label="Speed" bytes={statsProm.then((s) => s.speed)} unitSuffix="/s" />
-<StatCard label="Errors" value={statsProm.then((s) => s.errors)} />
-<StatCard label="Checks" value={statsProm.then((s) => s.checks)} />
-<StatCard label="Transfers" value={statsProm.then((s) => s.transfers)} />
-<StatCard label="Deletes" value={statsProm.then((s) => s.deletes)} />
-<StatCard label="Renames" value={statsProm.then((s) => s.renames)} />
-<StatCard
-	label="ETA"
-	value={statsProm.then((s) => (s.transferring ? formatEta(s.eta) : '- No transfers -'))}
-	class="sm:col-span-2"
-/>
--->

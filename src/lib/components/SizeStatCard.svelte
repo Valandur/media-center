@@ -4,18 +4,19 @@
 	import StatCard from './StatCard.svelte';
 
 	export let label: string;
-	export let bytes: number | Promise<number>;
+	export let value: number | Promise<number>;
 	export let unitSuffix: string = '';
+	export let right: boolean = false;
 
-	let unit = typeof bytes === 'object' ? 'B' : getSize(bytes)[1];
+	let unit = typeof value === 'object' ? 'B' : getSize(value)[1];
 	$: size =
-		typeof bytes === 'object'
-			? bytes.then((b) => {
+		typeof value === 'object'
+			? value.then((b) => {
 					const [newSize, newUnit] = getSize(b);
 					unit = newUnit;
 					return newSize;
 				})
-			: getSize(bytes)[0];
+			: getSize(value)[0];
 </script>
 
-<StatCard {label} value={size} suffix="{unit}{unitSuffix}" class={$$props.class ?? ''} />
+<StatCard {label} value={size} suffix="{unit}{unitSuffix}" class={$$props.class ?? ''} {right} />
