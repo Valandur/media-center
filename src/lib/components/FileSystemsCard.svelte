@@ -11,16 +11,29 @@
 
 	let loading = true;
 	let fileSystems: FileSystem[] = [];
+	let error = '';
 
 	$: fileSystemsPromise, setup();
 
 	function setup() {
-		fileSystemsPromise.then((newFileSystems) => {
-			fileSystems = newFileSystems;
-			loading = false;
-		});
+		fileSystemsPromise
+			.then((newFileSystems) => {
+				fileSystems = newFileSystems;
+				loading = false;
+			})
+			.catch((err) => {
+				console.error(err);
+				error = err.message;
+			});
 	}
 </script>
+
+{#if error}
+	<Card>
+		<svelte:fragment slot="header">Error</svelte:fragment>
+		{error}
+	</Card>
+{/if}
 
 <Card class={$$props.class ?? ''}>
 	<svelte:fragment slot="header">File Systems</svelte:fragment>

@@ -1,6 +1,7 @@
 import { env } from '$env/dynamic/private';
 
 import type { Torrent } from '$lib/models/torrent';
+import { error } from '@sveltejs/kit';
 
 import { Service } from './service';
 
@@ -12,24 +13,28 @@ class Transmission extends Service {
 	}
 
 	public async getTorrents(): Promise<Torrent[]> {
-		const res = await this.request<{ arguments: { torrents: Torrent[] } }>({
-			arguments: {
-				fields: [
-					'id',
-					'name',
-					'eta',
-					'isFinished',
-					'isStalled',
-					'peersConnected',
-					'peersSendingToUs',
-					'percentDone',
-					'rateDownload',
-					'sizeWhenDone'
-				]
-			},
-			method: 'torrent-get'
-		});
-		return res.arguments.torrents;
+		try {
+			const res = await this.request<{ arguments: { torrents: Torrent[] } }>({
+				arguments: {
+					fields: [
+						'id',
+						'name',
+						'eta',
+						'isFinished',
+						'isStalled',
+						'peersConnected',
+						'peersSendingToUs',
+						'percentDone',
+						'rateDownload',
+						'sizeWhenDone'
+					]
+				},
+				method: 'torrent-get'
+			});
+			return res.arguments.torrents;
+		} catch (err) {
+			error(500, (err as Error).message);
+		}
 	}
 
 	private async request<T = unknown>(body: Record<string, unknown>, retry = true): Promise<T> {

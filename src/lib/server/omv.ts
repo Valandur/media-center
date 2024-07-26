@@ -2,6 +2,7 @@ import makeFetchCookie from 'fetch-cookie';
 import { CookieJar } from 'tough-cookie';
 import { env } from '$env/dynamic/private';
 import { differenceInSeconds } from 'date-fns/differenceInSeconds';
+import { error } from '@sveltejs/kit';
 
 import type { SmartDevice } from '$lib/models/smart';
 import type { Container } from '$lib/models/docker';
@@ -29,46 +30,66 @@ class OMV extends Service {
 	}
 
 	public async getDevices(): Promise<Device[]> {
-		if (this.devCache && differenceInSeconds(new Date(), this.devUpdate) < 60) {
-			return this.devCache;
-		}
+		try {
+			if (this.devCache && differenceInSeconds(new Date(), this.devUpdate) < 60) {
+				return this.devCache;
+			}
 
-		const res = await this.request<Device[]>('DiskMgmt', 'enumerateDevices', {
-			start: 0,
-			limit: -1
-		});
-		this.devCache = res;
-		this.devUpdate = new Date();
-		return this.devCache;
+			const res = await this.request<Device[]>('DiskMgmt', 'enumerateDevices', {
+				start: 0,
+				limit: -1
+			});
+			this.devCache = res;
+			this.devUpdate = new Date();
+			return this.devCache;
+		} catch (err) {
+			error(500, (err as Error).message);
+		}
 	}
 
 	public async getSmartDevices(): Promise<SmartDevice[]> {
-		const res = await this.requestAsync<{ data: SmartDevice[] }>('Smart', 'getListBg', {
-			start: 0,
-			limit: -1
-		});
-		return res.data;
+		try {
+			const res = await this.requestAsync<{ data: SmartDevice[] }>('Smart', 'getListBg', {
+				start: 0,
+				limit: -1
+			});
+			return res.data;
+		} catch (err) {
+			error(500, (err as Error).message);
+		}
 	}
 
 	public async getFileSystems(): Promise<FileSystem[]> {
-		const res = await this.requestAsync<{ data: FileSystem[] }>('FileSystemMgmt', 'getListBg', {
-			start: 0,
-			limit: -1
-		});
-		return res.data;
+		try {
+			const res = await this.requestAsync<{ data: FileSystem[] }>('FileSystemMgmt', 'getListBg', {
+				start: 0,
+				limit: -1
+			});
+			return res.data;
+		} catch (err) {
+			error(500, (err as Error).message);
+		}
 	}
 
 	public async getComposeContainers(): Promise<Container[]> {
-		const res = await this.request<Container[]>('Compose', 'getContainers');
-		return res;
+		try {
+			const res = await this.request<Container[]>('Compose', 'getContainers');
+			return res;
+		} catch (err) {
+			error(500, (err as Error).message);
+		}
 	}
 
 	public async getZfsPools(): Promise<ZfsPool[]> {
-		const res = await this.requestAsync<{ data: ZfsPool[] }>('Zfs', 'listPoolsBg', {
-			start: 0,
-			limit: -1
-		});
-		return res.data;
+		try {
+			const res = await this.requestAsync<{ data: ZfsPool[] }>('Zfs', 'listPoolsBg', {
+				start: 0,
+				limit: -1
+			});
+			return res.data;
+		} catch (err) {
+			error(500, (err as Error).message);
+		}
 	}
 
 	private async request<T>(

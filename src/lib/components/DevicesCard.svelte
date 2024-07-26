@@ -12,28 +12,54 @@
 
 	let loading = true;
 	let devices: Device[] = [];
+	let devError = '';
 
 	let loadingSmart = true;
 	let smartDevicesMap: Map<string, SmartDevice> = new Map();
+	let smartDevError = '';
 
 	$: devicesPromise, smartDevicesPromise, setup();
 
 	function setup() {
-		devicesPromise.then((newDevices) => {
-			devices = newDevices;
-			loading = false;
-		});
+		devicesPromise
+			.then((newDevices) => {
+				devices = newDevices;
+				loading = false;
+			})
+			.catch((err) => {
+				console.log(err);
+				devError = err.message;
+			});
 
-		smartDevicesPromise.then((newSmartDevices) => {
-			const newSmartDevicesMap: Map<string, SmartDevice> = new Map();
-			for (const newSmartDevice of newSmartDevices) {
-				newSmartDevicesMap.set(newSmartDevice.canonicaldevicefile, newSmartDevice);
-			}
-			smartDevicesMap = newSmartDevicesMap;
-			loadingSmart = false;
-		});
+		smartDevicesPromise
+			.then((newSmartDevices) => {
+				const newSmartDevicesMap: Map<string, SmartDevice> = new Map();
+				for (const newSmartDevice of newSmartDevices) {
+					newSmartDevicesMap.set(newSmartDevice.canonicaldevicefile, newSmartDevice);
+				}
+				smartDevicesMap = newSmartDevicesMap;
+				loadingSmart = false;
+			})
+			.catch((err) => {
+				console.error(err);
+				smartDevError = err.message;
+			});
 	}
 </script>
+
+{#if devError}
+	<Card>
+		<svelte:fragment slot="header">Device Error</svelte:fragment>
+		{devError}
+	</Card>
+{/if}
+
+{#if smartDevError}
+	<Card>
+		<svelte:fragment slot="header">S.M.A.R.T. Error</svelte:fragment>
+		{smartDevError}
+	</Card>
+{/if}
 
 <Card class={$$props.class ?? ''}>
 	<svelte:fragment slot="header">Devices</svelte:fragment>

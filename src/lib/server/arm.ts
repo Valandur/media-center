@@ -1,6 +1,7 @@
 import makeFetchCookie from 'fetch-cookie';
 import { CookieJar } from 'tough-cookie';
 import { env } from '$env/dynamic/private';
+import { error } from '@sveltejs/kit';
 
 import type { ArmJob, ArmResult } from '$lib/models/arm';
 import type { Title } from '$lib/models/title';
@@ -21,24 +22,32 @@ class ARM extends Service {
 	}
 
 	public async getJobList(): Promise<ArmJob[]> {
-		const res = await this.request(JOB_LIST_URL);
-		const data: ArmResult = await res.json();
-		const jobs = Object.keys(data.results).map((key) => data.results[key]);
-		return jobs;
+		try {
+			const res = await this.request(JOB_LIST_URL);
+			const data: ArmResult = await res.json();
+			const jobs = Object.keys(data.results).map((key) => data.results[key]);
+			return jobs;
+		} catch (err) {
+			error(500, (err as Error).message);
+		}
 	}
 
 	public async setTitle(id: string, title: Title) {
-		const params = new URLSearchParams();
-		params.set('title', title.Title);
-		params.set('year', title.Year);
-		params.set('imdbID', title.imdbID);
-		params.set('type', title.Type);
-		params.set('poster', title.Poster);
-		params.set('job_id', id);
-		const url = `${SET_TITLE_URL}?${params.toString()}`;
-		const res = await this.request(url);
-		if (res.status !== 200) {
-			throw new Error('Could not set title: ' + res.status);
+		try {
+			const params = new URLSearchParams();
+			params.set('title', title.Title);
+			params.set('year', title.Year);
+			params.set('imdbID', title.imdbID);
+			params.set('type', title.Type);
+			params.set('poster', title.Poster);
+			params.set('job_id', id);
+			const url = `${SET_TITLE_URL}?${params.toString()}`;
+			const res = await this.request(url);
+			if (res.status !== 200) {
+				throw new Error('Could not set title: ' + res.status);
+			}
+		} catch (err) {
+			error(500, (err as Error).message);
 		}
 	}
 

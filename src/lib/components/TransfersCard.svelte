@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fade, fly, slide } from 'svelte/transition';
+	import { fade, slide } from 'svelte/transition';
 
 	import { isInProgress, type Transfer } from '$lib/models/transfer';
 	import { formatEta, formatSize, formatSpeed } from '$lib/util';
@@ -11,16 +11,29 @@
 
 	let loading = true;
 	let transfers: Transfer[] = [];
+	let error = '';
 
 	$: transfersPromise, setup();
 
 	function setup() {
-		transfersPromise.then((newTransfers) => {
-			transfers = newTransfers;
-			loading = false;
-		});
+		transfersPromise
+			.then((newTransfers) => {
+				transfers = newTransfers;
+				loading = false;
+			})
+			.catch((err) => {
+				console.error(err);
+				error = err.message;
+			});
 	}
 </script>
+
+{#if error}
+	<Card>
+		<svelte:fragment slot="header">Error</svelte:fragment>
+		{error}
+	</Card>
+{/if}
 
 <Card class={$$props.class ?? ''}>
 	<svelte:fragment slot="header">Transfers</svelte:fragment>

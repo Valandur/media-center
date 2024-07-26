@@ -9,16 +9,29 @@
 
 	let loading = true;
 	let containers: Container[] = [];
+	let error = '';
 
 	$: containersPromise, setup();
 
 	function setup() {
-		containersPromise.then((newContainers) => {
-			containers = newContainers;
-			loading = false;
-		});
+		containersPromise
+			.then((newContainers) => {
+				containers = newContainers;
+				loading = false;
+			})
+			.catch((err) => {
+				console.error(err);
+				error = err.message;
+			});
 	}
 </script>
+
+{#if error}
+	<Card>
+		<svelte:fragment slot="header">Error</svelte:fragment>
+		{error}
+	</Card>
+{/if}
 
 <Card class={$$props.class ?? ''}>
 	<svelte:fragment slot="header">Docker Containers</svelte:fragment>

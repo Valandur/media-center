@@ -11,16 +11,29 @@
 
 	let loading = true;
 	let torrents: Torrent[] = [];
+	let error = '';
 
 	$: torrentsPromise, setup();
 
 	function setup() {
-		torrentsPromise.then((newTorrents) => {
-			torrents = newTorrents;
-			loading = false;
-		});
+		torrentsPromise
+			.then((newTorrents) => {
+				torrents = newTorrents;
+				loading = false;
+			})
+			.catch((err) => {
+				console.error(err);
+				error = err.message;
+			});
 	}
 </script>
+
+{#if error}
+	<Card>
+		<svelte:fragment slot="header">Error</svelte:fragment>
+		{error}
+	</Card>
+{/if}
 
 <Card class={$$props.class ?? ''}>
 	<svelte:fragment slot="header">Torrents</svelte:fragment>

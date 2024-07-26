@@ -16,14 +16,21 @@
 	let jobs: ArmJob[] = [];
 	let selectedId = '';
 	let titles: Title[] = [];
+	let error = '';
 
 	$: jobsPromise, setup();
 
 	function setup() {
-		jobsPromise.then((newJobs) => {
-			jobs = newJobs;
-			loading = false;
-		});
+		jobsPromise
+			.then((newJobs) => {
+				jobs = newJobs;
+				loading = false;
+				error = '';
+			})
+			.catch((err) => {
+				console.error(err);
+				error = err.message;
+			});
 	}
 
 	async function onSubmit(event: SubmitEvent) {
@@ -49,6 +56,13 @@
 		}
 	}
 </script>
+
+{#if error}
+	<Card>
+		<svelte:fragment slot="header">Error</svelte:fragment>
+		{error}
+	</Card>
+{/if}
 
 {#each jobs as job (job.job_id)}
 	<div

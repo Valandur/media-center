@@ -1,4 +1,5 @@
 import { env } from '$env/dynamic/private';
+import { error } from '@sveltejs/kit';
 
 import type { About } from '$lib/models/about';
 import type { FsInfo } from '$lib/models/fsinfo';
@@ -22,64 +23,96 @@ class Rclone extends Service {
 	}
 
 	public async coreVersion(): Promise<Version> {
-		if (this.version) {
-			return this.version;
-		}
+		try {
+			if (this.version) {
+				return this.version;
+			}
 
-		const newVersion = await this.request('core/version');
-		this.version = newVersion;
-		return newVersion;
+			const newVersion = await this.request('core/version');
+			this.version = newVersion;
+			return newVersion;
+		} catch (err) {
+			error(500, (err as Error).message);
+		}
 	}
 
 	public async coreStats(): Promise<Stats> {
-		const data: Stats = await this.request('core/stats');
-		if (data.transferring) {
-			for (const transfer of data.transferring) {
-				let id = this.transferMap.get(transfer.name);
-				if (!id) {
-					id = this.transferIndex++;
-					this.transferMap.set(transfer.name, id);
+		try {
+			const data: Stats = await this.request('core/stats');
+			if (data.transferring) {
+				for (const transfer of data.transferring) {
+					let id = this.transferMap.get(transfer.name);
+					if (!id) {
+						id = this.transferIndex++;
+						this.transferMap.set(transfer.name, id);
+					}
+					transfer.id = id;
 				}
-				transfer.id = id;
 			}
+			return data;
+		} catch (err) {
+			error(500, (err as Error).message);
 		}
-		return data;
 	}
 
 	public async coreTransferred(): Promise<CompletedTransfer[]> {
-		const data = await this.request('core/transferred');
-		return data.transferred;
+		try {
+			const data = await this.request('core/transferred');
+			return data.transferred;
+		} catch (err) {
+			error(500, (err as Error).message);
+		}
 	}
 
 	public async jobList(): Promise<number[]> {
-		const data = await this.request('job/list');
-		return data.jobids;
+		try {
+			const data = await this.request('job/list');
+			return data.jobids;
+		} catch (err) {
+			error(500, (err as Error).message);
+		}
 	}
 
 	public async jobStatus(jobId: number): Promise<unknown[]> {
-		const data = await this.request('job/status', { jobid: jobId });
-		return data;
+		try {
+			const data = await this.request('job/status', { jobid: jobId });
+			return data;
+		} catch (err) {
+			error(500, (err as Error).message);
+		}
 	}
 
 	public async configListRemotes(): Promise<string[]> {
-		const data = await this.request('config/listremotes');
-		return data.remotes;
+		try {
+			const data = await this.request('config/listremotes');
+			return data.remotes;
+		} catch (err) {
+			error(500, (err as Error).message);
+		}
 	}
 
 	public async opFsInfo(fs: string): Promise<FsInfo> {
-		const data = await this.request('operations/fsinfo', { fs: `${fs}:` });
-		if ('error' in data) {
-			throw new Error('Could not get fs info: ' + data.error);
+		try {
+			const data = await this.request('operations/fsinfo', { fs: `${fs}:` });
+			if ('error' in data) {
+				throw new Error('Could not get fs info: ' + data.error);
+			}
+			return data;
+		} catch (err) {
+			error(500, (err as Error).message);
 		}
-		return data;
 	}
 
 	public async opAbout(fs: string): Promise<About> {
-		const data = await this.request('operations/about', { fs: `${fs}:` });
-		if ('error' in data) {
-			throw new Error('Could not get about: ' + data.error);
+		try {
+			const data = await this.request('operations/about', { fs: `${fs}:` });
+			if ('error' in data) {
+				throw new Error('Could not get about: ' + data.error);
+			}
+			return data;
+		} catch (err) {
+			error(500, (err as Error).message);
 		}
-		return data;
 	}
 
 	public async opList(
@@ -87,11 +120,19 @@ class Rclone extends Service {
 		dir: string,
 		options?: { recurse?: boolean; dirsOnly?: boolean; filesOnly?: boolean }
 	): Promise<ListEntry[]> {
-		const data = await this.request('operations/list', { fs: `${fs}:`, remote: dir, opt: options });
-		if ('error' in data) {
-			throw new Error('Could not get about: ' + data.error);
+		try {
+			const data = await this.request('operations/list', {
+				fs: `${fs}:`,
+				remote: dir,
+				opt: options
+			});
+			if ('error' in data) {
+				throw new Error('Could not get about: ' + data.error);
+			}
+			return data.list;
+		} catch (err) {
+			error(500, (err as Error).message);
 		}
-		return data.list;
 	}
 
 	private async request(op: string, body?: Record<string, unknown>) {
