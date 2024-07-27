@@ -80,12 +80,15 @@
 			<svelte:fragment slot="header">
 				ARM - {job.title}
 			</svelte:fragment>
-			<button on:click={() => (selectedId = job.job_id)} class="mb-2">
-				<img src={job.poster_url} alt="Poster" />
-			</button>
-			<div>{job.stage}</div>
-			<div>
-				<Progress total={100} progress={Number(job.progress_round)} />
+
+			<div class="flex flex-col">
+				<button on:click={() => (selectedId = job.job_id)} class="self-center mb-2">
+					<img src={job.poster_url} alt="Poster" />
+				</button>
+				<div>{job.stage}</div>
+				<div>
+					<Progress total={100} progress={Number(job.progress_round)} />
+				</div>
 			</div>
 		</Card>
 	</div>
