@@ -7,7 +7,6 @@
 	import ContainersCard from '$lib/components/ContainersCard.svelte';
 	import DevicesCard from '$lib/components/DevicesCard.svelte';
 	import FileSystemsCard from '$lib/components/FileSystemsCard.svelte';
-	import PageTitle from '$lib/components/PageTitle.svelte';
 	import TorrentsCard from '$lib/components/TorrentsCard.svelte';
 	import TransfersCard from '$lib/components/TransfersCard.svelte';
 	import StatCard from '$lib/components/StatCard.svelte';
@@ -73,28 +72,30 @@
 	}
 </script>
 
-<PageTitle title="Dashboard" class="mb-2">
-	<label class="inline-flex items-center space-x-2">
-		<span>Auto Refresh</span>
-		<input
-			type="checkbox"
-			bind:checked={autoRefresh}
-			class="appearance-none w-10 h-6 rounded-full bg-no-repeat switch"
-		/>
-	</label>
+<div class="flex items-center justify-between mb-2">
+	<h3 class="text-lg font-medium">Dashboard</h3>
 
-	<button class="ms-4" on:click={refresh}>
-		<i
-			class="fa-solid fa-arrows-rotate transition-transform duration-500 ease-in-out rotate-180"
-			style="transform: rotate({count * 360}deg);"
-		></i>
-	</button>
-</PageTitle>
+	<div class="flex">
+		<label class="inline-flex items-center space-x-2">
+			<span>Auto Refresh</span>
+			<input
+				type="checkbox"
+				bind:checked={autoRefresh}
+				class="appearance-none w-10 h-6 rounded-full bg-no-repeat switch"
+			/>
+		</label>
+
+		<button class="ms-4" on:click={refresh}>
+			<i
+				class="fa-solid fa-arrows-rotate transition-transform duration-500 ease-in-out rotate-180"
+				style="transform: rotate({count * 360}deg);"
+			></i>
+		</button>
+	</div>
+</div>
 
 <div class="flex-1 flex flex-row gap-4 overflow-auto">
-	<div
-		class="flex-grow basis-2/3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 auto-rows-max gap-4"
-	>
+	<div class="flex-grow basis-2/3 grid grid-cols-[repeat(6,1fr)] auto-rows-max gap-4">
 		<StatCard
 			label="CPU"
 			value={sysInfo.then((s) => s.cpuUtilization.toFixed(1))}
@@ -114,17 +115,13 @@
 			right
 		/>
 		<StatCard label="Updates" value={sysInfo.then((s) => s.availablePkgUpdates)} right />
-
-		<TorrentsCard {torrentsPromise} class="col-span-4" />
-
 		<StatCard label="Total Checks" value={statsPromise.then((s) => s.totalChecks)} right />
 		<StatCard label="Total Transfers" value={statsPromise.then((s) => s.totalTransfers)} right />
-		<SizeStatCard label="Speed" value={statsPromise.then((s) => s.speed)} unitSuffix="/s" right />
-		<StatCard label="Errors" value={statsPromise.then((s) => s.errors)} right />
 
-		<TransfersCard {transfersPromise} class="col-span-4" />
+		<TorrentsCard {torrentsPromise} class="col-span-3" />
+		<TransfersCard {transfersPromise} class="col-span-3" />
 
-		<ArmJobsCardList {jobsPromise} class="row-span-2" />
+		<ArmJobsCardList {jobsPromise} class="col-span-2 row-span-2" />
 	</div>
 
 	<div class="flex-grow basis-1/3 flex flex-col gap-4">
