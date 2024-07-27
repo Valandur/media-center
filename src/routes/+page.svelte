@@ -101,8 +101,8 @@
 		<SizeStatCard label="Speed" value={statsPromise.then((s) => s.speed)} right />
 		<StatCard label="Errors" value={statsPromise.then((s) => s.errors)} right />
 		<StatCard
-			label="ETA"
-			value={statsPromise.then((s) => s.eta ?? 'Unknown')}
+			label="Rclone upload ETA"
+			value={statsPromise.then((s) => (s.transferring ? (s.eta ?? 'Unknown') : 'Unknown'))}
 			right
 			class="col-span-2"
 		/>
