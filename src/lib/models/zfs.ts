@@ -16,3 +16,11 @@ export interface ZfsPool {
 	state: string;
 	status: string;
 }
+
+export interface ZfsStats {
+	hits: string;
+	misses: string;
+	hitsMisses: number;
+	ratio: number;
+	size: string;
+}

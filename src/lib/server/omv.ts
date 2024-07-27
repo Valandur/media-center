@@ -9,11 +9,14 @@ import type { Container } from '$lib/models/docker';
 import type { FileSystem } from '$lib/models/file-system';
 import type { Device } from '$lib/models/device';
 import type { Output } from '$lib/models/output';
-import type { ZfsPool } from '$lib/models/zfs';
+import type { ZfsPool, ZfsStats } from '$lib/models/zfs';
+import type { SystemInfo } from '$lib/models/system';
 
 import { Service } from './service';
 
 const OUTPUT_CHECK_INTERVAL = 1000;
+const RPC_URL = `${env.OMV_URL}/rpc.php`;
+const DOWNLOAD_URL = `${env.OMV_URL}/download.php`;
 
 class OMV extends Service {
 	private cookieJar = new CookieJar();
@@ -27,6 +30,54 @@ class OMV extends Service {
 
 	public constructor() {
 		super('OMV');
+	}
+
+	public async getSystemInformation(): Promise<SystemInfo> {
+		try {
+			const res = await this.request<SystemInfo>('System', 'getInformation');
+			return res;
+		} catch (err) {
+			error(500, (err as Error).message);
+		}
+	}
+
+	public async getCpuTemp(): Promise<number> {
+		try {
+			const res = await this.request<{ cputemp: number }>('CpuTemp', 'get');
+			return res.cputemp;
+		} catch (err) {
+			error(500, (err as Error).message);
+		}
+	}
+
+	public async getCpuUsage(): Promise<string> {
+		try {
+			console.log(
+				`${DOWNLOAD_URL}?service=Rrd&method=getGraph&params={"kind":"cpu-0","period":"hour"}`
+			);
+			const res = await this.fetch(
+				`${DOWNLOAD_URL}?service=Rrd&method=getGraph&params={"kind":"cpu-0","period":"hour"}`,
+				{
+					credentials: 'include'
+				}
+			);
+			if (res.status !== 200) {
+				throw new Error('Could not load cpu usage: ' + res.status);
+			}
+			const img = Buffer.from(await res.arrayBuffer());
+			return `data:image/png;base64,${img.toString('base64')}`;
+		} catch (err) {
+			error(500, (err as Error).message);
+		}
+	}
+
+	public async getZfsStats(): Promise<ZfsStats> {
+		try {
+			const res = await this.request<ZfsStats>('Zfs', 'getStats');
+			return res;
+		} catch (err) {
+			error(500, (err as Error).message);
+		}
 	}
 
 	public async getDevices(): Promise<Device[]> {
@@ -99,7 +150,7 @@ class OMV extends Service {
 		retry = true
 	): Promise<T> {
 		let status = 0;
-		const url = env.OMV_RPC;
+		const url = RPC_URL;
 
 		try {
 			const res = await this.fetch(url, {
@@ -176,7 +227,7 @@ class OMV extends Service {
 		}
 
 		this.authPending = true;
-		const res = await this.fetch(env.OMV_RPC, {
+		const res = await this.fetch(RPC_URL, {
 			method: 'POST',
 			headers: { 'content-type': 'application/json' },
 			body: JSON.stringify({

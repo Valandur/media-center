@@ -27,11 +27,14 @@
 	let timer: ReturnType<typeof setInterval> | null = null;
 	let count = 0;
 
+	$: sysInfo = data.omv.sysInfo;
+	$: cpuTempPrommise = data.omv.cpuTemp;
 	$: devicesPromise = data.omv.devices;
 	$: smartDevicesPromise = data.omv.smartDevices;
 	$: fileSystemsPromise = data.omv.fileSystems;
 	$: containersPromise = data.omv.containers;
-	$: transfersPromise = data.rclone.stats.then((s) => s.transferring ?? []);
+	$: statsPromise = data.rclone.stats;
+	$: transfersPromise = statsPromise.then((s) => s.transferring ?? []);
 	$: jobsPromise = data.arm.jobs;
 	$: torrentsPromise = data.transmission.torrents;
 
@@ -92,21 +95,32 @@
 	<div
 		class="flex-grow basis-2/3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 auto-rows-max gap-4"
 	>
+		<StatCard
+			label="CPU"
+			value={sysInfo.then((s) => s.cpuUtilization.toFixed(1))}
+			suffix="%"
+			right
+		/>
+		<StatCard
+			label="Temperature"
+			value={cpuTempPrommise.then((temp) => temp.toFixed(1))}
+			suffix="°C"
+			right
+		/>
+		<StatCard
+			label="Memory"
+			value={sysInfo.then((s) => (Number(s.memUtilization) * 100).toFixed(1))}
+			suffix="%"
+			right
+		/>
+		<StatCard label="Updates" value={sysInfo.then((s) => s.availablePkgUpdates)} right />
+
 		<TorrentsCard {torrentsPromise} class="col-span-4" />
 
-		<StatCard label="Total Checks" value={data.rclone.stats.then((s) => s.totalChecks)} right />
-		<StatCard
-			label="Total Transfers"
-			value={data.rclone.stats.then((s) => s.totalTransfers)}
-			right
-		/>
-		<SizeStatCard
-			label="Speed"
-			value={data.rclone.stats.then((s) => s.speed)}
-			unitSuffix="/s"
-			right
-		/>
-		<StatCard label="Errors" value={data.rclone.stats.then((s) => s.errors)} right />
+		<StatCard label="Total Checks" value={statsPromise.then((s) => s.totalChecks)} right />
+		<StatCard label="Total Transfers" value={statsPromise.then((s) => s.totalTransfers)} right />
+		<SizeStatCard label="Speed" value={statsPromise.then((s) => s.speed)} unitSuffix="/s" right />
+		<StatCard label="Errors" value={statsPromise.then((s) => s.errors)} right />
 
 		<TransfersCard {transfersPromise} class="col-span-4" />
 

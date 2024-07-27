@@ -9,6 +9,8 @@ export const load: PageServerLoad = async ({ depends }) => {
 	depends('mc:stats');
 
 	// OMV
+	const sysInfo = omv.getSystemInformation();
+	const cpuTemp = omv.getCpuTemp();
 	const devices = omv.getDevices();
 	const smartDevices = omv.getSmartDevices();
 	const fileSystems = omv.getFileSystems();
@@ -26,6 +28,8 @@ export const load: PageServerLoad = async ({ depends }) => {
 
 	return {
 		omv: {
+			sysInfo,
+			cpuTemp,
 			devices,
 			smartDevices,
 			fileSystems,
