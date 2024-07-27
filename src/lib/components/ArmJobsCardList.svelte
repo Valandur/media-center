@@ -15,6 +15,7 @@
 	let loading = true;
 	let jobs: ArmJob[] = [];
 	let selectedId = '';
+	let search = '';
 	let titles: Title[] = [];
 	let error = '';
 
@@ -37,9 +38,8 @@
 
 	async function onSubmit(event: SubmitEvent) {
 		if (event.target instanceof HTMLFormElement) {
-			const form = new FormData(event.target);
 			try {
-				const res = await fetch('/api/omdb', { method: 'POST', body: form });
+				const res = await fetch('/api/omdb', { method: 'POST', body: JSON.stringify({ search }) });
 				const data = await res.json();
 				titles = data;
 			} catch (err) {
@@ -107,12 +107,8 @@
 			<div class="border border-primary/75 bg-dark">
 				<div class="border-b border-primary/75 p-4 uppercase">Find movie / show by title</div>
 				<div class="p-4">
-					<form
-						method="post"
-						action="/api/omdb"
-						on:submit|preventDefault|stopPropagation={onSubmit}
-					>
-						<input type="text" name="title" placeholder="Title" class="input me-2" />
+					<form on:submit|preventDefault|stopPropagation={onSubmit}>
+						<input type="text" placeholder="Title" class="input me-2" bind:value={search} />
 						<button type="submit" class="btn btn-primary">Search</button>
 					</form>
 					{#if titles}
