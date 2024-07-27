@@ -32,6 +32,7 @@
 	$: smartDevicesPromise = data.omv.smartDevices;
 	$: fileSystemsPromise = data.omv.fileSystems;
 	$: containersPromise = data.omv.containers;
+	$: zfsStats = data.omv.zfsStats;
 	$: statsPromise = data.rclone.stats;
 	$: transfersPromise = statsPromise.then((s) => s.transferring ?? []);
 	$: jobsPromise = data.arm.jobs;
@@ -96,15 +97,21 @@
 
 <div class="flex-1 flex flex-row gap-4 overflow-auto">
 	<div class="flex-grow basis-2/3 grid grid-cols-[repeat(6,1fr)] auto-rows-max gap-4">
-		<StatCard label="Total Checks" value={statsPromise.then((s) => s.totalChecks)} right />
-		<StatCard label="Total Transfers" value={statsPromise.then((s) => s.totalTransfers)} right />
-		<SizeStatCard label="Speed" value={statsPromise.then((s) => s.speed)} right />
-		<StatCard label="Errors" value={statsPromise.then((s) => s.errors)} right />
-		<StatCard
-			label="Rclone upload ETA"
-			value={statsPromise.then((s) => (s.transferring ? (s.eta ?? 'Unknown') : 'Unknown'))}
+		<StatCard label="Rclone Checks" value={statsPromise.then((s) => s.totalChecks)} right />
+		<StatCard label="Rclone Transfers" value={statsPromise.then((s) => s.totalTransfers)} right />
+		<SizeStatCard
+			label="Rclone Speed"
+			value={statsPromise.then((s) => s.speed)}
+			unitSuffix="/s"
 			right
-			class="col-span-2"
+		/>
+		<StatCard label="Rclone Errors" value={statsPromise.then((s) => s.errors)} right />
+		<StatCard label="Updates" value={sysInfo.then((s) => s.availablePkgUpdates)} right />
+		<StatCard
+			label="ZFS cache hits"
+			value={zfsStats.then((zfs) => zfs.ratio.toFixed(1))}
+			suffix="%"
+			right
 		/>
 
 		<TorrentsCard {torrentsPromise} class="col-span-3" />

@@ -16,7 +16,9 @@
 	function setup() {
 		containersPromise
 			.then((newContainers) => {
-				containers = newContainers;
+				containers = newContainers
+					.filter((c) => !!c.image)
+					.sort((a, b) => a.name.localeCompare(b.name));
 				loading = false;
 				error = '';
 			})
