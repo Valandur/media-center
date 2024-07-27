@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fade, scale, slide } from 'svelte/transition';
+	import { fade, slide } from 'svelte/transition';
 
 	import type { Torrent } from '$lib/models/torrent';
 	import { formatEta, formatSize, formatSpeed } from '$lib/util';
@@ -24,19 +24,12 @@
 			})
 			.catch((err) => {
 				console.error(err);
+				torrents = [];
+				loading = false;
 				error = err.message;
 			});
 	}
 </script>
-
-{#if error}
-	<div transition:scale>
-		<Card>
-			<svelte:fragment slot="header">Torrents Error</svelte:fragment>
-			{error}
-		</Card>
-	</div>
-{/if}
 
 <Card class={$$props.class ?? ''}>
 	<svelte:fragment slot="header">Torrents</svelte:fragment>
@@ -45,7 +38,10 @@
 		<div class="grid grid-cols-[4fr_1fr_2fr_2fr_3fr_auto] items-center gap-x-4">
 			{#if loading}
 				<div class="spinner"></div>
+			{:else if error}
+				<div class="text-error text-xl font-bold">{error}</div>
 			{/if}
+
 			{#each torrents as torrent (torrent.id)}
 				<div class="text-nowrap text-ellipsis overflow-hidden" transition:slide>
 					{torrent.name}

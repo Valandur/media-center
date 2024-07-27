@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fade, scale, slide } from 'svelte/transition';
+	import { fade, slide } from 'svelte/transition';
 
 	import { isInProgress, type Transfer } from '$lib/models/transfer';
 	import { formatEta, formatSize, formatSpeed } from '$lib/util';
@@ -24,19 +24,12 @@
 			})
 			.catch((err) => {
 				console.error(err);
+				transfers = [];
+				loading = false;
 				error = err.message;
 			});
 	}
 </script>
-
-{#if error}
-	<div transition:scale>
-		<Card>
-			<svelte:fragment slot="header">Transfers Error</svelte:fragment>
-			{error}
-		</Card>
-	</div>
-{/if}
 
 <Card class={$$props.class ?? ''}>
 	<svelte:fragment slot="header">Transfers</svelte:fragment>
@@ -45,7 +38,10 @@
 		<div class="grid grid-cols-[2fr_2fr_1fr_2fr_auto] items-center gap-x-4">
 			{#if loading}
 				<div class="spinner"></div>
+			{:else if error}
+				<div class="text-error text-xl font-bold">{error}</div>
 			{/if}
+
 			{#each transfers as transfer (transfer.id)}
 				{@const lastSeperator = transfer.name.lastIndexOf('/')}
 				{@const fileName = transfer.name.substring(lastSeperator + 1)}

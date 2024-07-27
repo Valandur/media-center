@@ -29,6 +29,8 @@
 			})
 			.catch((err) => {
 				console.error(err);
+				jobs = [];
+				loading = false;
 				error = err.message;
 			});
 	}
@@ -61,7 +63,7 @@
 	<div transition:scale>
 		<Card>
 			<svelte:fragment slot="header">ARM Error</svelte:fragment>
-			{error}
+			<div class="text-error text-xl font-bold">{error}</div>
 		</Card>
 	</div>
 {/if}

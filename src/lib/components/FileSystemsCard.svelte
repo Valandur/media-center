@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fade, scale, slide } from 'svelte/transition';
+	import { fade, slide } from 'svelte/transition';
 
 	import type { FileSystem } from '$lib/models/file-system';
 	import { formatSize } from '$lib/util';
@@ -24,19 +24,12 @@
 			})
 			.catch((err) => {
 				console.error(err);
+				fileSystems = [];
+				loading = false;
 				error = err.message;
 			});
 	}
 </script>
-
-{#if error}
-	<div transition:scale>
-		<Card>
-			<svelte:fragment slot="header">FileSystems Error</svelte:fragment>
-			{error}
-		</Card>
-	</div>
-{/if}
 
 <Card class={$$props.class ?? ''}>
 	<svelte:fragment slot="header">File Systems</svelte:fragment>
@@ -45,7 +38,10 @@
 		<div class="grid grid-cols-[auto_auto_auto_1fr_auto] items-center gap-x-4">
 			{#if loading}
 				<div class="spinner"></div>
+			{:else if error}
+				<div class="text-error text-xl font-bold">{error}</div>
 			{/if}
+
 			{#each fileSystems as fs (fs.devicename)}
 				{@const used = formatSize(Number(fs.size) - Number(fs.available))}
 				<div class="text-nowrap text-ellipsis overflow-hidden" transition:slide>

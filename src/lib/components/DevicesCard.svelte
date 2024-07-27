@@ -29,6 +29,8 @@
 			})
 			.catch((err) => {
 				console.log(err);
+				devices = [];
+				loading = false;
 				devError = err.message;
 			});
 
@@ -44,28 +46,12 @@
 			})
 			.catch((err) => {
 				console.error(err);
+				smartDevicesMap = new Map();
+				loadingSmart = false;
 				smartDevError = err.message;
 			});
 	}
 </script>
-
-{#if devError}
-	<div transition:scale>
-		<Card>
-			<svelte:fragment slot="header">Devices Error</svelte:fragment>
-			{devError}
-		</Card>
-	</div>
-{/if}
-
-{#if smartDevError}
-	<div transition:scale>
-		<Card>
-			<svelte:fragment slot="header">S.M.A.R.T. Error</svelte:fragment>
-			{smartDevError}
-		</Card>
-	</div>
-{/if}
 
 <Card class={$$props.class ?? ''}>
 	<svelte:fragment slot="header">Devices</svelte:fragment>
@@ -74,7 +60,12 @@
 		<div class="grid grid-cols-[1fr_4fr_1fr_2fr_2fr] items-center gap-x-2">
 			{#if loading}
 				<div class="spinner"></div>
+			{:else if devError}
+				<div class="text-error text-xl font-bold">{devError}</div>
+			{:else if smartDevError}
+				<div class="text-error text-xl font-bold">{smartDevError}</div>
 			{/if}
+
 			{#each devices as device (device.devicename)}
 				{@const smart = smartDevicesMap.get(device.canonicaldevicefile)}
 				{@const bg = smart ? (smart.overallstatus === 'GOOD' ? 'bg-success' : 'bg-warning') : ''}

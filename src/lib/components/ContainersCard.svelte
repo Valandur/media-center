@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { scale, slide } from 'svelte/transition';
+	import { slide } from 'svelte/transition';
 
 	import type { Container } from '$lib/models/docker';
 
@@ -22,19 +22,12 @@
 			})
 			.catch((err) => {
 				console.error(err);
+				containers = [];
+				loading = false;
 				error = err.message;
 			});
 	}
 </script>
-
-{#if error}
-	<div transition:scale>
-		<Card>
-			<svelte:fragment slot="header">Containers Error</svelte:fragment>
-			{error}
-		</Card>
-	</div>
-{/if}
 
 <Card class={$$props.class ?? ''}>
 	<svelte:fragment slot="header">Docker Containers</svelte:fragment>
@@ -43,6 +36,8 @@
 		<div class="grid grid-cols-[auto_auto] items-center gap-x-4">
 			{#if loading}
 				<div class="spinner"></div>
+			{:else if error}
+				<div class="text-error text-xl font-bold">{error}</div>
 			{/if}
 			{#each containers as container (container.name)}
 				{@const bg =
