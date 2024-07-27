@@ -96,27 +96,16 @@
 
 <div class="flex-1 flex flex-row gap-4 overflow-auto">
 	<div class="flex-grow basis-2/3 grid grid-cols-[repeat(6,1fr)] auto-rows-max gap-4">
-		<StatCard
-			label="CPU"
-			value={sysInfo.then((s) => s.cpuUtilization.toFixed(1))}
-			suffix="%"
-			right
-		/>
-		<StatCard
-			label="Temperature"
-			value={cpuTempPrommise.then((temp) => temp.toFixed(1))}
-			suffix="°C"
-			right
-		/>
-		<StatCard
-			label="Memory"
-			value={sysInfo.then((s) => (Number(s.memUtilization) * 100).toFixed(1))}
-			suffix="%"
-			right
-		/>
-		<StatCard label="Updates" value={sysInfo.then((s) => s.availablePkgUpdates)} right />
 		<StatCard label="Total Checks" value={statsPromise.then((s) => s.totalChecks)} right />
 		<StatCard label="Total Transfers" value={statsPromise.then((s) => s.totalTransfers)} right />
+		<SizeStatCard label="Speed" value={statsPromise.then((s) => s.speed)} right />
+		<StatCard label="Errors" value={statsPromise.then((s) => s.errors)} right />
+		<StatCard
+			label="ETA"
+			value={statsPromise.then((s) => s.eta ?? 'Unknown')}
+			right
+			class="col-span-2"
+		/>
 
 		<TorrentsCard {torrentsPromise} class="col-span-3" />
 		<TransfersCard {transfersPromise} class="col-span-3" />
@@ -125,6 +114,30 @@
 	</div>
 
 	<div class="flex-grow basis-1/3 flex flex-col gap-4">
+		<div class="flex flex-row gap-4">
+			<StatCard
+				label="CPU"
+				value={sysInfo.then((s) => s.cpuUtilization.toFixed(1))}
+				suffix="%"
+				right
+				class="flex-1"
+			/>
+			<StatCard
+				label="Temperature"
+				value={cpuTempPrommise.then((temp) => temp.toFixed(1))}
+				suffix="°C"
+				right
+				class="flex-1"
+			/>
+			<StatCard
+				label="Memory"
+				value={sysInfo.then((s) => (Number(s.memUtilization) * 100).toFixed(1))}
+				suffix="%"
+				right
+				class="flex-1"
+			/>
+		</div>
+
 		<ContainersCard {containersPromise} />
 
 		<FileSystemsCard {fileSystemsPromise} />
