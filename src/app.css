@@ -13,7 +13,7 @@
 		right: 0;
 		height: 100%;
 		z-index: -500;
-		background: linear-gradient(180deg, rgba(50, 70, 80, 0.9) 0%, rgba(13, 16, 27, 1) 100%);
+		background: linear-gradient(180deg, rgba(50, 70, 80, 0.95) 0%, rgba(13, 16, 27, 1) 100%);
 	}
 	html::after {
 		content: '';

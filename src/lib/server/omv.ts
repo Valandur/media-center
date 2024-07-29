@@ -52,7 +52,7 @@ class OMV extends Service {
 
 	public async getCpuUsage(): Promise<string> {
 		try {
-			console.log(
+			this.logger.debug(
 				`${DOWNLOAD_URL}?service=Rrd&method=getGraph&params={"kind":"cpu-0","period":"hour"}`
 			);
 			const res = await this.fetch(
@@ -227,9 +227,7 @@ class OMV extends Service {
 
 			return wrapper.response;
 		} finally {
-			if (status !== 200) {
-				this.logger.warn(httpMethod, url, service, method, status);
-			}
+			this.logger.debug(httpMethod, url, service, method, status);
 		}
 	}
 
