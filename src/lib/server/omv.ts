@@ -5,7 +5,7 @@ import { differenceInSeconds } from 'date-fns/differenceInSeconds';
 import { error } from '@sveltejs/kit';
 
 import type { SmartDevice } from '$lib/models/smart';
-import type { Container } from '$lib/models/docker';
+import type { Container, Service as DockerService } from '$lib/models/docker';
 import type { FileSystem } from '$lib/models/file-system';
 import type { Device } from '$lib/models/device';
 import type { Output } from '$lib/models/output';
@@ -122,9 +122,47 @@ class OMV extends Service {
 		}
 	}
 
+	public async getComposeServices(): Promise<DockerService[]> {
+		try {
+			const res = await this.requestAsync<{ data: DockerService[] }>(
+				'Compose',
+				'getServicesListBg',
+				{ start: 0, limit: -1, sortdir: 'asc', sortfield: 'name' }
+			);
+			return res.data;
+		} catch (err) {
+			error(500, (err as Error).message);
+		}
+	}
+
+	public async doComposeServiceCommand(
+		cmd: string,
+		service: string,
+		filepath: string,
+		envpath: string
+	): Promise<void> {
+		try {
+			const res = await this.request('Compose', 'doServiceCommand', {
+				command: cmd,
+				command2: '',
+				service: service,
+				envpath: envpath,
+				path: filepath
+			});
+			this.logger.info('Compose', 'doServiceCommand', cmd, service, res);
+		} catch (err) {
+			error(500, (err as Error).message);
+		}
+	}
+
 	public async getComposeContainers(): Promise<Container[]> {
 		try {
-			const res = await this.request<Container[]>('Compose', 'getContainers');
+			const res = await this.requestAsync<Container[]>('Compose', 'getContainerListBg', {
+				start: 0,
+				limit: -1,
+				sortdir: 'asc',
+				sortfield: 'name'
+			});
 			return res;
 		} catch (err) {
 			error(500, (err as Error).message);
@@ -151,10 +189,11 @@ class OMV extends Service {
 	): Promise<T> {
 		let status = 0;
 		const url = RPC_URL;
+		const httpMethod = 'POST';
 
 		try {
 			const res = await this.fetch(url, {
-				method: 'POST',
+				method: httpMethod,
 				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({
 					service,
@@ -173,22 +212,24 @@ class OMV extends Service {
 						await this.auth();
 						return this.request(service, method, params, false);
 					} else {
-						console.error(wrapper.error.message);
+						this.logger.error(httpMethod, url, service, method, wrapper.error.message);
 						throw new Error(wrapper.error.message);
 					}
 				}
-				console.error(wrapper.error);
+				this.logger.error(httpMethod, url, service, method, wrapper.error);
 				throw new Error(JSON.stringify(wrapper.error));
 			}
 
 			if (!('response' in wrapper)) {
-				console.error(wrapper);
+				this.logger.error(httpMethod, url, service, method, wrapper);
 				throw new Error('Missing response!');
 			}
 
 			return wrapper.response;
 		} finally {
-			this.logger.debug('GET', url, service, method, status);
+			if (status !== 200) {
+				this.logger.warn(httpMethod, url, service, method, status);
+			}
 		}
 	}
 

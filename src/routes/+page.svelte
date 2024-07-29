@@ -4,13 +4,13 @@
 	import { onMount } from 'svelte';
 
 	import ArmJobsCardList from '$lib/components/ArmJobsCardList.svelte';
-	import ContainersCard from '$lib/components/ContainersCard.svelte';
 	import DevicesCard from '$lib/components/DevicesCard.svelte';
+	import DockerServicesCard from '$lib/components/DockerServicesCard.svelte';
 	import FileSystemsCard from '$lib/components/FileSystemsCard.svelte';
+	import SizeStatCard from '$lib/components/SizeStatCard.svelte';
+	import StatCard from '$lib/components/StatCard.svelte';
 	import TorrentsCard from '$lib/components/TorrentsCard.svelte';
 	import TransfersCard from '$lib/components/TransfersCard.svelte';
-	import StatCard from '$lib/components/StatCard.svelte';
-	import SizeStatCard from '$lib/components/SizeStatCard.svelte';
 
 	import type { PageServerData } from './$types';
 
@@ -31,7 +31,7 @@
 	$: devicesPromise = data.omv.devices;
 	$: smartDevicesPromise = data.omv.smartDevices;
 	$: fileSystemsPromise = data.omv.fileSystems;
-	$: containersPromise = data.omv.containers;
+	$: servicesPromise = data.omv.services;
 	$: zfsStats = data.omv.zfsStats;
 	$: statsPromise = data.rclone.stats;
 	$: transfersPromise = statsPromise.then((s) => s.transferring ?? []);
@@ -86,7 +86,7 @@
 			/>
 		</label>
 
-		<button class="ms-4" on:click={refresh}>
+		<button class="btn btn-primary btn-small ms-4" on:click={refresh}>
 			<i
 				class="fa-solid fa-arrows-rotate transition-transform duration-500 ease-in-out rotate-180"
 				style="transform: rotate({count * 360}deg);"
@@ -145,7 +145,7 @@
 			/>
 		</div>
 
-		<ContainersCard {containersPromise} />
+		<DockerServicesCard {servicesPromise} />
 
 		<FileSystemsCard {fileSystemsPromise} />
 

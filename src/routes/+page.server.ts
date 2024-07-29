@@ -15,8 +15,7 @@ export const load: PageServerLoad = async ({ depends }) => {
 	const smartDevices = omv.getSmartDevices();
 	const fileSystems = omv.getFileSystems();
 	const zfsStats = omv.getZfsStats();
-
-	const containers = omv.getComposeContainers();
+	const services = omv.getComposeServices();
 
 	// rclone
 	const stats = rclone.coreStats();
@@ -34,7 +33,7 @@ export const load: PageServerLoad = async ({ depends }) => {
 			devices,
 			smartDevices,
 			fileSystems,
-			containers,
+			services,
 			zfsStats
 		},
 		rclone: {
