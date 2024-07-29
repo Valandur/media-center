@@ -34,6 +34,7 @@
 		try {
 			await fetch('/api/docker', {
 				method: 'POST',
+				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({
 					action: 'pull',
 					service: service.name,
@@ -56,6 +57,7 @@
 		try {
 			await fetch('/api/docker', {
 				method: 'POST',
+				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({
 					action: 'restart',
 					service: service.name,

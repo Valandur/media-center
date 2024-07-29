@@ -39,7 +39,11 @@
 	async function onSubmit(event: SubmitEvent) {
 		if (event.target instanceof HTMLFormElement) {
 			try {
-				const res = await fetch('/api/omdb', { method: 'POST', body: JSON.stringify({ search }) });
+				const res = await fetch('/api/omdb', {
+					method: 'POST',
+					headers: { 'content-type': 'application/json' },
+					body: JSON.stringify({ search })
+				});
 				const data = await res.json();
 				titles = data;
 			} catch (err) {
@@ -50,7 +54,11 @@
 
 	async function onSelect(title: Title) {
 		try {
-			await fetch('/api/arm', { method: 'POST', body: JSON.stringify({ ...title, selectedId }) });
+			await fetch('/api/arm', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ ...title, selectedId })
+			});
 			selectedId = '';
 			invalidate('mc:stats');
 		} catch (err) {
