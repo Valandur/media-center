@@ -142,7 +142,7 @@ class OMV extends Service {
 		envpath: string
 	): Promise<void> {
 		try {
-			const res = await this.request('Compose', 'doServiceCommand', {
+			const res = await this.requestAsync('Compose', 'doServiceCommand', {
 				command: cmd,
 				command2: '',
 				service: service,
