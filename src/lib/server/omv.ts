@@ -13,9 +13,10 @@ import type { ZfsPool, ZfsStats } from '$lib/models/zfs';
 import type { SystemInfo } from '$lib/models/system';
 
 import { Service } from './service';
+import { fetch } from './fetch';
 
 const OUTPUT_CHECK_INTERVAL = 1000;
-const RPC_URL = `${env.OMV_URL}/rpc.php`;
+const URL = `${env.OMV_URL}/rpc.php`;
 const DOWNLOAD_URL = `${env.OMV_URL}/download.php`;
 const MAX_CACHE_TIME = 60; // in seconds
 
@@ -188,48 +189,36 @@ class OMV extends Service {
 		params?: Record<string, unknown>,
 		retry = true
 	): Promise<T> {
-		let status = 0;
-		const url = RPC_URL;
-		const httpMethod = 'POST';
+		const res = await this.fetch(URL, {
+			method: 'POST',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify({
+				service,
+				method,
+				params
+			}),
+			credentials: 'include'
+		});
 
-		try {
-			const res = await this.fetch(url, {
-				method: httpMethod,
-				headers: { 'content-type': 'application/json' },
-				body: JSON.stringify({
-					service,
-					method,
-					params
-				}),
-				credentials: 'include'
-			});
-			status = res.status;
+		const wrapper = await res.json();
 
-			const wrapper = await res.json();
-
-			if ('error' in wrapper && wrapper.error) {
-				if (typeof wrapper.error === 'object' && 'message' in wrapper.error) {
-					if (wrapper.error.message === 'Session not authenticated.' && retry) {
-						await this.auth();
-						return this.request(service, method, params, false);
-					} else {
-						this.logger.error(httpMethod, url, service, method, wrapper.error.message);
-						throw new Error(wrapper.error.message);
-					}
+		if ('error' in wrapper && wrapper.error) {
+			if (typeof wrapper.error === 'object' && 'message' in wrapper.error) {
+				if (wrapper.error.message === 'Session not authenticated.' && retry) {
+					await this.auth();
+					return this.request(service, method, params, false);
+				} else {
+					throw new Error(wrapper.error.message);
 				}
-				this.logger.error(httpMethod, url, service, method, wrapper.error);
-				throw new Error(JSON.stringify(wrapper.error));
 			}
-
-			if (!('response' in wrapper)) {
-				this.logger.error(httpMethod, url, service, method, wrapper);
-				throw new Error('Missing response!');
-			}
-
-			return wrapper.response;
-		} finally {
-			this.logger.debug(httpMethod, url, service, method, status);
+			throw new Error(JSON.stringify(wrapper.error));
 		}
+
+		if (!('response' in wrapper)) {
+			throw new Error('Missing response!');
+		}
+
+		return wrapper.response;
 	}
 
 	private async requestAsync<T>(service: string, method: string, params?: Record<string, unknown>) {
@@ -267,7 +256,7 @@ class OMV extends Service {
 		}
 
 		this.authPending = true;
-		const res = await this.fetch(RPC_URL, {
+		const res = await this.fetch(URL, {
 			method: 'POST',
 			headers: { 'content-type': 'application/json' },
 			body: JSON.stringify({

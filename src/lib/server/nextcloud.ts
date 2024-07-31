@@ -4,6 +4,7 @@ import type { NextcloudInfo, NextcloudResponse } from '$lib/models/nextcloud';
 import { differenceInSeconds } from 'date-fns/differenceInSeconds';
 
 import { Service } from './service';
+import { fetch } from './fetch';
 
 const BASE_URL = env.NEXTCLOUD_URL;
 const URL = `${BASE_URL}/ocs/v2.php/apps/serverinfo/api/v1/info?format=json`;

@@ -7,6 +7,7 @@ import type { ArmJob, ArmResult } from '$lib/models/arm';
 import type { Title } from '$lib/models/title';
 
 import { Service } from './service';
+import { fetch } from './fetch';
 
 const LOGIN_URL = `${env.ARM_URL}/login`;
 const JOB_LIST_URL = `${env.ARM_URL}/json?mode=joblist`;
@@ -52,20 +53,13 @@ class ARM extends Service {
 	}
 
 	private async request(url: string, retry = true): Promise<Response> {
-		let status = 0;
+		const res = await this.fetch(url);
 
-		try {
-			const res = await this.fetch(url);
-			status = res.status;
-
-			if (res.redirected && res.url.endsWith('/login') && retry) {
-				await this.auth();
-				return this.request(url, false);
-			}
-			return res;
-		} finally {
-			this.logger.debug('GET', url, status);
+		if (res.redirected && res.url.endsWith('/login') && retry) {
+			await this.auth();
+			return this.request(url, false);
 		}
+		return res;
 	}
 
 	private async auth() {

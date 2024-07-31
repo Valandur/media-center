@@ -1,9 +1,10 @@
 import { env } from '$env/dynamic/private';
-
-import type { Session } from '$lib/models/jellyfin';
 import { differenceInSeconds } from 'date-fns/differenceInSeconds';
 
+import type { Session } from '$lib/models/jellyfin';
+
 import { Service } from './service';
+import { fetch } from './fetch';
 
 const BASE_URL = env.JELLYFIN_URL;
 const URL = `${BASE_URL}/Sessions?ActiveWithinSeconds=960`;

@@ -136,21 +136,13 @@ class Rclone extends Service {
 	}
 
 	private async request(op: string, body?: Record<string, unknown>) {
-		let status = 0;
-		const url = `${env.RCLONE_URL}/${op}`;
-
-		try {
-			const res = await fetch(url, {
-				method: 'POST',
-				headers: HEADERS,
-				body: JSON.stringify(body ?? {})
-			});
-			status = res.status;
-			const data = await res.json();
-			return data;
-		} finally {
-			this.logger.debug('POST', url, JSON.stringify(body), status);
-		}
+		const res = await fetch(`${env.RCLONE_URL}/${op}`, {
+			method: 'POST',
+			headers: HEADERS,
+			body: JSON.stringify(body ?? {})
+		});
+		const data = await res.json();
+		return data;
 	}
 }
 
