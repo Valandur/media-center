@@ -17,13 +17,14 @@ import { Service } from './service';
 const OUTPUT_CHECK_INTERVAL = 1000;
 const RPC_URL = `${env.OMV_URL}/rpc.php`;
 const DOWNLOAD_URL = `${env.OMV_URL}/download.php`;
+const MAX_CACHE_TIME = 60; // in seconds
 
 class OMV extends Service {
 	private cookieJar = new CookieJar();
 	private fetch = makeFetchCookie(fetch, this.cookieJar);
 
 	private devUpdate = new Date(0);
-	private devCache: Device[] = [];
+	private devCache: Device[] | null = null;
 
 	private authPending = false;
 	private authCallbacks: Set<[() => void, (err: Error) => void]> = new Set();
@@ -82,7 +83,7 @@ class OMV extends Service {
 
 	public async getDevices(): Promise<Device[]> {
 		try {
-			if (this.devCache && differenceInSeconds(new Date(), this.devUpdate) < 60) {
+			if (this.devCache && differenceInSeconds(new Date(), this.devUpdate) < MAX_CACHE_TIME) {
 				return this.devCache;
 			}
 

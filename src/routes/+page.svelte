@@ -4,13 +4,14 @@
 	import { onMount } from 'svelte';
 
 	import ArmJobsCardList from '$lib/components/ArmJobsCardList.svelte';
-	import DevicesCard from '$lib/components/DevicesCard.svelte';
-	import DockerServicesCard from '$lib/components/DockerServicesCard.svelte';
-	import FileSystemsCard from '$lib/components/FileSystemsCard.svelte';
+	import JellyfinSessionsCard from '$lib/components/JellyfinSessionsCard.svelte';
+	import OMVDevicesCard from '$lib/components/OMVDevicesCard.svelte';
+	import OMVDockerServicesCard from '$lib/components/OMVDockerServicesCard.svelte';
+	import OMVFileSystemsCard from '$lib/components/OMVFileSystemsCard.svelte';
+	import RcloneTransfersCard from '$lib/components/RcloneTransfersCard.svelte';
 	import SizeStatCard from '$lib/components/SizeStatCard.svelte';
 	import StatCard from '$lib/components/StatCard.svelte';
-	import TorrentsCard from '$lib/components/TorrentsCard.svelte';
-	import TransfersCard from '$lib/components/TransfersCard.svelte';
+	import TransmissionTorrentsCard from '$lib/components/TransmissionTorrentsCard.svelte';
 
 	import type { PageServerData } from './$types';
 
@@ -37,6 +38,8 @@
 	$: transfersPromise = statsPromise.then((s) => s.transferring ?? []);
 	$: jobsPromise = data.arm.jobs;
 	$: torrentsPromise = data.transmission.torrents;
+	$: nextcloudPromise = data.nextcloud.info;
+	$: jellyfinPromise = data.jellyfin.info;
 
 	$: autoRefresh, setupAutoRefresh();
 
@@ -114,8 +117,27 @@
 			right
 		/>
 
-		<TorrentsCard {torrentsPromise} class="col-span-3" />
-		<TransfersCard {transfersPromise} class="col-span-3" />
+		<SizeStatCard
+			label="Nextcloud DB"
+			value={nextcloudPromise.then((i) => Number(i.server.database.size))}
+			right
+		/>
+		<StatCard
+			label="Nextcloud Files"
+			value={nextcloudPromise.then((i) => i.nextcloud.storage.num_files)}
+			right
+		/>
+		<StatCard
+			label="Nextcloud Shares"
+			value={nextcloudPromise.then((i) => i.nextcloud.shares.num_shares)}
+			right
+		/>
+
+		<JellyfinSessionsCard {jellyfinPromise} class="col-span-6" />
+
+		<TransmissionTorrentsCard {torrentsPromise} class="col-span-3" />
+
+		<RcloneTransfersCard {transfersPromise} class="col-span-3" />
 
 		<ArmJobsCardList {jobsPromise} class="col-span-2 row-span-2" />
 	</div>
@@ -145,10 +167,10 @@
 			/>
 		</div>
 
-		<DockerServicesCard {servicesPromise} />
+		<OMVDockerServicesCard {servicesPromise} />
 
-		<FileSystemsCard {fileSystemsPromise} />
+		<OMVFileSystemsCard {fileSystemsPromise} />
 
-		<DevicesCard {devicesPromise} {smartDevicesPromise} />
+		<OMVDevicesCard {devicesPromise} {smartDevicesPromise} />
 	</div>
 </div>

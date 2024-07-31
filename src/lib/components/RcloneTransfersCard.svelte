@@ -32,7 +32,7 @@
 </script>
 
 <Card class={$$props.class ?? ''}>
-	<svelte:fragment slot="header">Transfers</svelte:fragment>
+	<svelte:fragment slot="header">Rclone Transfers</svelte:fragment>
 
 	<div class="flex flex-col">
 		<div class="grid grid-cols-[2fr_2fr_1fr_2fr_auto] items-center gap-x-4">

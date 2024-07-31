@@ -32,7 +32,7 @@
 </script>
 
 <Card class={$$props.class ?? ''}>
-	<svelte:fragment slot="header">Torrents</svelte:fragment>
+	<svelte:fragment slot="header">Transmission Torrents</svelte:fragment>
 
 	<div class="flex flex-col">
 		<div class="grid grid-cols-[4fr_1fr_2fr_2fr_3fr_auto] items-center gap-x-4">

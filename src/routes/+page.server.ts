@@ -1,4 +1,6 @@
 import { arm } from '$lib/server/arm';
+import { jellyfin } from '$lib/server/jellyfin';
+import { nextcloud } from '$lib/server/nextcloud';
 import { omv } from '$lib/server/omv';
 import { rclone } from '$lib/server/rclone';
 import { transmission } from '$lib/server/transmission';
@@ -26,6 +28,12 @@ export const load: PageServerLoad = async ({ depends }) => {
 	// Transmission
 	const torrents = transmission.getTorrents();
 
+	// Nextcloud
+	const nextcloudInfo = nextcloud.getInfo();
+
+	// Jellyfin
+	const jellyfinInfo = jellyfin.getInfo();
+
 	return {
 		omv: {
 			sysInfo,
@@ -44,6 +52,12 @@ export const load: PageServerLoad = async ({ depends }) => {
 		},
 		transmission: {
 			torrents
+		},
+		nextcloud: {
+			info: nextcloudInfo
+		},
+		jellyfin: {
+			info: jellyfinInfo
 		}
 	};
 };
