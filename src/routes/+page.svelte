@@ -135,13 +135,13 @@
 			/>
 		</div>
 
-		<JellyfinSessions {jellyfinPromise} class="mt-4" />
+		<JellyfinSessions {jellyfinPromise} />
 
-		<TransmissionTorrents {torrentsPromise} class="mt-4" />
+		<TransmissionTorrents {torrentsPromise} />
 
-		<RcloneTransfers {transfersPromise} class="mt-4" />
+		<RcloneTransfers {transfersPromise} />
 
-		<ArmJobs {jobsPromise} class="mt-4" />
+		<ArmJobs {jobsPromise} />
 	</div>
 
 	<div class="flex-grow basis-1/3 flex flex-col gap-4">

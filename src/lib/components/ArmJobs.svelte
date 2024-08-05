@@ -67,7 +67,7 @@
 	}
 </script>
 
-<div class="grid grid-cols-4 auto-rows-max gap-4 {$$props.class ?? ''}">
+<div class="grid grid-cols-4 auto-rows-max gap-4" class:mt-4={error || jobs.length > 0}>
 	{#if error}
 		<div class="col-span-4" transition:scale>
 			<Card>
