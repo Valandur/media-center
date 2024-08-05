@@ -5,7 +5,10 @@
 	export let remaining: number | null = null;
 	export let colorProgress: boolean = false;
 
-	$: ratio = progress ? progress / total : remaining ? 1 - remaining / total : 0;
+	$: ratio = Math.min(
+		Math.max(progress ? progress / total : remaining ? 1 - remaining / total : 0, 0),
+		1
+	);
 	$: pct = (ratio * 100).toFixed(0);
 	$: bg = colorProgress
 		? ratio < 0.5

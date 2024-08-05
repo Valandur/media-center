@@ -67,40 +67,41 @@
 	}
 </script>
 
-{#if error}
-	<div transition:scale>
-		<Card>
-			<svelte:fragment slot="header">ARM Error</svelte:fragment>
-			<div class="text-error text-xl font-bold">{error}</div>
-		</Card>
-	</div>
-{/if}
+<div class="grid grid-cols-4 auto-rows-max gap-4 {$$props.class ?? ''}">
+	{#if error}
+		<div class="col-span-4" transition:scale>
+			<Card>
+				<svelte:fragment slot="header">ARM Error</svelte:fragment>
+				<div class="text-error text-xl font-bold">{error}</div>
+			</Card>
+		</div>
+	{/if}
 
-{#each jobs as job (job.job_id)}
-	<div
-		class={$$props.class ?? ''}
-		style="order: {job.job_id};"
-		in:scale={{ delay: 250, duration: 200, easing: cubicInOut }}
-		out:scale={{ duration: 200, easing: cubicInOut }}
-		animate:flip={{ delay: 250, duration: 200, easing: cubicInOut }}
-	>
-		<Card>
-			<svelte:fragment slot="header">
-				ARM - {job.title}
-			</svelte:fragment>
+	{#each jobs as job (job.job_id)}
+		<div
+			style="order: {job.job_id};"
+			in:scale={{ delay: 250, duration: 200, easing: cubicInOut }}
+			out:scale={{ duration: 200, easing: cubicInOut }}
+			animate:flip={{ delay: 250, duration: 200, easing: cubicInOut }}
+		>
+			<Card>
+				<svelte:fragment slot="header">
+					{job.title}
+				</svelte:fragment>
 
-			<div class="flex flex-col">
-				<button on:click={() => (selectedId = job.job_id)} class="self-center mb-2">
-					<img src={job.poster_url} alt="Poster" />
-				</button>
-				<div>{job.stage}</div>
-				<div>
-					<Progress total={100} progress={Number(job.progress_round)} />
+				<div class="flex flex-col">
+					<button on:click={() => (selectedId = job.job_id)} class="self-center mb-2">
+						<img src={job.poster_url} alt="Poster" />
+					</button>
+					<div>{job.stage}</div>
+					<div>
+						<Progress total={100} progress={Number(job.progress_round)} />
+					</div>
 				</div>
-			</div>
-		</Card>
-	</div>
-{/each}
+			</Card>
+		</div>
+	{/each}
+</div>
 
 {#if selectedId}
 	<button

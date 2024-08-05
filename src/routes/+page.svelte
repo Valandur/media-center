@@ -3,15 +3,15 @@
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
 
-	import ArmJobsCardList from '$lib/components/ArmJobsCardList.svelte';
-	import JellyfinSessionsCard from '$lib/components/JellyfinSessionsCard.svelte';
+	import ArmJobs from '$lib/components/ArmJobs.svelte';
+	import JellyfinSessions from '$lib/components/JellyfinSessions.svelte';
 	import OMVDevicesCard from '$lib/components/OMVDevicesCard.svelte';
 	import OMVDockerServicesCard from '$lib/components/OMVDockerServicesCard.svelte';
 	import OMVFileSystemsCard from '$lib/components/OMVFileSystemsCard.svelte';
-	import RcloneTransfersCard from '$lib/components/RcloneTransfersCard.svelte';
+	import RcloneTransfers from '$lib/components/RcloneTransfers.svelte';
 	import SizeStatCard from '$lib/components/SizeStatCard.svelte';
 	import StatCard from '$lib/components/StatCard.svelte';
-	import TransmissionTorrentsCard from '$lib/components/TransmissionTorrentsCard.svelte';
+	import TransmissionTorrents from '$lib/components/TransmissionTorrents.svelte';
 
 	import type { PageServerData } from './$types';
 
@@ -99,47 +99,49 @@
 </div>
 
 <div class="flex-1 flex flex-row gap-4 overflow-auto">
-	<div class="flex-grow basis-2/3 grid grid-cols-[repeat(6,1fr)] auto-rows-max gap-4">
-		<StatCard label="Rclone Checks" value={statsPromise.then((s) => s.totalChecks)} right />
-		<StatCard label="Rclone Transfers" value={statsPromise.then((s) => s.totalTransfers)} right />
-		<SizeStatCard
-			label="Rclone Speed"
-			value={statsPromise.then((s) => s.speed)}
-			unitSuffix="/s"
-			right
-		/>
-		<StatCard label="Rclone Errors" value={statsPromise.then((s) => s.errors)} right />
-		<StatCard label="Updates" value={sysInfo.then((s) => s.availablePkgUpdates)} right />
-		<StatCard
-			label="ZFS cache hits"
-			value={zfsStats.then((zfs) => zfs.ratio.toFixed(1))}
-			suffix="%"
-			right
-		/>
+	<div class="flex flex-col flex-grow basis-2/3">
+		<div class="grid grid-cols-6 auto-rows-max gap-4">
+			<StatCard label="Rclone Checks" value={statsPromise.then((s) => s.totalChecks)} right />
+			<StatCard label="Rclone Transfers" value={statsPromise.then((s) => s.totalTransfers)} right />
+			<SizeStatCard
+				label="Rclone Speed"
+				value={statsPromise.then((s) => s.speed)}
+				unitSuffix="/s"
+				right
+			/>
+			<StatCard label="Rclone Errors" value={statsPromise.then((s) => s.errors)} right />
+			<StatCard label="Updates" value={sysInfo.then((s) => s.availablePkgUpdates)} right />
+			<StatCard
+				label="ZFS cache hits"
+				value={zfsStats.then((zfs) => zfs.ratio.toFixed(1))}
+				suffix="%"
+				right
+			/>
 
-		<SizeStatCard
-			label="Nextcloud DB"
-			value={nextcloudPromise.then((i) => Number(i.server.database.size))}
-			right
-		/>
-		<StatCard
-			label="Nextcloud Files"
-			value={nextcloudPromise.then((i) => i.nextcloud.storage.num_files)}
-			right
-		/>
-		<StatCard
-			label="Nextcloud Shares"
-			value={nextcloudPromise.then((i) => i.nextcloud.shares.num_shares)}
-			right
-		/>
+			<SizeStatCard
+				label="Nextcloud DB"
+				value={nextcloudPromise.then((i) => Number(i.server.database.size))}
+				right
+			/>
+			<StatCard
+				label="Nextcloud Files"
+				value={nextcloudPromise.then((i) => i.nextcloud.storage.num_files)}
+				right
+			/>
+			<StatCard
+				label="Nextcloud Shares"
+				value={nextcloudPromise.then((i) => i.nextcloud.shares.num_shares)}
+				right
+			/>
+		</div>
 
-		<JellyfinSessionsCard {jellyfinPromise} class="col-span-6" />
+		<JellyfinSessions {jellyfinPromise} class="mt-4" />
 
-		<TransmissionTorrentsCard {torrentsPromise} class="col-span-3" />
+		<TransmissionTorrents {torrentsPromise} class="mt-4" />
 
-		<RcloneTransfersCard {transfersPromise} class="col-span-3" />
+		<RcloneTransfers {transfersPromise} class="mt-4" />
 
-		<ArmJobsCardList {jobsPromise} class="col-span-2 row-span-2" />
+		<ArmJobs {jobsPromise} class="mt-4" />
 	</div>
 
 	<div class="flex-grow basis-1/3 flex flex-col gap-4">
