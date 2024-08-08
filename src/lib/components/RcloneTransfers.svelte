@@ -35,8 +35,8 @@
 
 <div class="grid grid-cols-4 auto-rows-max gap-4" class:mt-4={error || transfers.length > 0}>
 	{#if error}
-		<div class="col-span-4" transition:scale>
-			<Card>
+		<div transition:scale>
+			<Card class="h-full">
 				<svelte:fragment slot="header">Rclone Error</svelte:fragment>
 				<div class="text-error text-xl font-bold">{error}</div>
 			</Card>

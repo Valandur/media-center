@@ -36,19 +36,17 @@
 			});
 	}
 
-	async function onSubmit(event: SubmitEvent) {
-		if (event.target instanceof HTMLFormElement) {
-			try {
-				const res = await fetch('/api/omdb', {
-					method: 'POST',
-					headers: { 'content-type': 'application/json' },
-					body: JSON.stringify({ search })
-				});
-				const data = await res.json();
-				titles = data;
-			} catch (err) {
-				console.error(err);
-			}
+	async function onSubmit() {
+		try {
+			const res = await fetch('/api/omdb', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ search })
+			});
+			const data = await res.json();
+			titles = data;
+		} catch (err) {
+			console.error(err);
 		}
 	}
 

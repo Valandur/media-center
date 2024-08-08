@@ -40,6 +40,28 @@ class Transmission extends Service {
 		}
 	}
 
+	public async addTorrent(filename: string): Promise<void> {
+		try {
+			await this.request({
+				arguments: { 'download-dir': '/downloads/complete', filename, paused: false },
+				method: 'torrent-add'
+			});
+		} catch (err) {
+			error(500, (err as Error).message);
+		}
+	}
+
+	public async removeTorrent(id: number): Promise<void> {
+		try {
+			await this.request({
+				arguments: { 'delete-local-data': false, ids: [id] },
+				method: 'torrent-remove'
+			});
+		} catch (err) {
+			error(500, (err as Error).message);
+		}
+	}
+
 	private async request<T = unknown>(body: Record<string, unknown>, retry = true): Promise<T> {
 		const res = await fetch(URL, {
 			method: 'POST',

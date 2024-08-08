@@ -2,6 +2,7 @@
 	import { invalidate } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
+	import { fade } from 'svelte/transition';
 
 	import ArmJobs from '$lib/components/ArmJobs.svelte';
 	import JellyfinSessions from '$lib/components/JellyfinSessions.svelte';
@@ -26,6 +27,9 @@
 		: true;
 	let timer: ReturnType<typeof setInterval> | null = null;
 	let count = 0;
+	let torrent = '';
+	let showAddTorrent = false;
+	let addTorrentError = '';
 
 	$: sysInfo = data.omv.sysInfo;
 	$: cpuTempPrommise = data.omv.cpuTemp;
@@ -74,28 +78,61 @@
 		count = count + 1;
 		invalidate('mc:stats');
 	}
+
+	async function onAddTorrent() {
+		try {
+			addTorrentError = '';
+			const res = await fetch('/api/transmission', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ torrent })
+			});
+			const data = await res.json();
+			if (res.status !== 200) {
+				if (data && 'message' in data) {
+					throw new Error(data.message);
+				}
+				throw new Error('Could not add torrent: ' + res.statusText);
+			}
+			torrent = '';
+			showAddTorrent = false;
+		} catch (err) {
+			console.error(err);
+			addTorrentError = (err as Error).message;
+		}
+	}
 </script>
 
-<div class="flex items-center justify-between mb-2">
+<div class="flex flex-row items-center gap-4 mb-2">
 	<h3 class="text-lg font-medium">Dashboard</h3>
 
-	<div class="flex">
-		<label class="inline-flex items-center space-x-2">
-			<span>Auto Refresh</span>
-			<input
-				type="checkbox"
-				bind:checked={autoRefresh}
-				class="appearance-none w-10 h-6 rounded-full bg-no-repeat switch"
-			/>
-		</label>
-
-		<button class="btn btn-primary btn-small ms-4" on:click={refresh}>
-			<i
-				class="fa-solid fa-arrows-rotate transition-transform duration-500 ease-in-out rotate-180"
-				style="transform: rotate({count * 360}deg);"
-			></i>
+	<div>
+		<button
+			type="button"
+			class="btn btn-primary btn-small"
+			on:click={() => (showAddTorrent = true)}
+		>
+			<i class="fa-solid fa-plus"></i> Add Torrent
 		</button>
 	</div>
+
+	<div class="flex-1"></div>
+
+	<label class="inline-flex items-center gap-2">
+		<span>Auto Refresh</span>
+		<input
+			type="checkbox"
+			bind:checked={autoRefresh}
+			class="appearance-none w-10 h-6 rounded-full bg-no-repeat switch"
+		/>
+	</label>
+
+	<button class="btn btn-primary btn-small" on:click={refresh}>
+		<i
+			class="fa-solid fa-arrows-rotate transition-transform duration-500 ease-in-out rotate-180"
+			style="transform: rotate({count * 360}deg);"
+		></i>
+	</button>
 </div>
 
 <div class="flex-1 flex flex-row gap-4 overflow-auto">
@@ -176,3 +213,37 @@
 		<OMVDevicesCard {devicesPromise} {smartDevicesPromise} />
 	</div>
 </div>
+
+{#if showAddTorrent}
+	<button
+		class="fixed top-0 left-0 right-0 bottom-0 bg-dark/95 flex flex-col items-center justify-center z-20"
+		transition:fade
+		on:click={() => (showAddTorrent = false)}
+	>
+		<div
+			class="flex flex-row items-center justify-center text-primary cursor-default"
+			role="button"
+			on:click|stopPropagation
+			on:keydown|stopPropagation
+			tabindex={0}
+		>
+			<div class="border border-primary/75 bg-dark">
+				<div class="border-b border-primary/75 p-4 uppercase">Add a torrent</div>
+				<div class="p-4">
+					{#if addTorrentError}
+						<div class="text-error">
+							{addTorrentError}
+						</div>
+					{/if}
+
+					<form class="flex flex-col gap-2" on:submit|preventDefault|stopPropagation={onAddTorrent}>
+						<input type="text" placeholder="Torrent" class="input w-96 me-2" bind:value={torrent} />
+						<button type="submit" class="btn btn-primary">
+							<i class="fa-solid fa-plus"></i> Add Torrent
+						</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</button>
+{/if}

@@ -102,6 +102,6 @@
 	}
 
 	.input {
-		@apply appearance-none bg-[transparent] border border-secondary/30 rounded py-2 px-3;
+		@apply appearance-none bg-[transparent] border border-secondary/50 rounded py-2 px-3;
 	}
 }

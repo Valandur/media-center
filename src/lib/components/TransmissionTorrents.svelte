@@ -35,8 +35,8 @@
 
 <div class="grid grid-cols-3 auto-rows-max gap-4" class:mt-4={error || torrents.length > 0}>
 	{#if error}
-		<div class="col-span-4" transition:scale>
-			<Card>
+		<div transition:scale>
+			<Card class="h-full">
 				<svelte:fragment slot="header">Transmission Error</svelte:fragment>
 				<div class="text-error text-xl font-bold">{error}</div>
 			</Card>
