@@ -63,11 +63,11 @@
 	<svelte:fragment slot="header">
 		<div class="flex flex-row items-center justify-between">
 			<div>Devices</div>
-			{#if devDiffInMinutes > 1}
+			{#if !loading && devDiffInMinutes > 1}
 				<div class="badge bg-warning">
 					{formatDistanceToNow(devLastUpdate, { addSuffix: true })}
 				</div>
-			{:else if smartDevDiffInMinutes > 1}
+			{:else if !loadingSmart && smartDevDiffInMinutes > 1}
 				<div class="badge bg-warning">
 					SMART {formatDistanceToNow(smartDevLastUpdate, { addSuffix: true })}
 				</div>

@@ -85,7 +85,7 @@
 	<svelte:fragment slot="header">
 		<div class="flex flex-row items-center justify-between">
 			<div>Docker Services</div>
-			{#if diffInMinutes > 1}
+			{#if !loading && diffInMinutes > 1}
 				<div class="badge bg-warning">{formatDistanceToNow(lastUpdate, { addSuffix: true })}</div>
 			{/if}
 		</div>
