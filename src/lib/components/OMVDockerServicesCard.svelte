@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { fade, slide } from 'svelte/transition';
 	import { invalidate } from '$app/navigation';
+	import { differenceInMinutes } from 'date-fns/differenceInMinutes';
+	import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
 
 	import type { Service } from '$lib/models/docker';
 
@@ -11,26 +13,30 @@
 	let loading = true;
 	let services: Service[] = [];
 	let error = '';
+	let lastUpdate = new Date(0);
 	let selectedService: Service | null = null;
+	let pullingServices: string[] = [];
 
 	$: servicesPromise, setup();
+	$: diffInMinutes = differenceInMinutes(new Date(), lastUpdate);
 
 	function setup() {
 		servicesPromise
 			.then((newContainers) => {
 				services = newContainers.sort((a, b) => a.name.localeCompare(b.name));
 				loading = false;
+				lastUpdate = new Date();
 				error = '';
 			})
 			.catch((err) => {
 				console.error(err);
-				services = [];
 				loading = false;
 				error = err.message;
 			});
 	}
 
 	async function onUpdate(service: Service) {
+		pullingServices = pullingServices.concat(service.name);
 		try {
 			await fetch('/api/docker', {
 				method: 'POST',
@@ -45,6 +51,8 @@
 			invalidate('mc:stats');
 		} catch (err) {
 			console.error(err);
+		} finally {
+			pullingServices = pullingServices.filter((s) => s !== service.name);
 		}
 	}
 
@@ -74,13 +82,20 @@
 </script>
 
 <Card class={$$props.class ?? ''}>
-	<svelte:fragment slot="header">Docker Services</svelte:fragment>
+	<svelte:fragment slot="header">
+		<div class="flex flex-row items-center justify-between">
+			<div>Docker Services</div>
+			{#if diffInMinutes > 1}
+				<div class="badge bg-warning">{formatDistanceToNow(lastUpdate, { addSuffix: true })}</div>
+			{/if}
+		</div>
+	</svelte:fragment>
 
 	<div class="flex flex-col">
-		<div class="grid grid-cols-[1fr_1fr_1fr_auto] items-center gap-x-4">
+		<div class="grid grid-cols-[1fr_1fr_1fr_auto_auto] items-center gap-x-2">
 			{#if loading}
 				<div class="spinner"></div>
-			{:else if error}
+			{:else if error && diffInMinutes > 2}
 				<div class="text-error text-xl font-bold">{error}</div>
 			{/if}
 			{#each services as service (service.name)}
@@ -99,10 +114,16 @@
 				<div class="text-nowrap text-right" transition:slide>
 					{service.status}
 				</div>
-				<div class="text-nowrap text-right" transition:slide>
-					<button class="btn btn-primary btn-small" on:click={() => onUpdate(service)}>
-						<i class="fa-solid fa-download"></i>
-					</button>
+				<div transition:slide>
+					{#if pullingServices.includes(service.name)}
+						<div class="spinner"></div>
+					{:else}
+						<button class="btn btn-primary btn-small" on:click={() => onUpdate(service)}>
+							<i class="fa-solid fa-download"></i>
+						</button>
+					{/if}
+				</div>
+				<div transition:slide>
 					<button class="btn btn-primary btn-small" on:click={() => onRestart(service)}>
 						<i class="fa-solid fa-arrows-rotate"></i>
 					</button>

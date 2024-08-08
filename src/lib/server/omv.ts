@@ -142,17 +142,24 @@ class OMV extends Service {
 		service: string,
 		filepath: string,
 		envpath: string
-	): Promise<void> {
+	): Promise<string> {
 		try {
-			const res = await this.requestAsync('Compose', 'doServiceCommand', {
-				command: cmd,
-				command2: '',
-				service: service,
-				envpath: envpath,
-				path: filepath
-			});
-			this.logger.info('Compose', 'doServiceCommand', cmd, service, res);
+			this.logger.info('Compose', 'doServiceCommand', cmd, service);
+			const res = await this.requestAsync<string>(
+				'Compose',
+				'doServiceCommand',
+				{
+					command: cmd,
+					command2: '',
+					service: service,
+					envpath: envpath,
+					path: filepath
+				},
+				true
+			);
+			return res;
 		} catch (err) {
+			this.logger.error(err);
 			error(500, (err as Error).message);
 		}
 	}
@@ -221,20 +228,25 @@ class OMV extends Service {
 		return wrapper.response;
 	}
 
-	private async requestAsync<T>(service: string, method: string, params?: Record<string, unknown>) {
+	private async requestAsync<T>(
+		service: string,
+		method: string,
+		params?: Record<string, unknown>,
+		raw = false
+	) {
 		const filename = await this.request<string>(service, method, params);
-		const res = await this.waitForOutput<T>(filename);
+		const res = await this.waitForOutput<T>(filename, raw);
 		return res;
 	}
 
-	private async waitForOutput<T>(filename: string): Promise<T> {
+	private async waitForOutput<T>(filename: string, raw = false): Promise<T> {
 		let output: T | null = null;
 		let i = 0;
 		while (output === null) {
 			await new Promise((resolve) => setTimeout(resolve, OUTPUT_CHECK_INTERVAL));
 			const res = await this.request<Output>('Exec', 'getOutput', { filename, pos: 0 });
 			if (!res.running && !res.pendingOutput) {
-				output = JSON.parse(res.output);
+				output = raw ? res.output : JSON.parse(res.output);
 				break;
 			}
 			i++;
