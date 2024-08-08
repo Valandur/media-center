@@ -2,6 +2,8 @@ import makeFetchCookie from 'fetch-cookie';
 import { CookieJar } from 'tough-cookie';
 import { env } from '$env/dynamic/private';
 import { error } from '@sveltejs/kit';
+import { mkdir, readFile, writeFile } from 'fs/promises';
+import { dirname } from 'path';
 
 import type { ArmJob, ArmResult } from '$lib/models/arm';
 import type { Title } from '$lib/models/title';
@@ -13,10 +15,11 @@ const LOGIN_URL = `${env.ARM_URL}/login`;
 const JOB_LIST_URL = `${env.ARM_URL}/json?mode=joblist`;
 const SET_TITLE_URL = `${env.ARM_URL}/updatetitle`;
 const CSRF_REGEX = /name="csrf_token" type="hidden" value="(.*?)"/i;
+const COOKIE_FILE = '.cache/arm/cookies.json';
 
 class ARM extends Service {
-	private readonly cookieJar = new CookieJar();
-	private readonly fetch = makeFetchCookie(fetch, this.cookieJar);
+	private cookieJar = new CookieJar();
+	private fetch = makeFetchCookie(fetch, this.cookieJar);
 
 	public constructor() {
 		super('ARM');
@@ -63,6 +66,14 @@ class ARM extends Service {
 	}
 
 	private async auth() {
+		const cookieJarStr = await readFile(COOKIE_FILE, 'utf-8').catch(() => null);
+		if (cookieJarStr) {
+			const cookieJar = JSON.parse(cookieJarStr);
+			this.cookieJar = await CookieJar.deserialize(cookieJar);
+			this.fetch = makeFetchCookie(fetch, this.cookieJar);
+			this.logger.debug('Restored cookies from file');
+		}
+
 		const tokenRes = await this.fetch(LOGIN_URL);
 		const tokenText = await tokenRes.text();
 		const tokenMatch = CSRF_REGEX.exec(tokenText);
@@ -82,6 +93,11 @@ class ARM extends Service {
 		if (res.status !== 200) {
 			throw new Error('Authentication not successfull: ' + res.status);
 		}
+
+		// Save cookies to disk
+		const jar = await this.cookieJar.serialize();
+		await mkdir(dirname(COOKIE_FILE), { recursive: true });
+		await writeFile(COOKIE_FILE, JSON.stringify(jar), 'utf-8');
 	}
 }
 

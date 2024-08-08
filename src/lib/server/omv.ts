@@ -3,6 +3,8 @@ import { CookieJar } from 'tough-cookie';
 import { env } from '$env/dynamic/private';
 import { differenceInSeconds } from 'date-fns/differenceInSeconds';
 import { error } from '@sveltejs/kit';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { dirname } from 'node:path';
 
 import type { SmartDevice } from '$lib/models/smart';
 import type { Container, Service as DockerService } from '$lib/models/docker';
@@ -19,6 +21,7 @@ const OUTPUT_CHECK_INTERVAL = 1000;
 const URL = `${env.OMV_URL}/rpc.php`;
 const DOWNLOAD_URL = `${env.OMV_URL}/download.php`;
 const MAX_CACHE_TIME = 60; // in seconds
+const COOKIE_FILE = '.cache/omv/cookies.json';
 
 class OMV extends Service {
 	private cookieJar = new CookieJar();
@@ -268,6 +271,15 @@ class OMV extends Service {
 		}
 
 		this.authPending = true;
+
+		const cookieJarStr = await readFile(COOKIE_FILE, 'utf-8').catch(() => null);
+		if (cookieJarStr) {
+			const cookieJar = JSON.parse(cookieJarStr);
+			this.cookieJar = await CookieJar.deserialize(cookieJar);
+			this.fetch = makeFetchCookie(fetch, this.cookieJar);
+			this.logger.debug('Restored cookies from file');
+		}
+
 		const res = await this.fetch(URL, {
 			method: 'POST',
 			headers: { 'content-type': 'application/json' },
@@ -287,6 +299,11 @@ class OMV extends Service {
 			this.authCallbacks.clear();
 			throw err;
 		}
+
+		// Save cookies to disk
+		const jar = await this.cookieJar.serialize();
+		await mkdir(dirname(COOKIE_FILE), { recursive: true });
+		await writeFile(COOKIE_FILE, JSON.stringify(jar), 'utf-8');
 
 		this.authPending = false;
 		this.authCallbacks.forEach(([resolve]) => resolve());
