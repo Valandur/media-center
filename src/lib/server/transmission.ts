@@ -7,6 +7,7 @@ import { Service } from './service';
 import { fetch } from './fetch';
 
 const URL = `${env.TRANSMISSION_URL}/transmission/rpc`;
+const AUTH = `Basic ${btoa(`${env.TRANSMISSION_USERNAME}:${env.TRANSMISSION_PASSWORD}`)}`;
 
 class Transmission extends Service {
 	protected sessionId = '';
@@ -67,7 +68,8 @@ class Transmission extends Service {
 			method: 'POST',
 			headers: {
 				'content-type': 'application/json',
-				'x-transmission-session-id': this.sessionId
+				'x-transmission-session-id': this.sessionId,
+				Authorization: AUTH
 			},
 			body: JSON.stringify(body)
 		});
