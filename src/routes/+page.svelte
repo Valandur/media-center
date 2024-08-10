@@ -16,7 +16,7 @@
 
 	import type { PageServerData } from './$types';
 
-	const AUTO_REFRESH_INTERVAL = 5000;
+	const AUTO_REFRESH_INTERVAL = 10000;
 
 	export let data: PageServerData;
 
