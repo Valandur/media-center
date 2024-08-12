@@ -7,19 +7,6 @@ export interface Transfer {
 	size: number;
 }
 
-export interface CompletedTransfer {
-	error: string;
-	name: string;
-	size: number;
-	bytes: number;
-	checked: boolean;
-	started_at: string;
-	completed_at: string;
-	group: string;
-	srcFs: string;
-	dstFs: string;
-}
-
 export interface TransferInProgress extends Transfer {
 	bytes: number;
 	eta: number;
