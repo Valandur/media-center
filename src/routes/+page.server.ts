@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ depends }) => {
 	depends('mc:stats');
 
 	// OMV
-	const sysInfo = await omv.getSystemInformation(); // this prevents all OMV requests from triggering 401 errors at once
+	const sysInfo = omv.getSystemInformation();
 	const cpuTemp = omv.getCpuTemp();
 	const devices = omv.getDevices();
 	const smartDevices = omv.getSmartDevices();

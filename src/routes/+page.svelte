@@ -147,7 +147,7 @@
 				right
 			/>
 			<StatCard label="Rclone Errors" value={statsPromise.then((s) => s.errors)} right />
-			<StatCard label="Updates" value={sysInfo.availablePkgUpdates} right />
+			<StatCard label="Updates" value={sysInfo.then((s) => s.availablePkgUpdates)} right />
 			<StatCard
 				label="ZFS cache hits"
 				value={zfsStats.then((zfs) => zfs.ratio.toFixed(1))}
@@ -185,7 +185,7 @@
 		<div class="flex flex-row gap-4">
 			<StatCard
 				label="CPU"
-				value={sysInfo.cpuUtilization.toFixed(1)}
+				value={sysInfo.then((s) => s.cpuUtilization.toFixed(1))}
 				suffix="%"
 				right
 				class="flex-1"
@@ -199,7 +199,7 @@
 			/>
 			<StatCard
 				label="Memory"
-				value={(Number(sysInfo.memUtilization) * 100).toFixed(1)}
+				value={sysInfo.then((s) => (Number(s.memUtilization) * 100).toFixed(1))}
 				suffix="%"
 				right
 				class="flex-1"

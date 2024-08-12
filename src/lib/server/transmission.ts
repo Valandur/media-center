@@ -23,19 +23,24 @@ class Transmission extends Service {
 					fields: [
 						'id',
 						'name',
+						'status',
 						'eta',
 						'isFinished',
 						'isStalled',
 						'peersConnected',
 						'peersSendingToUs',
 						'percentDone',
+						'sizeWhenDone',
 						'rateDownload',
-						'sizeWhenDone'
+						'uploadedEver',
+						'peersGettingFromUs',
+						'rateUpload',
+						'etaIdle'
 					]
 				},
 				method: 'torrent-get'
 			});
-			return res.arguments.torrents;
+			return res.arguments.torrents.sort((a, b) => a.name.localeCompare(b.name));
 		} catch (err) {
 			error(500, (err as Error).message);
 		}

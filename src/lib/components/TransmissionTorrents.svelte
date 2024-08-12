@@ -3,7 +3,7 @@
 	import { cubicInOut } from 'svelte/easing';
 	import { flip } from 'svelte/animate';
 
-	import type { Torrent } from '$lib/models/torrent';
+	import { Status, type Torrent } from '$lib/models/torrent';
 	import { formatEta, formatSize, formatSpeed } from '$lib/util';
 
 	import Card from './Card.svelte';
@@ -44,9 +44,6 @@
 	{/if}
 
 	{#each torrents as torrent (torrent.id)}
-		{@const lastSeperator = torrent.name.lastIndexOf('/')}
-		{@const fileName = torrent.name.substring(lastSeperator + 1)}
-
 		<div
 			style="order: {torrent.id};"
 			in:scale={{ delay: 250, duration: 200, easing: cubicInOut }}
@@ -55,28 +52,51 @@
 		>
 			<Card>
 				<svelte:fragment slot="header">
-					{fileName}
+					{torrent.name}
 				</svelte:fragment>
 
 				<div class="flex flex-col">
 					{#if !torrent.isFinished}
-						{@const eta = formatEta(torrent.eta)}
+						{@const eta = torrent.eta < 0 ? null : formatEta(torrent.eta)}
+						{@const etaIdle = torrent.etaIdle < 0 ? null : formatEta(torrent.etaIdle)}
 						{@const speed = formatSpeed(torrent.rateDownload)}
-						{@const conns = `${torrent.peersSendingToUs} / ${torrent.peersConnected}`}
+						{@const status = Status[torrent.status]}
+						{@const dlPeers = `${torrent.peersSendingToUs} / ${torrent.peersConnected}`}
+						{@const ulPeers = `${torrent.peersGettingFromUs}`}
 
-						<div class="flex flex-row items-center justify-between gap-2 mb-4">
-							<div>Downloading from peers</div>
-							{#key conns}
+						<div class="flex flex-row items-center justify-between gap-2">
+							<div>Status</div>
+							{#key status}
 								<div in:fade>
-									{conns}
+									{status}
 								</div>
 							{/key}
 						</div>
 
-						<div class="flex flex-row items-center justify-between gap-2">
+						{#if torrent.status === Status.Downloading}
+							<div class="flex flex-row items-center justify-between gap-2">
+								<div>Downloading from peers</div>
+								{#key dlPeers}
+									<div in:fade>
+										{dlPeers}
+									</div>
+								{/key}
+							</div>
+						{:else if torrent.status === Status.Seeding}
+							<div class="flex flex-row items-center justify-between gap-2">
+								<div>Uploading to peers</div>
+								{#key ulPeers}
+									<div in:fade>
+										{ulPeers}
+									</div>
+								{/key}
+							</div>
+						{/if}
+
+						<div class="flex flex-row items-center justify-between gap-2 mt-4">
 							{#key eta}
 								<div in:fade>
-									{eta}
+									{eta ?? etaIdle ?? '---'}
 								</div>
 							{/key}
 
