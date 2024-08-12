@@ -9,7 +9,7 @@ import type { ArmJob, ArmResult } from '$lib/models/arm';
 import type { Title } from '$lib/models/title';
 
 import { Service } from './service';
-import { fetch } from './fetch';
+import { fetch, FormData, type Response } from './fetch';
 
 const LOGIN_URL = `${env.ARM_URL}/login`;
 const JOB_LIST_URL = `${env.ARM_URL}/json?mode=joblist`;
@@ -28,7 +28,7 @@ class ARM extends Service {
 	public async getJobList(): Promise<ArmJob[]> {
 		try {
 			const res = await this.request(JOB_LIST_URL);
-			const data: ArmResult = await res.json();
+			const data = (await res.json()) as ArmResult;
 			const jobs = Object.keys(data.results).map((key) => data.results[key]);
 			return jobs;
 		} catch (err) {

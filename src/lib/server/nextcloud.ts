@@ -32,7 +32,7 @@ class Nextcloud extends Service {
 			throw new Error(`Failed to fetch Nextcloud info: ${res.status}`);
 		}
 
-		const data: NextcloudResponse = await res.json();
+		const data = (await res.json()) as NextcloudResponse;
 
 		this.infoCache = data.ocs.data;
 		this.infoUpdate = new Date();

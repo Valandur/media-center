@@ -84,11 +84,14 @@ class Transmission extends Service {
 		}
 
 		const data = await res.json();
+		if (!data || typeof data !== 'object' || !('result' in data)) {
+			throw new Error(`Response data has incorrect format: ${data}`);
+		}
 		if (data.result !== 'success') {
-			throw new Error('Transmission request not successfull: ' + data.result);
+			throw new Error(`Transmission request not successfull: ${data.result}`);
 		}
 
-		return data;
+		return data as T;
 	}
 }
 

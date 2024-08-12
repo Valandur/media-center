@@ -212,23 +212,26 @@ class OMV extends Service {
 
 		const wrapper = await res.json();
 
+		if (!wrapper || typeof wrapper !== 'object') {
+			throw new Error(`Response data has incorrect format: ${wrapper}`);
+		}
 		if ('error' in wrapper && wrapper.error) {
 			if (typeof wrapper.error === 'object' && 'message' in wrapper.error) {
 				if (wrapper.error.message === 'Session not authenticated.' && retry) {
 					await this.auth();
 					return this.request(service, method, params, false);
 				} else {
-					throw new Error(wrapper.error.message);
+					throw new Error(`${wrapper.error.message}`);
 				}
 			}
-			throw new Error(JSON.stringify(wrapper.error));
+			throw new Error(`Error with unknown format: ${JSON.stringify(wrapper.error)}`);
 		}
 
 		if (!('response' in wrapper)) {
 			throw new Error('Missing response!');
 		}
 
-		return wrapper.response;
+		return wrapper.response as T;
 	}
 
 	private async requestAsync<T>(
@@ -292,8 +295,8 @@ class OMV extends Service {
 		});
 		const wrapper = await res.json();
 
-		if ('error' in wrapper && wrapper.error) {
-			const err = new Error('Could not authenticate: ' + JSON.stringify(wrapper.error));
+		if (!wrapper || typeof wrapper !== 'object' || ('error' in wrapper && wrapper.error)) {
+			const err = new Error(`Could not authenticate: ${JSON.stringify(wrapper)}`);
 			this.authPending = false;
 			this.authCallbacks.forEach(([, reject]) => reject(err));
 			this.authCallbacks.clear();

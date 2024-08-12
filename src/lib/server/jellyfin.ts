@@ -35,7 +35,7 @@ class Jellyfin extends Service {
 			throw new Error(`Failed to fetch Jellyfin info: ${res.status}`);
 		}
 
-		const data: Session[] = await res.json();
+		const data = (await res.json()) as Session[];
 
 		this.sessionsCache = data;
 		this.sessionsUpdate = new Date();

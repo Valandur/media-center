@@ -16,7 +16,7 @@ class OMDB extends Service {
 	public async search(title: string): Promise<Title[]> {
 		try {
 			const res = await fetch(`${BASE_URL}s=${title}`);
-			const data = await res.json();
+			const data = (await res.json()) as { Search: Title[] };
 			return data.Search ?? [];
 		} catch (err) {
 			error(500, (err as Error).message);
