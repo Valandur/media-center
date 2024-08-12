@@ -170,6 +170,20 @@
 				value={nextcloudPromise.then((i) => i.nextcloud.shares.num_shares)}
 				right
 			/>
+
+			<SizeStatCard
+				label="Transmission Download"
+				value={torrentsPromise.then((t) => t.reduce((acc, t) => acc + t.rateDownload, 0))}
+				unitSuffix="/s"
+				right
+			/>
+
+			<SizeStatCard
+				label="Transmission Upload"
+				value={torrentsPromise.then((t) => t.reduce((acc, t) => acc + t.rateUpload, 0))}
+				unitSuffix="/s"
+				right
+			/>
 		</div>
 
 		<JellyfinSessions {jellyfinPromise} />
