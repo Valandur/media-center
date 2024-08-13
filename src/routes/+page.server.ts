@@ -2,7 +2,9 @@ import { arm } from '$lib/server/arm';
 import { jellyfin } from '$lib/server/jellyfin';
 import { nextcloud } from '$lib/server/nextcloud';
 import { omv } from '$lib/server/omv';
+import { radarr } from '$lib/server/radarr';
 import { rclone } from '$lib/server/rclone';
+import { sonarr } from '$lib/server/sonarr';
 import { transmission } from '$lib/server/transmission';
 
 import type { PageServerLoad } from './$types';
@@ -13,14 +15,14 @@ export const load: PageServerLoad = async ({ depends }) => {
 	// OMV
 	const sysInfo = omv.getSystemInformation();
 	const cpuTemp = omv.getCpuTemp();
-	const devices = omv.getDevices();
-	const smartDevices = omv.getSmartDevices();
 	const fileSystems = omv.getFileSystems();
 	const zfsStats = omv.getZfsStats();
-	const services = omv.getComposeServices();
+	const devices = omv.getDevices();
+	const smartDevices = omv.getSmartDevices();
+	const compose = omv.getCompose();
 
-	// rclone
-	const stats = rclone.coreStats();
+	// Rclone
+	const rcloneStats = rclone.coreStats();
 
 	// ARM
 	const jobs = arm.getJobList();
@@ -34,6 +36,12 @@ export const load: PageServerLoad = async ({ depends }) => {
 	// Jellyfin
 	const jellyfinInfo = jellyfin.getInfo();
 
+	// Radarr
+	const radarrQueue = radarr.getQueueWithMovies();
+
+	// Sonarr
+	const sonarrQueue = sonarr.getQueueWithSeries();
+
 	return {
 		omv: {
 			sysInfo,
@@ -41,11 +49,11 @@ export const load: PageServerLoad = async ({ depends }) => {
 			devices,
 			smartDevices,
 			fileSystems,
-			services,
+			compose,
 			zfsStats
 		},
 		rclone: {
-			stats
+			stats: rcloneStats
 		},
 		arm: {
 			jobs
@@ -58,6 +66,12 @@ export const load: PageServerLoad = async ({ depends }) => {
 		},
 		jellyfin: {
 			info: jellyfinInfo
+		},
+		radarr: {
+			queue: radarrQueue
+		},
+		sonarr: {
+			queue: sonarrQueue
 		}
 	};
 };

@@ -4,24 +4,25 @@
 	import { differenceInMinutes } from 'date-fns/differenceInMinutes';
 	import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
 
-	import type { Service } from '$lib/models/docker';
+	import type { DockerService, DockerStats } from '$lib/models/omv';
+	import { formatSize } from '$lib/util';
 
 	import Card from './Card.svelte';
 
-	export let servicesPromise: Promise<Service[]>;
+	export let composePromise: Promise<(DockerService & DockerStats)[]>;
 
 	let loading = true;
-	let services: Service[] = [];
+	let services: (DockerService & DockerStats)[] = [];
 	let error = '';
 	let lastUpdate = new Date(0);
-	let selectedService: Service | null = null;
+	let selectedService: DockerService | null = null;
 	let pullingServices: string[] = [];
 
-	$: servicesPromise, setup();
+	$: composePromise, setup();
 	$: diffInMinutes = differenceInMinutes(new Date(), lastUpdate);
 
 	function setup() {
-		servicesPromise
+		composePromise
 			.then((newContainers) => {
 				services = newContainers.sort((a, b) => a.name.localeCompare(b.name));
 				loading = false;
@@ -35,7 +36,7 @@
 			});
 	}
 
-	async function onUpdate(service: Service) {
+	async function onUpdate(service: DockerService) {
 		pullingServices = pullingServices.concat(service.name);
 		try {
 			await fetch('/api/docker', {
@@ -56,7 +57,7 @@
 		}
 	}
 
-	async function onRestart(service: Service) {
+	async function onRestart(service: DockerService) {
 		if (!selectedService || service.name !== selectedService?.name) {
 			selectedService = service;
 			return;
@@ -92,7 +93,7 @@
 	</svelte:fragment>
 
 	<div class="flex flex-col">
-		<div class="grid grid-cols-[1fr_1fr_1fr_auto_auto] items-center gap-x-2">
+		<div class="grid grid-cols-[1fr_auto_1fr_auto_auto_auto_auto] items-center gap-x-2">
 			{#if loading}
 				<div class="spinner"></div>
 			{:else if error && diffInMinutes > 2}
@@ -111,8 +112,14 @@
 						{service.state}
 					</span>
 				</div>
-				<div class="text-nowrap text-right" transition:slide>
+				<div class="text-nowrap" transition:slide>
 					{service.status}
+				</div>
+				<div class="text-nowrap text-right" transition:slide>
+					{service.cpu.toFixed(0)}%
+				</div>
+				<div class="text-nowrap text-right" transition:slide>
+					{formatSize(service.memuse, 0)}
 				</div>
 				<div transition:slide>
 					{#if pullingServices.includes(service.name)}

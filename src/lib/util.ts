@@ -37,3 +37,10 @@ export function formatEta(seconds: number | null) {
 			: formatDistanceToNow(add(new Date(), { seconds }), { includeSeconds: true })
 		: 'unknown';
 }
+
+export function beautifyName(name: string) {
+	return name
+		.replace(/[.+]/gi, ' ')
+		.replace(/[^\w\s-]/gi, '')
+		.trim();
+}

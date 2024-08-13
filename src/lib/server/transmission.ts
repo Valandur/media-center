@@ -1,7 +1,7 @@
 import { env } from '$env/dynamic/private';
 import { error } from '@sveltejs/kit';
 
-import type { Torrent } from '$lib/models/torrent';
+import type { Torrent } from '$lib/models/transmission';
 
 import { Service } from './service';
 import { fetch } from './fetch';
@@ -40,7 +40,7 @@ class Transmission extends Service {
 				},
 				method: 'torrent-get'
 			});
-			return res.arguments.torrents.sort((a, b) => a.name.localeCompare(b.name));
+			return res.arguments.torrents;
 		} catch (err) {
 			error(500, (err as Error).message);
 		}

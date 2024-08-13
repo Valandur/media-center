@@ -5,7 +5,7 @@
 	import { flip } from 'svelte/animate';
 
 	import type { ArmJob } from '$lib/models/arm';
-	import type { Title } from '$lib/models/title';
+	import type { Title } from '$lib/models/omdb';
 
 	import Card from './Card.svelte';
 	import Progress from './Progress.svelte';

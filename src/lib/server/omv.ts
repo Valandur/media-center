@@ -6,13 +6,17 @@ import { error } from '@sveltejs/kit';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 
-import type { SmartDevice } from '$lib/models/smart';
-import type { Container, Service as DockerService } from '$lib/models/docker';
-import type { FileSystem } from '$lib/models/file-system';
-import type { Device } from '$lib/models/device';
-import type { Output } from '$lib/models/output';
-import type { ZfsPool, ZfsStats } from '$lib/models/zfs';
-import type { SystemInfo } from '$lib/models/system';
+import type {
+	Device,
+	FileSystem,
+	Output,
+	DockerService,
+	SmartDevice,
+	SystemInfo,
+	ZfsPool,
+	ZfsStats,
+	DockerStats
+} from '$lib/models/omv';
 
 import { Service } from './service';
 import { fetch } from './fetch';
@@ -127,14 +131,26 @@ class OMV extends Service {
 		}
 	}
 
-	public async getComposeServices(): Promise<DockerService[]> {
+	public async getCompose(): Promise<(DockerService & DockerStats)[]> {
 		try {
-			const res = await this.requestAsync<{ data: DockerService[] }>(
-				'Compose',
-				'getServicesListBg',
-				{ start: 0, limit: -1, sortdir: 'asc', sortfield: 'name' }
-			);
-			return res.data;
+			const [resServices, resStats] = await Promise.all([
+				this.requestAsync<{ data: DockerService[] }>('Compose', 'getServicesListBg', {
+					start: 0,
+					limit: -1,
+					sortdir: 'asc',
+					sortfield: 'name'
+				}),
+				this.requestAsync<{ data: DockerStats[] }>('Compose', 'getStatsBg', {
+					start: 0,
+					limit: -1,
+					sortdir: 'asc',
+					sortfield: 'name'
+				})
+			]);
+			return resServices.data.map((service) => ({
+				...service,
+				...resStats.data.find((s) => s.name === service.name)!
+			}));
 		} catch (err) {
 			error(500, (err as Error).message);
 		}
@@ -163,20 +179,6 @@ class OMV extends Service {
 			return res;
 		} catch (err) {
 			this.logger.error(err);
-			error(500, (err as Error).message);
-		}
-	}
-
-	public async getComposeContainers(): Promise<Container[]> {
-		try {
-			const res = await this.requestAsync<Container[]>('Compose', 'getContainerListBg', {
-				start: 0,
-				limit: -1,
-				sortdir: 'asc',
-				sortfield: 'name'
-			});
-			return res;
-		} catch (err) {
 			error(500, (err as Error).message);
 		}
 	}

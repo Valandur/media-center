@@ -1,13 +1,12 @@
 <script lang="ts">
 	import { fade, slide } from 'svelte/transition';
 	import { differenceInMinutes } from 'date-fns/differenceInMinutes';
+	import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
 
-	import type { Device } from '$lib/models/device';
-	import type { SmartDevice } from '$lib/models/smart';
+	import type { Device, SmartDevice } from '$lib/models/omv';
 	import { formatSize } from '$lib/util';
 
 	import Card from './Card.svelte';
-	import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
 
 	export let devicesPromise: Promise<Device[]>;
 	export let smartDevicesPromise: Promise<SmartDevice[]>;

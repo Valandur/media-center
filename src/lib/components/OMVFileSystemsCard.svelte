@@ -3,7 +3,7 @@
 	import { differenceInMinutes } from 'date-fns/differenceInMinutes';
 	import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
 
-	import type { FileSystem } from '$lib/models/file-system';
+	import type { FileSystem } from '$lib/models/omv';
 	import { formatSize } from '$lib/util';
 
 	import Card from './Card.svelte';

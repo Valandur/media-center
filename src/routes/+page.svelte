@@ -6,13 +6,13 @@
 
 	import ArmJobs from '$lib/components/ArmJobs.svelte';
 	import JellyfinSessions from '$lib/components/JellyfinSessions.svelte';
-	import OMVDevicesCard from '$lib/components/OMVDevicesCard.svelte';
-	import OMVDockerServicesCard from '$lib/components/OMVDockerServicesCard.svelte';
-	import OMVFileSystemsCard from '$lib/components/OMVFileSystemsCard.svelte';
+	import OmvDevicesCard from '$lib/components/OmvDevicesCard.svelte';
+	import OmvComposeCard from '$lib/components/OmvComposeCard.svelte';
+	import OmvFileSystemsCard from '$lib/components/OmvFileSystemsCard.svelte';
 	import RcloneTransfers from '$lib/components/RcloneTransfers.svelte';
 	import SizeStatCard from '$lib/components/SizeStatCard.svelte';
 	import StatCard from '$lib/components/StatCard.svelte';
-	import TransmissionTorrents from '$lib/components/TransmissionTorrents.svelte';
+	import TorrentList from '$lib/components/TorrentList.svelte';
 
 	import type { PageServerData } from './$types';
 
@@ -36,14 +36,16 @@
 	$: devicesPromise = data.omv.devices;
 	$: smartDevicesPromise = data.omv.smartDevices;
 	$: fileSystemsPromise = data.omv.fileSystems;
-	$: servicesPromise = data.omv.services;
 	$: zfsStats = data.omv.zfsStats;
+	$: composePromise = data.omv.compose;
 	$: statsPromise = data.rclone.stats;
 	$: transfersPromise = statsPromise.then((s) => s.transferring ?? []);
 	$: jobsPromise = data.arm.jobs;
 	$: torrentsPromise = data.transmission.torrents;
 	$: nextcloudPromise = data.nextcloud.info;
 	$: jellyfinPromise = data.jellyfin.info;
+	$: radarrQueuePromise = data.radarr.queue;
+	$: sonarrQueuePromise = data.sonarr.queue;
 
 	$: autoRefresh, setupAutoRefresh();
 
@@ -188,7 +190,7 @@
 
 		<JellyfinSessions {jellyfinPromise} />
 
-		<TransmissionTorrents {torrentsPromise} />
+		<TorrentList {torrentsPromise} {radarrQueuePromise} {sonarrQueuePromise} />
 
 		<RcloneTransfers {transfersPromise} />
 
@@ -220,11 +222,11 @@
 			/>
 		</div>
 
-		<OMVDockerServicesCard {servicesPromise} />
+		<OmvComposeCard {composePromise} />
 
-		<OMVFileSystemsCard {fileSystemsPromise} />
+		<OmvFileSystemsCard {fileSystemsPromise} />
 
-		<OMVDevicesCard {devicesPromise} {smartDevicesPromise} />
+		<OmvDevicesCard {devicesPromise} {smartDevicesPromise} />
 	</div>
 </div>
 

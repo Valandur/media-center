@@ -3,7 +3,7 @@
 	import { flip } from 'svelte/animate';
 	import { cubicInOut } from 'svelte/easing';
 
-	import { isInProgress, type Transfer } from '$lib/models/transfer';
+	import { isInProgress, type Transfer } from '$lib/models/rclone';
 	import { formatEta, formatSize, formatSpeed } from '$lib/util';
 
 	import Card from './Card.svelte';

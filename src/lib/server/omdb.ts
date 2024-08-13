@@ -1,14 +1,14 @@
 import { env } from '$env/dynamic/private';
 import { error } from '@sveltejs/kit';
 
-import type { Title } from '$lib/models/title';
+import type { Title } from '$lib/models/omdb';
 
 import { Service } from './service';
 import { fetch } from './fetch';
 
 const BASE_URL = `http://www.omdbapi.com/?apikey=${env.OMDB_API_KEY}&`;
 
-class OMDB extends Service {
+class Omdb extends Service {
 	public constructor() {
 		super('OMDB');
 	}
@@ -24,4 +24,4 @@ class OMDB extends Service {
 	}
 }
 
-export const omdb = new OMDB();
+export const omdb = new Omdb();

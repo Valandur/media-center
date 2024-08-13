@@ -9,7 +9,7 @@
 		Math.max(progress ? progress / total : remaining ? 1 - remaining / total : 0, 0),
 		1
 	);
-	$: pct = (ratio * 100).toFixed(0);
+	$: pct = Math.floor(ratio * 100).toFixed(0);
 	$: bg = colorProgress
 		? ratio < 0.5
 			? 'bg-success'

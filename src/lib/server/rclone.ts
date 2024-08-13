@@ -1,8 +1,7 @@
 import { env } from '$env/dynamic/private';
 import { error } from '@sveltejs/kit';
 
-import type { Stats } from '$lib/models/stats';
-import type { Version } from '$lib/models/version';
+import type { Stats } from '$lib/models/rclone';
 
 import { Service } from './service';
 import { fetch } from './fetch';
@@ -11,7 +10,6 @@ const AUTH = btoa(`${env.RCLONE_USERNAME}:${env.RCLONE_PASSWORD}`);
 const HEADERS = { Authorization: `Basic ${AUTH}`, 'content-type': 'application/json' };
 
 class Rclone extends Service {
-	private version: Version | null = null;
 	private transferIndex = 0;
 	private transferMap: Map<string, number> = new Map();
 

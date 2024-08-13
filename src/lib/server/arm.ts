@@ -6,7 +6,7 @@ import { mkdir, readFile, writeFile } from 'fs/promises';
 import { dirname } from 'path';
 
 import type { ArmJob, ArmResult } from '$lib/models/arm';
-import type { Title } from '$lib/models/title';
+import type { Title } from '$lib/models/omdb';
 
 import { Service } from './service';
 import { fetch, FormData, type Response } from './fetch';
