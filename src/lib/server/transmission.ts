@@ -8,6 +8,7 @@ import { fetch } from './fetch';
 
 const URL = `${env.TRANSMISSION_URL}/transmission/rpc`;
 const AUTH = `Basic ${btoa(`${env.TRANSMISSION_USERNAME}:${env.TRANSMISSION_PASSWORD}`)}`;
+const DIR = env.TRANSMISSION_TARGET_DIR;
 
 class Transmission extends Service {
 	protected sessionId = '';
@@ -49,7 +50,7 @@ class Transmission extends Service {
 	public async addTorrent(filename: string): Promise<void> {
 		try {
 			await this.request({
-				arguments: { 'download-dir': '/downloads/complete', filename, paused: false },
+				arguments: { 'download-dir': DIR, filename, paused: false },
 				method: 'torrent-add'
 			});
 		} catch (err) {
