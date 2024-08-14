@@ -243,11 +243,13 @@
 
 			<div transition:slide>
 				{#if radarr}
-					<span class="badge bg-info">
+					<span class="badge bg-info">Movie</span>
+					<span class="badge bg-secondary">
 						{radarr.quality.quality.name}
 					</span>
 				{:else if sonarrs && sonarrs.length > 0}
-					<span class="badge bg-info">
+					<span class="badge bg-success">Series</span>
+					<span class="badge bg-secondary">
 						{sonarrs[0].quality.quality.name}
 					</span>
 				{/if}

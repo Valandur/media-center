@@ -137,7 +137,39 @@
 	</button>
 </div>
 
-<div class="flex-1 flex flex-row gap-4 overflow-auto">
+<div class="flex-1 flex flex-row-reverse flex-wrap lg:flex-nowrap gap-4 overflow-auto">
+	<div class="flex-grow basis-1/3 flex flex-col gap-4">
+		<div class="flex flex-row gap-4">
+			<StatCard
+				label="CPU"
+				value={sysInfo.then((s) => s.cpuUtilization.toFixed(1))}
+				suffix="%"
+				right
+				class="flex-1"
+			/>
+			<StatCard
+				label="Temperature"
+				value={cpuTempPrommise.then((temp) => temp.toFixed(1))}
+				suffix="°C"
+				right
+				class="flex-1"
+			/>
+			<StatCard
+				label="Memory"
+				value={sysInfo.then((s) => (Number(s.memUtilization) * 100).toFixed(1))}
+				suffix="%"
+				right
+				class="flex-1"
+			/>
+		</div>
+
+		<OmvComposeCard {composePromise} />
+
+		<OmvFileSystemsCard {fileSystemsPromise} />
+
+		<OmvDevicesCard {devicesPromise} {smartDevicesPromise} />
+	</div>
+
 	<div class="flex flex-col flex-grow basis-2/3">
 		<div class="grid grid-cols-6 auto-rows-max gap-4">
 			<StatCard label="Rclone Checks" value={statsPromise.then((s) => s.totalChecks)} right />
@@ -174,14 +206,14 @@
 			/>
 
 			<SizeStatCard
-				label="Transmission Download"
+				label="Torrent Download"
 				value={torrentsPromise.then((t) => t.reduce((acc, t) => acc + t.rateDownload, 0))}
 				unitSuffix="/s"
 				right
 			/>
 
 			<SizeStatCard
-				label="Transmission Upload"
+				label="Torrent Upload"
 				value={torrentsPromise.then((t) => t.reduce((acc, t) => acc + t.rateUpload, 0))}
 				unitSuffix="/s"
 				right
@@ -195,38 +227,6 @@
 		<RcloneTransfers {transfersPromise} />
 
 		<ArmJobs {jobsPromise} />
-	</div>
-
-	<div class="flex-grow basis-1/3 flex flex-col gap-4">
-		<div class="flex flex-row gap-4">
-			<StatCard
-				label="CPU"
-				value={sysInfo.then((s) => s.cpuUtilization.toFixed(1))}
-				suffix="%"
-				right
-				class="flex-1"
-			/>
-			<StatCard
-				label="Temperature"
-				value={cpuTempPrommise.then((temp) => temp.toFixed(1))}
-				suffix="°C"
-				right
-				class="flex-1"
-			/>
-			<StatCard
-				label="Memory"
-				value={sysInfo.then((s) => (Number(s.memUtilization) * 100).toFixed(1))}
-				suffix="%"
-				right
-				class="flex-1"
-			/>
-		</div>
-
-		<OmvComposeCard {composePromise} />
-
-		<OmvFileSystemsCard {fileSystemsPromise} />
-
-		<OmvDevicesCard {devicesPromise} {smartDevicesPromise} />
 	</div>
 </div>
 

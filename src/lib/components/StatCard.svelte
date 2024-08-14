@@ -41,7 +41,7 @@
 <Card class={$$props.class ?? ''}>
 	<div class="flex items-baseline space-x-2" class:justify-end={right}>
 		{#key val}
-			<div class="text-2xl font-semibold text-primary whitespace-pre-wrap" in:fade>
+			<div class="text-2xl font-semibold text-primary text-nowrap" in:fade>
 				{#if loading}
 					...
 				{:else if typeof val !== 'undefined'}
@@ -52,7 +52,7 @@
 			</div>
 		{/key}
 		{#if suffix}
-			<div class="text-sm">{suffix}</div>
+			<div class="text-sm text-nowrap">{suffix}</div>
 		{/if}
 	</div>
 	<div class="text-sm text-secondary" class:text-right={right}>{label}</div>
