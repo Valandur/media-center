@@ -171,7 +171,7 @@
 	</div>
 
 	<div class="flex flex-col flex-grow basis-2/3">
-		<div class="grid grid-cols-6 auto-rows-max gap-4">
+		<div class="grid grid-cols-3 xl:grid-cols-6 auto-rows-max gap-4">
 			<StatCard label="Rclone Checks" value={statsPromise.then((s) => s.totalChecks)} right />
 			<StatCard label="Rclone Transfers" value={statsPromise.then((s) => s.totalTransfers)} right />
 			<SizeStatCard

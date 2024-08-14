@@ -113,7 +113,7 @@
 					</span>
 				</div>
 				<div class="text-nowrap" transition:slide>
-					{service.status}
+					{service.status.replace(' (healthy)', '')}
 				</div>
 				<div class="text-nowrap text-right" transition:slide>
 					{service.cpu.toFixed(0)}%
