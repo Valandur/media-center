@@ -7,6 +7,7 @@
 
 	import Card from './Card.svelte';
 	import Progress from './Progress.svelte';
+	import TextWithTooltip from './TextWithTooltip.svelte';
 
 	interface Item {
 		id: string;
@@ -31,28 +32,21 @@
 		(t, i) => t + (i.torrent ? (1 - i.torrent.percentDone) * i.torrent.sizeWhenDone : 0),
 		0
 	);
+	$: console.log(items.map((i) => beautifyName(i.torrent?.name ?? '')));
 
 	function sort(a: Item, b: Item) {
-		if (a.radarr && b.radarr) {
-			if (a.torrent && b.torrent && a.torrent.status !== b.torrent.status) {
-				return a.torrent.status - b.torrent.status;
-			}
-			return a.radarr.movie.title.localeCompare(b.radarr.movie.title);
-		} else if (a.radarr && !b.radarr) {
-			return -1;
-		} else if (!a.radarr && b.radarr) {
-			return 1;
-		} else if (a.torrent && b.torrent) {
-			if (a.torrent.status !== b.torrent.status) {
-				return a.torrent.status - b.torrent.status;
-			} else {
-				const aName = beautifyName(a.torrent?.name);
-				const bName = beautifyName(b.torrent?.name);
-				return aName.localeCompare(bName);
-			}
-		} else {
-			return 0;
+		if (a.torrent && b.torrent && a.torrent.status !== b.torrent.status) {
+			return Status[a.torrent.status].localeCompare(Status[b.torrent.status]);
 		}
+
+		const aName =
+			a.radarr?.movie.title ?? a.sonarrs?.[0].series.title ?? beautifyName(a.torrent?.name ?? '');
+		const bName =
+			b.radarr?.movie.title ?? b.sonarrs?.[0].series.title ?? beautifyName(b.torrent?.name ?? '');
+		if (aName.includes('Harry') || bName.includes('Harry')) {
+			console.log(aName, bName);
+		}
+		return aName.localeCompare(bName);
 	}
 
 	function setupTorrents() {
@@ -117,8 +111,9 @@
 						newItems.push({ id: sonarrItem.title, sonarrs: [sonarrItem] });
 					}
 				}
-				newItems.sort(sort);
-				items = newItems;
+				items = newItems
+					.filter((i) => i.radarr || (i.sonarrs?.length ?? 0) > 0 || i.torrent)
+					.sort(sort);
 				loading = false;
 				error = '';
 			})
@@ -154,9 +149,9 @@
 			{@const radarr = item.radarr}
 			{@const sonarrs = item.sonarrs}
 
-			<div class="overflow-hidden text-nowrap text-ellipsis" transition:slide>
+			<div class="truncate" transition:slide>
 				{#if radarr}
-					{radarr.movie.title}
+					<TextWithTooltip text={radarr.movie.title} />
 				{:else if sonarrs && sonarrs.length > 0}
 					{@const seasonMin = Math.min(...sonarrs.map((s) => s.seasonNumber))}
 					{@const seasonMax = Math.max(...sonarrs.map((s) => s.seasonNumber))}
@@ -164,14 +159,16 @@
 					{@const episodeMax = Math.max(...sonarrs.map((s) => s.episodeNumber))}
 
 					{#if seasonMin !== seasonMax}
-						{sonarrs[0].series.title} | S{seasonMin} - S{seasonMax}
+						<TextWithTooltip text="{sonarrs[0].series.title} | S{seasonMin} - S{seasonMax}" />
 					{:else if episodeMin !== episodeMax}
-						{sonarrs[0].series.title} | S{seasonMin} | E{episodeMin} - E{episodeMax}
+						<TextWithTooltip
+							text="{sonarrs[0].series.title} | S{seasonMin} | E{episodeMin} - E{episodeMax}"
+						/>
 					{:else}
-						{sonarrs[0].series.title} | S{seasonMin} | E{episodeMin}
+						<TextWithTooltip text="{sonarrs[0].series.title} | S{seasonMin} | E{episodeMin}" />
 					{/if}
 				{:else if torrent}
-					{beautifyName(torrent.name)}
+					<TextWithTooltip text={beautifyName(torrent.name)} />
 				{:else}
 					-- Unknown --
 				{/if}
@@ -209,33 +206,35 @@
 				{/if}
 			</div>
 
-			<div class="overflow-hidden text-nowrap text-ellipsis" transition:slide>
+			<div class="truncate" transition:slide>
 				{#if torrent}
 					{#if torrent.status === Status.Downloading}
 						{@const speed = formatSpeed(torrent.rateDownload)}
 						{#key speed}
-							<div class="overflow-hidden text-nowrap text-ellipsis" in:fade>
-								{speed}
+							<div class="truncate" in:fade>
+								<TextWithTooltip text={speed} />
 							</div>
 						{/key}
 					{:else if torrent.status === Status.Seeding}
 						{@const speed = formatSpeed(torrent.rateUpload)}
 						{#key speed}
-							<div class="overflow-hidden text-nowrap text-ellipsis" in:fade>
-								{speed}
+							<div class="truncate" in:fade>
+								<TextWithTooltip text={speed} />
 							</div>
 						{/key}
 					{/if}
 				{/if}
 			</div>
 
-			<div class="overflow-hidden text-nowrap text-ellipsis" transition:slide>
+			<div class="truncate" transition:slide>
 				{#if torrent}
 					{@const eta = torrent.eta < 0 ? null : formatEta(torrent.eta)}
 					{@const etaIdle = torrent.etaIdle < 0 ? null : formatEta(torrent.etaIdle)}
-					{#key eta}
-						<div class="overflow-hidden text-nowrap text-ellipsis" in:fade>
-							{eta ?? etaIdle ?? '---'}
+					{@const val = eta ?? etaIdle ?? '---'}
+
+					{#key val}
+						<div class="truncate" in:fade>
+							<TextWithTooltip text={val} />
 						</div>
 					{/key}
 				{/if}
@@ -252,16 +251,18 @@
 					<span class="badge bg-secondary">
 						{sonarrs[0].quality.quality.name}
 					</span>
+				{:else}
+					<span class="badge bg-warning">Custom</span>
 				{/if}
 			</div>
 
-			<div class="overflow-hidden text-nowrap text-ellipsis text-right" transition:slide>
+			<div class="truncate text-right" transition:slide>
 				{#if torrent}
-					{formatSize(torrent.sizeWhenDone)}
+					<TextWithTooltip text={formatSize(torrent.sizeWhenDone)} />
 				{:else if radarr}
-					{formatSize(radarr.size)}
+					<TextWithTooltip text={formatSize(radarr.size)} />
 				{:else if sonarrs && sonarrs.length > 0}
-					{formatSize(sonarrs[0].size)}
+					<TextWithTooltip text={formatSize(sonarrs[0].size)} />
 				{/if}
 			</div>
 		{/each}

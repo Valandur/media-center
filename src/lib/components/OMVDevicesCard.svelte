@@ -7,6 +7,7 @@
 	import { formatSize } from '$lib/util';
 
 	import Card from './Card.svelte';
+	import TextWithTooltip from './TextWithTooltip.svelte';
 
 	export let devicesPromise: Promise<Device[]>;
 	export let smartDevicesPromise: Promise<SmartDevice[]>;
@@ -75,7 +76,7 @@
 	</svelte:fragment>
 
 	<div class="flex flex-col">
-		<div class="grid grid-cols-[1fr_4fr_1fr_2fr_2fr] items-center gap-x-2">
+		<div class="grid grid-cols-[1fr_4fr_auto_auto_auto] items-center gap-x-2">
 			{#if loading}
 				<div class="spinner"></div>
 			{:else if devError && devDiffInMinutes > 2}
@@ -92,8 +93,8 @@
 				<div class="text-nowrap" transition:slide>
 					{device.devicename}
 				</div>
-				<div class="text-nowrap text-ellipsis overflow-hidden" transition:slide>
-					{device.model}
+				<div class="truncate" transition:slide>
+					<TextWithTooltip text={device.model} />
 				</div>
 				<div class="text-nowrap text-right" transition:slide>
 					{#key temp}

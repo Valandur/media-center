@@ -8,6 +8,7 @@
 	import { formatSize } from '$lib/util';
 
 	import Card from './Card.svelte';
+	import TextWithTooltip from './TextWithTooltip.svelte';
 
 	export let composePromise: Promise<(DockerService & DockerStats)[]>;
 
@@ -80,6 +81,10 @@
 			console.error(err);
 		}
 	}
+
+	function formatStatus(status: string) {
+		return status.replace(' (healthy)', '').replace('Up ', '');
+	}
 </script>
 
 <Card class={$$props.class ?? ''}>
@@ -100,8 +105,8 @@
 				<div class="text-error text-xl font-bold">{error}</div>
 			{/if}
 			{#each services as service (service.name)}
-				<div class="text-nowrap text-ellipsis overflow-hidden" transition:slide>
-					{service.name}
+				<div class="truncate" transition:slide>
+					<TextWithTooltip text={service.name} />
 				</div>
 				<div transition:slide>
 					<span
@@ -112,8 +117,8 @@
 						{service.state}
 					</span>
 				</div>
-				<div class="text-nowrap" transition:slide>
-					{service.status.replace(' (healthy)', '')}
+				<div class="truncate" transition:slide>
+					<TextWithTooltip text={formatStatus(service.status)} />
 				</div>
 				<div class="text-nowrap text-right" transition:slide>
 					{service.cpu.toFixed(0)}%

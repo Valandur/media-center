@@ -8,6 +8,7 @@
 
 	import Card from './Card.svelte';
 	import Progress from './Progress.svelte';
+	import TextWithTooltip from './TextWithTooltip.svelte';
 
 	export let fileSystemsPromise: Promise<FileSystem[]>;
 
@@ -55,11 +56,11 @@
 
 			{#each fileSystems as fs (fs.devicename)}
 				{@const used = formatSize(Number(fs.size) - Number(fs.available))}
-				<div class="text-nowrap text-ellipsis overflow-hidden" transition:slide>
-					{fs.devicename}
+				<div class="truncate" transition:slide>
+					<TextWithTooltip text={fs.devicename} />
 				</div>
-				<div class="text-nowrap text-ellipsis overflow-hidden" transition:slide>
-					{fs.type}
+				<div class="truncate" transition:slide>
+					<TextWithTooltip text={fs.type} />
 				</div>
 				<div class="text-nowrap text-right" transition:slide>
 					{#key used}
@@ -68,10 +69,10 @@
 						</div>
 					{/key}
 				</div>
-				<div class="text-nowrap text-ellipsis overflow-hidden" transition:slide>
+				<div transition:slide>
 					<Progress total={Number(fs.size)} remaining={Number(fs.available)} colorProgress />
 				</div>
-				<div class="text-nowrap text-ellipsis overflow-hidden text-right" transition:slide>
+				<div class="text-nowrap text-right" transition:slide>
 					{formatSize(Number(fs.size))}
 				</div>
 			{/each}

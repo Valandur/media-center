@@ -40,7 +40,7 @@ export function formatEta(seconds: number | null) {
 
 export function beautifyName(name: string) {
 	return name
-		.replace(/[.+]/gi, ' ')
-		.replace(/[^\w\s-]/gi, '')
+		.replace(/[.+\s]/gi, ' ')
+		.replace(/[^a-zA-Z0-9_-\s]/gi, '')
 		.trim();
 }

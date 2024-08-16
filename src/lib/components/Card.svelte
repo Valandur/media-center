@@ -4,7 +4,7 @@
 <div class="relative flex flex-col transition-transform {$$props.class ?? ''}">
 	{#if $$slots.header}
 		<div
-			class="text-primary uppercase font-bold bg-primary/5 border-b border-primary/30 py-2 px-4 text-nowrap text-ellipsis overflow-hidden"
+			class="text-primary uppercase font-bold bg-primary/5 border-b border-primary/30 py-2 px-4 truncate"
 		>
 			<slot name="header" />
 		</div>
