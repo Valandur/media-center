@@ -58,7 +58,7 @@
 					{fileName}
 				</svelte:fragment>
 
-				<div class="flex flex-col justify-between h-full">
+				<div class="flex flex-col h-full">
 					<div class="flex flex-row items-center justify-between gap-2 mb-4">
 						<div>
 							{transfer.srcFs}
@@ -70,6 +70,8 @@
 							{transfer.dstFs}
 						</div>
 					</div>
+
+					<div class="flex-1"></div>
 
 					{#if isInProgress(transfer)}
 						{@const eta = formatEta(transfer.eta)}
