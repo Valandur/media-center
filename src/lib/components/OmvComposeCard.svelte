@@ -17,6 +17,7 @@
 	let error = '';
 	let lastUpdate = new Date(0);
 	let selectedService: DockerService | null = null;
+	let isRestarting = false;
 	let pullingServices: string[] = [];
 
 	$: composePromise, setup();
@@ -59,10 +60,12 @@
 	}
 
 	async function onRestart(service: DockerService) {
-		if (!selectedService || service.name !== selectedService?.name) {
+		if (isRestarting || !selectedService || service.name !== selectedService?.name) {
 			selectedService = service;
 			return;
 		}
+
+		isRestarting = true;
 
 		try {
 			await fetch('/api/docker', {
@@ -79,6 +82,8 @@
 			invalidate('mc:stats');
 		} catch (err) {
 			console.error(err);
+		} finally {
+			isRestarting = false;
 		}
 	}
 
@@ -150,7 +155,7 @@
 	<button
 		class="fixed top-0 left-0 right-0 bottom-0 bg-dark/95 flex flex-col items-center justify-center z-20"
 		transition:fade
-		on:click={() => (selectedService = null)}
+		on:click={() => (!isRestarting ? (selectedService = null) : null)}
 	>
 		<div
 			class="flex flex-row items-center justify-center text-primary cursor-default"
@@ -170,10 +175,24 @@
 					<div class="text-lg">Envpath: {selectedService.envpath}</div>
 				</div>
 				<div class="p-4 flex flex-row gap-4 justify-center">
-					<button type="button" class="btn btn-danger" on:click={() => onRestart(srv)}>
-						Yes
+					<button
+						type="button"
+						class="btn btn-danger"
+						disabled={isRestarting}
+						on:click={() => onRestart(srv)}
+					>
+						{#if isRestarting}
+							<div class="spinner"></div>
+						{:else}
+							Yes
+						{/if}
 					</button>
-					<button type="button" class="btn btn-secondary" on:click={() => (selectedService = null)}>
+					<button
+						type="button"
+						class="btn btn-secondary"
+						disabled={isRestarting}
+						on:click={() => (selectedService = null)}
+					>
 						No
 					</button>
 				</div>

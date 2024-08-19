@@ -22,9 +22,12 @@ export class Sonarr extends Service {
 				this.request<QueueResponse>(QUEUE_PATH),
 				this.request<Series[]>('/series')
 			]);
-			const resEpisodes = await this.request<Episode[]>(
-				`/episode?${resQueue.records.map((r) => `episodeIds=${r.episodeId}`).join('&')}`
-			);
+			let resEpisodes: Episode[] = [];
+			if (resQueue.totalRecords > 0) {
+				resEpisodes = await this.request<Episode[]>(
+					`/episode?${resQueue.records.map((r) => `episodeIds=${r.episodeId}`).join('&')}`
+				);
+			}
 			for (const record of resQueue.records) {
 				record.episodeNumber = resEpisodes.find((e) => e.id === record.episodeId)!.episodeNumber;
 				record.series = resSeries.find((s) => s.id === record.seriesId)!;

@@ -53,12 +53,12 @@
 			out:scale={{ duration: 200, easing: cubicInOut }}
 			animate:flip={{ delay: 250, duration: 200, easing: cubicInOut }}
 		>
-			<Card>
+			<Card class="h-full">
 				<svelte:fragment slot="header">
 					{fileName}
 				</svelte:fragment>
 
-				<div class="flex flex-col">
+				<div class="flex flex-col justify-between h-full">
 					<div class="flex flex-row items-center justify-between gap-2 mb-4">
 						<div>
 							{transfer.srcFs}

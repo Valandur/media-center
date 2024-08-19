@@ -30,6 +30,7 @@
 	let torrent = '';
 	let showAddTorrent = false;
 	let addTorrentError = '';
+	let torrentInput: HTMLInputElement;
 
 	$: sysInfo = data.omv.sysInfo;
 	$: cpuTempPrommise = data.omv.cpuTemp;
@@ -46,7 +47,6 @@
 	$: jellyfinPromise = data.jellyfin.info;
 	$: radarrQueuePromise = data.radarr.queue;
 	$: sonarrQueuePromise = data.sonarr.queue;
-
 	$: autoRefresh, setupAutoRefresh();
 
 	onMount(() => {
@@ -112,7 +112,10 @@
 		<button
 			type="button"
 			class="btn btn-primary btn-small"
-			on:click={() => (showAddTorrent = true)}
+			on:click={() => {
+				showAddTorrent = true;
+				requestAnimationFrame(() => torrentInput?.focus());
+			}}
 		>
 			<i class="fa-solid fa-plus"></i> Add Torrent
 		</button>
@@ -139,30 +142,6 @@
 
 <div class="flex-1 flex flex-row-reverse flex-wrap lg:flex-nowrap gap-4 overflow-auto">
 	<div class="flex-grow basis-1/3 flex flex-col gap-4">
-		<div class="flex flex-row gap-4">
-			<StatCard
-				label="CPU"
-				value={sysInfo.then((s) => s.cpuUtilization.toFixed(1))}
-				suffix="%"
-				right
-				class="flex-1"
-			/>
-			<StatCard
-				label="Temperature"
-				value={cpuTempPrommise.then((temp) => temp.toFixed(1))}
-				suffix="°C"
-				right
-				class="flex-1"
-			/>
-			<StatCard
-				label="Memory"
-				value={sysInfo.then((s) => (Number(s.memUtilization) * 100).toFixed(1))}
-				suffix="%"
-				right
-				class="flex-1"
-			/>
-		</div>
-
 		<OmvComposeCard {composePromise} />
 
 		<OmvFileSystemsCard {fileSystemsPromise} />
@@ -172,16 +151,32 @@
 
 	<div class="flex flex-col flex-grow basis-2/3">
 		<div class="grid grid-cols-3 xl:grid-cols-6 auto-rows-max gap-4">
-			<StatCard label="Rclone Checks" value={statsPromise.then((s) => s.totalChecks)} right />
-			<StatCard label="Rclone Transfers" value={statsPromise.then((s) => s.totalTransfers)} right />
-			<SizeStatCard
-				label="Rclone Speed"
-				value={statsPromise.then((s) => s.speed)}
-				unitSuffix="/s"
+			<StatCard
+				label="CPU"
+				value={sysInfo.then((s) => s.cpuUtilization.toFixed(1))}
+				suffix="%"
 				right
+				class="flex-1"
 			/>
-			<StatCard label="Rclone Errors" value={statsPromise.then((s) => s.errors)} right />
+
+			<StatCard
+				label="Temperature"
+				value={cpuTempPrommise.then((temp) => temp.toFixed(1))}
+				suffix="°C"
+				right
+				class="flex-1"
+			/>
+
+			<StatCard
+				label="Memory"
+				value={sysInfo.then((s) => (Number(s.memUtilization) * 100).toFixed(1))}
+				suffix="%"
+				right
+				class="flex-1"
+			/>
+
 			<StatCard label="Updates" value={sysInfo.then((s) => s.availablePkgUpdates)} right />
+
 			<StatCard
 				label="ZFS cache hits"
 				value={zfsStats.then((zfs) => zfs.ratio.toFixed(1))}
@@ -189,19 +184,20 @@
 				right
 			/>
 
-			<SizeStatCard
-				label="Nextcloud DB"
-				value={nextcloudPromise.then((i) => Number(i.server.database.size))}
-				right
-			/>
-			<StatCard
-				label="Nextcloud Files"
-				value={nextcloudPromise.then((i) => i.nextcloud.storage.num_files)}
-				right
-			/>
 			<StatCard
 				label="Nextcloud Shares"
 				value={nextcloudPromise.then((i) => i.nextcloud.shares.num_shares)}
+				right
+			/>
+
+			<StatCard label="Rclone Checks" value={statsPromise.then((s) => s.totalChecks)} right />
+
+			<StatCard label="Rclone Transfers" value={statsPromise.then((s) => s.totalTransfers)} right />
+
+			<SizeStatCard
+				label="Rclone Speed"
+				value={statsPromise.then((s) => s.speed)}
+				unitSuffix="/s"
 				right
 			/>
 
@@ -216,6 +212,12 @@
 				label="Torrent Upload"
 				value={torrentsPromise.then((t) => t.reduce((acc, t) => acc + t.rateUpload, 0))}
 				unitSuffix="/s"
+				right
+			/>
+
+			<StatCard
+				label="Nextcloud Files"
+				value={nextcloudPromise.then((i) => i.nextcloud.storage.num_files)}
 				right
 			/>
 		</div>
@@ -253,7 +255,13 @@
 					{/if}
 
 					<form class="flex flex-col gap-2" on:submit|preventDefault|stopPropagation={onAddTorrent}>
-						<input type="text" placeholder="Torrent" class="input w-96 me-2" bind:value={torrent} />
+						<input
+							type="text"
+							placeholder="Torrent"
+							class="input w-96 me-2"
+							bind:this={torrentInput}
+							bind:value={torrent}
+						/>
 						<button type="submit" class="btn btn-primary">
 							<i class="fa-solid fa-plus"></i> Add Torrent
 						</button>

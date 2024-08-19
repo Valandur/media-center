@@ -32,7 +32,6 @@
 		(t, i) => t + (i.torrent ? (1 - i.torrent.percentDone) * i.torrent.sizeWhenDone : 0),
 		0
 	);
-	$: console.log(items.map((i) => beautifyName(i.torrent?.name ?? '')));
 
 	function sort(a: Item, b: Item) {
 		if (a.torrent && b.torrent && a.torrent.status !== b.torrent.status) {
@@ -43,9 +42,6 @@
 			a.radarr?.movie.title ?? a.sonarrs?.[0].series.title ?? beautifyName(a.torrent?.name ?? '');
 		const bName =
 			b.radarr?.movie.title ?? b.sonarrs?.[0].series.title ?? beautifyName(b.torrent?.name ?? '');
-		if (aName.includes('Harry') || bName.includes('Harry')) {
-			console.log(aName, bName);
-		}
 		return aName.localeCompare(bName);
 	}
 
