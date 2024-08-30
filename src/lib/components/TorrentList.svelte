@@ -50,11 +50,12 @@
 			.then((newTorrents) => {
 				const newItems: Item[] = [...items.map(({ torrent, ...item }) => item)];
 				for (const torrent of newTorrents) {
-					const index = newItems.findIndex((item) => item.id === torrent.name);
+					const name = torrent.name.replace('.mkv', '');
+					const index = newItems.findIndex((item) => item.id === name);
 					if (index >= 0) {
 						newItems[index].torrent = torrent;
 					} else {
-						newItems.push({ id: torrent.name, torrent });
+						newItems.push({ id: name, torrent });
 					}
 				}
 				items = newItems
