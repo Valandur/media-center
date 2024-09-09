@@ -222,9 +222,9 @@
 			/>
 		</div>
 
-		<JellyfinSessions {jellyfinPromise} />
-
 		<TorrentList {torrentsPromise} {radarrQueuePromise} {sonarrQueuePromise} />
+
+		<JellyfinSessions {jellyfinPromise} />
 
 		<RcloneTransfers {transfersPromise} />
 
