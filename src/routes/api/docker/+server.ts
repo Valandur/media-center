@@ -12,13 +12,10 @@ export const POST: RequestHandler = async ({ request }) => {
 	const envpath = data.envpath;
 
 	switch (action) {
-		case 'pull': {
-			await omv.doComposeServiceCommand('pull', service, filepath, envpath);
-			break;
-		}
-
+		case 'pull':
+		case 'up':
 		case 'restart': {
-			await omv.doComposeServiceCommand('restart', service, filepath, envpath);
+			await omv.doComposeServiceCommand(action, service, filepath, envpath);
 			break;
 		}
 
