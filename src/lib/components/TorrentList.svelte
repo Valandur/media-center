@@ -125,11 +125,16 @@
 <Card class={error || items.length > 0 ? 'mt-4' : ''}>
 	<div class="flex flex-row justify-between" slot="header">
 		<div>Downloads</div>
-		{#key pending}
-			<div class="font-normal normal-case" in:fade>
-				{formatSize(pending)} <span class="text-secondary">pending</span>
-			</div>
-		{/key}
+
+		<div class="font-normal normal-case me-2">
+			{#key pending}
+				<span in:fade>
+					{formatSize(pending)}
+				</span>
+			{/key}
+			<span class="text-secondary">pending</span>
+		</div>
+
 		<label class="inline-flex items-center gap-2 font-normal normal-case">
 			<span>Seeding</span>
 			<input

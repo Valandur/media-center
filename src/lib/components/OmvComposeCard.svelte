@@ -22,6 +22,8 @@
 
 	$: composePromise, setup();
 	$: diffInMinutes = differenceInMinutes(new Date(), lastUpdate);
+	$: totalCpu = services.reduce((total, srv) => total + srv.cpu, 0);
+	$: totalRam = services.reduce((total, srv) => total + srv.memuse, 0);
 
 	function setup() {
 		composePromise
@@ -100,11 +102,26 @@
 
 <Card class={$$props.class ?? ''}>
 	<svelte:fragment slot="header">
-		<div class="flex flex-row items-center justify-between">
+		<div class="flex flex-row items-center">
 			<div>Docker Services</div>
 			{#if !loading && diffInMinutes > 1}
-				<div class="badge bg-warning">{formatDistanceToNow(lastUpdate, { addSuffix: true })}</div>
+				<div class="badge bg-warning ms-2">
+					{formatDistanceToNow(lastUpdate, { addSuffix: true })}
+				</div>
 			{/if}
+			<div class="flex-1"></div>
+			<div class="font-normal normal-case me-2">
+				{#key totalCpu}
+					<span in:fade>{totalCpu.toFixed(0)}%</span>
+				{/key}
+				<span class="text-secondary">CPU</span>
+			</div>
+			<div class="font-normal normal-case">
+				{#key totalRam}
+					<span in:fade>{formatSize(totalRam)}</span>
+				{/key}
+				<span class="text-secondary">RAM</span>
+			</div>
 		</div>
 	</svelte:fragment>
 
