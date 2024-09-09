@@ -81,7 +81,7 @@
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({
-					action: 'up',
+					action: 'restart',
 					service: service.name,
 					filepath: service.filepath,
 					envpath: service.envpath
