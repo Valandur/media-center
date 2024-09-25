@@ -122,7 +122,7 @@
 	}
 </script>
 
-<Card class={error || items.length > 0 ? 'mt-4' : ''}>
+<Card class="mt-4">
 	<div class="flex flex-row justify-between" slot="header">
 		<div>Downloads</div>
 
