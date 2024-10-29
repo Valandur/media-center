@@ -76,11 +76,12 @@
 			.then((newRadarrItems) => {
 				const newItems: Item[] = [...items.map(({ radarr, ...item }) => item)];
 				for (const radarrItem of newRadarrItems) {
-					const index = newItems.findIndex((item) => item.id === radarrItem.title);
+					const name = radarrItem.title.replace('.mkv', '');
+					const index = newItems.findIndex((item) => item.id === name);
 					if (index >= 0) {
 						newItems[index].radarr = radarrItem;
 					} else {
-						newItems.push({ id: radarrItem.title, radarr: radarrItem });
+						newItems.push({ id: name, radarr: radarrItem });
 					}
 				}
 				items = newItems
@@ -101,11 +102,12 @@
 			.then((newSonarrItems) => {
 				const newItems: Item[] = [...items.map(({ sonarrs, ...item }) => item)];
 				for (const sonarrItem of newSonarrItems) {
-					const index = newItems.findIndex((item) => item.id === sonarrItem.title);
+					const name = sonarrItem.title.replace('.mkv', '');
+					const index = newItems.findIndex((item) => item.id === name);
 					if (index >= 0) {
 						newItems[index].sonarrs = (newItems[index].sonarrs ?? []).concat(sonarrItem);
 					} else {
-						newItems.push({ id: sonarrItem.title, sonarrs: [sonarrItem] });
+						newItems.push({ id: name, sonarrs: [sonarrItem] });
 					}
 				}
 				items = newItems
