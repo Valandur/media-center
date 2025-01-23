@@ -147,13 +147,16 @@
 		</label>
 	</div>
 
-	<div class="grid grid-cols-[3fr_auto_auto_2fr_1fr_1fr_auto_auto] items-center gap-x-2">
+	<div
+		class="grid grid-cols-[auto_1fr] sm:grid-cols-[3fr_auto_auto_2fr_1fr_1fr_auto_auto] items-center gap-x-2"
+	>
 		{#each items.filter((i) => showSeeding || i.torrent?.status !== Status.Seeding) as item (item.id)}
 			{@const torrent = item.torrent}
 			{@const radarr = item.radarr}
 			{@const sonarrs = item.sonarrs}
 
-			<div class="truncate" transition:slide>
+			<div class="sm:hidden">Name</div>
+			<div class="truncate text-right sm:text-left" transition:slide>
 				{#if radarr}
 					<TextWithTooltip text={radarr.movie.title} />
 				{:else if sonarrs && sonarrs.length > 0}
@@ -178,7 +181,8 @@
 				{/if}
 			</div>
 
-			<div transition:slide>
+			<div class="sm:hidden">Status</div>
+			<div class="text-right sm:text-left" transition:slide>
 				{#if torrent}
 					{@const status = Status[torrent.status]}
 					{@const isOk = status === 'Downloading' || status === 'Seeding'}
@@ -188,7 +192,8 @@
 				{/if}
 			</div>
 
-			<div transition:slide>
+			<div class="sm:hidden">Peers</div>
+			<div class="text-right sm:text-left" transition:slide>
 				{#if torrent}
 					{#if torrent.status === Status.Downloading}
 						{torrent.peersSendingToUs}/{torrent.peersConnected}
@@ -200,7 +205,7 @@
 				{/if}
 			</div>
 
-			<div transition:slide>
+			<div class="col-span-2 sm:col-span-1" transition:slide>
 				{#if torrent}
 					<Progress total={1} progress={torrent.percentDone} />
 				{:else if radarr}
@@ -210,7 +215,8 @@
 				{/if}
 			</div>
 
-			<div class="truncate" transition:slide>
+			<div class="sm:hidden">Speed</div>
+			<div class="truncate text-right sm:text-left" transition:slide>
 				{#if torrent}
 					{#if torrent.status === Status.Downloading}
 						{@const speed = formatSpeed(torrent.rateDownload)}
@@ -230,7 +236,8 @@
 				{/if}
 			</div>
 
-			<div class="truncate" transition:slide>
+			<div class="sm:hidden">ETA</div>
+			<div class="truncate text-right sm:text-left" transition:slide>
 				{#if torrent}
 					{@const eta = torrent.eta < 0 ? null : formatEta(torrent.eta)}
 					{@const etaIdle = torrent.etaIdle < 0 ? null : formatEta(torrent.etaIdle)}
@@ -244,7 +251,8 @@
 				{/if}
 			</div>
 
-			<div transition:slide>
+			<div class="sm:hidden">Type</div>
+			<div class="text-right sm:text-left" transition:slide>
 				{#if radarr}
 					<span class="badge bg-info">Movie</span>
 					<span class="badge bg-secondary">
@@ -260,6 +268,7 @@
 				{/if}
 			</div>
 
+			<div class="sm:hidden">Size</div>
 			<div class="truncate text-right" transition:slide>
 				{#if torrent}
 					<TextWithTooltip text={formatSize(torrent.sizeWhenDone)} />
@@ -269,6 +278,8 @@
 					<TextWithTooltip text={formatSize(sonarrs[0].size)} />
 				{/if}
 			</div>
+
+			<div class="sm:hidden last:hidden border-b border-primary/30 col-span-2 -mx-4 my-2"></div>
 		{/each}
 	</div>
 </Card>

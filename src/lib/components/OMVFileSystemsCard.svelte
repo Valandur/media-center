@@ -47,7 +47,9 @@
 	</svelte:fragment>
 
 	<div class="flex flex-col">
-		<div class="grid grid-cols-[auto_auto_auto_1fr_auto] items-center gap-x-4">
+		<div
+			class="grid grid-cols-[auto_1fr] sm:grid-cols-[auto_auto_auto_1fr_auto] items-center gap-x-4"
+		>
 			{#if loading}
 				<div class="spinner"></div>
 			{:else if error && diffInMinutes > 2}
@@ -56,12 +58,17 @@
 
 			{#each fileSystems as fs (fs.devicename)}
 				{@const used = formatSize(Number(fs.size) - Number(fs.available))}
-				<div class="truncate" transition:slide>
+				<div class="sm:hidden">Name</div>
+				<div class="truncate text-right sm:text-left" transition:slide>
 					<TextWithTooltip text={fs.devicename} />
 				</div>
-				<div class="truncate" transition:slide>
+
+				<div class="sm:hidden">Type</div>
+				<div class="truncate text-right sm:text-left" transition:slide>
 					<TextWithTooltip text={fs.type} />
 				</div>
+
+				<div class="sm:hidden">Used</div>
 				<div class="text-nowrap text-right" transition:slide>
 					{#key used}
 						<div in:fade>
@@ -69,12 +76,17 @@
 						</div>
 					{/key}
 				</div>
-				<div transition:slide>
+
+				<div class="col-span-2 sm:col-span-1" transition:slide>
 					<Progress total={Number(fs.size)} remaining={Number(fs.available)} colorProgress />
 				</div>
-				<div class="text-nowrap text-right" transition:slide>
+
+				<div class="sm:hidden">Total</div>
+				<div class="text-nowrap text-right sm:text-left" transition:slide>
 					{formatSize(Number(fs.size))}
 				</div>
+
+				<div class="sm:hidden last:hidden border-b border-primary/30 col-span-2 -mx-4 my-2"></div>
 			{/each}
 		</div>
 	</div>

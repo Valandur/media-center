@@ -76,7 +76,9 @@
 	</svelte:fragment>
 
 	<div class="flex flex-col">
-		<div class="grid grid-cols-[1fr_4fr_auto_auto_auto] items-center gap-x-2">
+		<div
+			class="grid grid-cols-[auto_1fr] sm:grid-cols-[1fr_4fr_auto_auto_auto] items-center gap-x-2"
+		>
 			{#if loading}
 				<div class="spinner"></div>
 			{:else if devError && devDiffInMinutes > 2}
@@ -90,12 +92,17 @@
 				{@const bg = smart ? (smart.overallstatus === 'GOOD' ? 'bg-success' : 'bg-warning') : ''}
 				{@const temp = device.temperature ? device.temperature + '°C' : '---'}
 
-				<div class="text-nowrap" transition:slide>
+				<div class="sm:hidden">Name</div>
+				<div class="text-nowrap text-right sm:text-left" transition:slide>
 					{device.devicename}
 				</div>
-				<div class="truncate" transition:slide>
+
+				<div class="sm:hidden">Model</div>
+				<div class="truncate text-right sm:text-left" transition:slide>
 					<TextWithTooltip text={device.model} />
 				</div>
+
+				<div class="sm:hidden">Temperature</div>
 				<div class="text-nowrap text-right" transition:slide>
 					{#key temp}
 						<div in:fade>
@@ -103,9 +110,13 @@
 						</div>
 					{/key}
 				</div>
+
+				<div class="sm:hidden">Size</div>
 				<div class="text-nowrap text-right" transition:slide>
 					{formatSize(Number(device.size))}
 				</div>
+
+				<div class="sm:hidden">Status</div>
 				<div class="text-nowrap text-right" transition:slide>
 					{#if smart}
 						<span class="badge {bg}">{smart.overallstatus}</span>
@@ -115,6 +126,8 @@
 						---
 					{/if}
 				</div>
+
+				<div class="sm:hidden last:hidden border-b border-primary/30 col-span-2 -mx-4 my-2"></div>
 			{/each}
 		</div>
 	</div>

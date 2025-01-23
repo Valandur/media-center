@@ -126,17 +126,22 @@
 	</svelte:fragment>
 
 	<div class="flex flex-col">
-		<div class="grid grid-cols-[1fr_auto_1fr_auto_auto_auto_auto] items-center gap-x-2">
+		<div
+			class="grid grid-cols-[auto_1fr] sm:grid-cols-[1fr_auto_1fr_auto_auto_auto_auto] items-center gap-x-2"
+		>
 			{#if loading}
 				<div class="spinner"></div>
 			{:else if error && diffInMinutes > 2}
 				<div class="text-error text-xl font-bold">{error}</div>
 			{/if}
 			{#each services as service (service.name)}
-				<div class="truncate" transition:slide>
+				<div class="sm:hidden">Name</div>
+				<div class="truncate text-right sm:text-left" transition:slide>
 					<TextWithTooltip text={service.name} />
 				</div>
-				<div transition:slide>
+
+				<div class="sm:hidden">State</div>
+				<div class="text-right sm:text-left" transition:slide>
 					<span
 						class="badge"
 						class:bg-success={service.state === 'running'}
@@ -145,16 +150,24 @@
 						{service.state}
 					</span>
 				</div>
-				<div class="truncate" transition:slide>
+
+				<div class="sm:hidden">Uptime</div>
+				<div class="truncate text-right sm:text-left" transition:slide>
 					<TextWithTooltip text={formatStatus(service.status)} />
 				</div>
+
+				<div class="sm:hidden">CPU</div>
 				<div class="text-nowrap text-right" transition:slide>
 					{service.cpu.toFixed(0)}%
 				</div>
+
+				<div class="sm:hidden">Memory</div>
 				<div class="text-nowrap text-right" transition:slide>
 					{formatSize(service.memuse, 0)}
 				</div>
-				<div transition:slide>
+
+				<div class="sm:hidden">Update</div>
+				<div class="text-right sm:text-left" transition:slide>
 					{#if pullingServices.includes(service.name)}
 						<div class="spinner"></div>
 					{:else}
@@ -163,7 +176,9 @@
 						</button>
 					{/if}
 				</div>
-				<div transition:slide>
+
+				<div class="sm:hidden">Restart</div>
+				<div class="text-right sm:text-left" transition:slide>
 					{#if restartingServices.includes(service.name)}
 						<div class="spinner"></div>
 					{:else}
@@ -172,6 +187,8 @@
 						</button>
 					{/if}
 				</div>
+
+				<div class="sm:hidden last:hidden border-b border-primary/30 col-span-2 -mx-4 my-2"></div>
 			{/each}
 		</div>
 	</div>
