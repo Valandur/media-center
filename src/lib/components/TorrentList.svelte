@@ -140,11 +140,11 @@
 					{formatSize(pending)}
 				</span>
 			{/key}
-			<span class="text-secondary">⇩</span>
+			<span class="text-secondary">in</span>
 		</div>
 
 		<label class="inline-flex items-center gap-2 font-normal normal-case">
-			<span>Seeding</span>
+			<span>Seeds</span>
 			<input
 				type="checkbox"
 				class="appearance-none w-10 h-6 rounded-full bg-no-repeat switch"
