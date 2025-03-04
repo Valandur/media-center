@@ -105,7 +105,7 @@
 	}
 </script>
 
-<div class="flex flex-row items-center gap-4 mb-2">
+<div class="flex flex-row items-center gap-4 mb-3 sm:mb-2 pb-2 sm:pb-0 border-b sm:border-none">
 	<h3 class="text-lg font-medium">Dashboard</h3>
 
 	<div>
