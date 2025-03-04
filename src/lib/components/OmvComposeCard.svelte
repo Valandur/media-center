@@ -103,7 +103,7 @@
 <Card class={$$props.class ?? ''}>
 	<svelte:fragment slot="header">
 		<div class="flex flex-row items-center">
-			<div>Docker Services</div>
+			<div>Docker</div>
 			{#if !loading && diffInMinutes > 1}
 				<div class="badge bg-warning ms-2">
 					{formatDistanceToNow(lastUpdate, { addSuffix: true })}

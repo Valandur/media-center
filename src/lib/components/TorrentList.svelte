@@ -4,6 +4,7 @@
 	import { Status, type Torrent } from '$lib/models/transmission';
 	import { beautifyName, formatEta, formatSize, formatSpeed } from '$lib/util';
 	import { fade, slide } from 'svelte/transition';
+	import { browser } from '$app/environment';
 
 	import Card from './Card.svelte';
 	import Progress from './Progress.svelte';
@@ -23,7 +24,11 @@
 	let loading = true;
 	let items: Item[] = [];
 	let error = '';
-	let showSeeding = false;
+	let showSeeding = browser
+		? localStorage
+			? localStorage.getItem('seeding') === 'true'
+			: false
+		: true;
 
 	$: torrentsPromise, setupTorrents();
 	$: radarrQueuePromise, setupRadarr();
@@ -32,6 +37,7 @@
 		(t, i) => t + (i.torrent ? (1 - i.torrent.percentDone) * i.torrent.sizeWhenDone : 0),
 		0
 	);
+	$: browser ? localStorage?.setItem('seeding', showSeeding ? 'true' : 'false') : null;
 
 	function sort(a: Item, b: Item) {
 		if (a.torrent && b.torrent && a.torrent.status !== b.torrent.status) {
@@ -126,7 +132,7 @@
 
 <Card class="mt-4">
 	<div class="flex flex-row justify-between" slot="header">
-		<div>Downloads</div>
+		<div>Torrents</div>
 
 		<div class="font-normal normal-case me-2">
 			{#key pending}
@@ -134,7 +140,7 @@
 					{formatSize(pending)}
 				</span>
 			{/key}
-			<span class="text-secondary">pending</span>
+			<span class="text-secondary">⇩</span>
 		</div>
 
 		<label class="inline-flex items-center gap-2 font-normal normal-case">

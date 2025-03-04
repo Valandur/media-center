@@ -8,6 +8,7 @@
 
 	import Card from './Card.svelte';
 	import Progress from './Progress.svelte';
+	import TextWithTooltip from './TextWithTooltip.svelte';
 
 	export let transfersPromise: Promise<Transfer[]>;
 
@@ -33,7 +34,10 @@
 	}
 </script>
 
-<div class="grid grid-cols-4 auto-rows-max gap-4" class:mt-4={error || transfers.length > 0}>
+<div
+	class="grid grid-cols-1 sm:grid-cols-2 auto-rows-max gap-4"
+	class:mt-4={error || transfers.length > 0}
+>
 	{#if error}
 		<div transition:scale>
 			<Card class="h-full">
@@ -55,7 +59,7 @@
 		>
 			<Card class="h-full">
 				<svelte:fragment slot="header">
-					{fileName}
+					<TextWithTooltip text={fileName} />
 				</svelte:fragment>
 
 				<div class="flex flex-col h-full">
