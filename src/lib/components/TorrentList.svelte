@@ -140,7 +140,7 @@
 					{formatSize(pending)}
 				</span>
 			{/key}
-			<span class="text-secondary">in</span>
+			<span class="text-secondary">pend.</span>
 		</div>
 
 		<label class="inline-flex items-center gap-2 font-normal normal-case">
