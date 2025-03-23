@@ -159,7 +159,7 @@
 
 	<div class="flex flex-col">
 		<div
-			class="grid grid-cols-[auto_1fr] sm:grid-cols-[1fr_auto_1fr_auto_auto_auto_auto] items-center gap-x-2"
+			class="grid grid-cols-[auto_1fr] sm:grid-cols-[auto_auto_1fr_auto_auto_auto_auto] items-center gap-x-2"
 		>
 			{#if loading}
 				<div class="spinner"></div>
@@ -174,7 +174,7 @@
 					</div>
 
 					<div class="sm:hidden">State</div>
-					<div class="text-nowrap text-right sm:text-left sm:col-span-2" transition:slide>
+					<div class="text-right sm:text-left sm:col-span-2" transition:slide>
 						{#if !group.expanded}
 							{#each group.containers as container (container.name)}
 								<span
