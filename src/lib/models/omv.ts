@@ -25,6 +25,10 @@ export interface Device {
 	hotpluggable: boolean;
 }
 
+export interface DockerContainer extends DockerService, DockerStats {
+	runningAction: string | null;
+}
+
 export interface DockerService {
 	name: string;
 	image: string;

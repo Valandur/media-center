@@ -15,7 +15,8 @@ import type {
 	SystemInfo,
 	ZfsPool,
 	ZfsStats,
-	DockerStats
+	DockerStats,
+	DockerContainer
 } from '$lib/models/omv';
 
 import { Service } from './service';
@@ -36,6 +37,8 @@ class OMV extends Service {
 
 	private authPending = false;
 	private authCallbacks: Set<[() => void, (err: Error) => void]> = new Set();
+
+	private runningComposeActions: Map<string, string> = new Map();
 
 	public constructor() {
 		super('OMV');
@@ -131,7 +134,7 @@ class OMV extends Service {
 		}
 	}
 
-	public async getCompose(): Promise<(DockerService & DockerStats)[]> {
+	public async getCompose(): Promise<DockerContainer[]> {
 		try {
 			const [resServices, resStats] = await Promise.all([
 				this.requestAsync<{ data: DockerService[] }>('Compose', 'getServicesListBg', {
@@ -149,7 +152,8 @@ class OMV extends Service {
 			]);
 			return resServices.data.map((service) => ({
 				...service,
-				...resStats.data.find((s) => s.name === service.name)!
+				...resStats.data.find((s) => s.name === service.name)!,
+				runningAction: this.runningComposeActions.get(service.name) ?? null
 			}));
 		} catch (err) {
 			error(500, (err as Error).message);
@@ -163,6 +167,7 @@ class OMV extends Service {
 		envpath: string
 	): Promise<string> {
 		try {
+			this.runningComposeActions.set(service, cmd);
 			this.logger.info('Compose', 'doServiceCommand', cmd, service);
 			const res = await this.requestAsync<string>(
 				'Compose',
@@ -180,6 +185,8 @@ class OMV extends Service {
 		} catch (err) {
 			this.logger.error(err);
 			error(500, (err as Error).message);
+		} finally {
+			this.runningComposeActions.delete(service);
 		}
 	}
 
@@ -251,7 +258,7 @@ class OMV extends Service {
 		let output: T | null = null;
 		let i = 0;
 		while (output === null) {
-			await new Promise((resolve) => setTimeout(resolve, OUTPUT_CHECK_INTERVAL));
+			await new Promise((resolve) => setTimeout(resolve, (i + 1) * OUTPUT_CHECK_INTERVAL));
 			const res = await this.request<Output>('Exec', 'getOutput', { filename, pos: 0 });
 			if (!res.running && !res.pendingOutput) {
 				output = raw ? res.output : JSON.parse(res.output);
