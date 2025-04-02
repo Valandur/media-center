@@ -44,7 +44,7 @@ export const load: PageServerLoad = async ({ depends }) => {
 	const sonarrQueue = sonarr.getQueueWithSeries();
 
 	// GPU
-	gpu.getStats();
+	const gpuStats = gpu.getStats();
 
 	return {
 		omv: {
@@ -76,6 +76,9 @@ export const load: PageServerLoad = async ({ depends }) => {
 		},
 		sonarr: {
 			queue: sonarrQueue
+		},
+		gpu: {
+			stats: gpuStats
 		}
 	};
 };
