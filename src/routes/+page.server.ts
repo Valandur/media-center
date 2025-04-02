@@ -1,4 +1,5 @@
 import { arm } from '$lib/server/arm';
+import { gpu } from '$lib/server/gpu';
 import { jellyfin } from '$lib/server/jellyfin';
 import { nextcloud } from '$lib/server/nextcloud';
 import { omv } from '$lib/server/omv';
@@ -41,6 +42,9 @@ export const load: PageServerLoad = async ({ depends }) => {
 
 	// Sonarr
 	const sonarrQueue = sonarr.getQueueWithSeries();
+
+	// GPU
+	gpu.getStats();
 
 	return {
 		omv: {
