@@ -15,7 +15,10 @@ export function getSize(bytes: number, decimals = 2): [string, string] {
 	}
 }
 
-export function formatSize(bytes: number, decimals = 2) {
+export function formatSize(bytes: number | null | undefined, decimals = 2) {
+	if (typeof bytes !== 'number') {
+		return '---';
+	}
 	const [size, unit] = getSize(bytes, decimals);
 	return `${size} ${unit}`;
 }

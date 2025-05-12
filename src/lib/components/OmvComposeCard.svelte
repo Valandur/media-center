@@ -28,8 +28,8 @@
 
 	$: composePromise, setup();
 	$: diffInMinutes = differenceInMinutes(new Date(), lastUpdate);
-	$: totalCpu = containerGroups.reduce((total, grp) => total + grp.cpu, 0);
-	$: totalRam = containerGroups.reduce((total, grp) => total + grp.memuse, 0);
+	$: totalCpu = containerGroups.reduce((total, grp) => total + (grp.cpu ? grp.cpu : 0), 0);
+	$: totalRam = containerGroups.reduce((total, grp) => total + (grp.memuse ? grp.memuse : 0), 0);
 
 	function setup() {
 		composePromise
@@ -241,7 +241,11 @@
 
 						<div class="sm:hidden">CPU</div>
 						<div class="text-nowrap text-right" transition:slide>
-							{container.cpu.toFixed(0)}%
+							{#if typeof container.cpu === 'number'}
+								{container.cpu.toFixed(0)}%
+							{:else}
+								---
+							{/if}
 						</div>
 
 						<div class="sm:hidden">Memory</div>
