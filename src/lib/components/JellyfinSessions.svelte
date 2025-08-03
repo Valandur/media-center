@@ -61,7 +61,8 @@
 					<div class="font-bold mb-4">
 						{#if session.NowPlayingItem}
 							{#if session.NowPlayingItem.SeriesId}
-								{session.NowPlayingItem.SeriesName} - {session.NowPlayingItem.Name}
+								{session.NowPlayingItem.SeriesName} - {session.NowPlayingItem.Name} <br />
+								S{session.NowPlayingItem.ParentIndexNumber}:E{session.NowPlayingItem.IndexNumber}
 							{:else}
 								{session.NowPlayingItem.Name}
 							{/if}
@@ -87,12 +88,16 @@
 								{session.TranscodingInfo.Width}x{session.TranscodingInfo.Height}
 							</div>
 
-							<div class="badge bg-info">
-								{session.TranscodingInfo.AudioCodec}
+							<div class="badge bg-accent">
+								{session.TranscodingInfo.Container}
 							</div>
 
 							<div class="badge bg-info">
 								{session.TranscodingInfo.VideoCodec}
+							</div>
+
+							<div class="badge bg-success">
+								{session.TranscodingInfo.AudioCodec}
 							</div>
 						{:else}
 							---

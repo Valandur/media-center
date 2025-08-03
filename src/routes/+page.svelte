@@ -47,6 +47,7 @@
 	$: jellyfinPromise = data.jellyfin.info;
 	$: radarrQueuePromise = data.radarr.queue;
 	$: sonarrQueuePromise = data.sonarr.queue;
+	$: gpuPromise = data.gpu.stats;
 	$: autoRefresh, setupAutoRefresh();
 
 	onMount(() => {
@@ -175,6 +176,20 @@
 				class="flex-1"
 			/>
 
+			<StatCard
+				label="GPU Temperature"
+				value={gpuPromise.then((i) => i.temp.toFixed(1))}
+				suffix="°C"
+				right
+			/>
+
+			<StatCard
+				label="GPU Memory"
+				value={gpuPromise.then((i) => ((i.memUsed / i.memTotal) * 100).toFixed(1))}
+				suffix="%"
+				right
+			/>
+
 			<StatCard label="Updates" value={sysInfo.then((s) => s.availablePkgUpdates)} right />
 
 			<StatCard
@@ -187,6 +202,12 @@
 			<StatCard
 				label="Nextcloud Shares"
 				value={nextcloudPromise.then((i) => i.nextcloud.shares.num_shares)}
+				right
+			/>
+
+			<StatCard
+				label="Nextcloud Files"
+				value={nextcloudPromise.then((i) => i.nextcloud.storage.num_files)}
 				right
 			/>
 
@@ -212,12 +233,6 @@
 				label="Torrent Upload"
 				value={torrentsPromise.then((t) => t.reduce((acc, t) => acc + t.rateUpload, 0))}
 				unitSuffix="/s"
-				right
-			/>
-
-			<StatCard
-				label="Nextcloud Files"
-				value={nextcloudPromise.then((i) => i.nextcloud.storage.num_files)}
 				right
 			/>
 		</div>
