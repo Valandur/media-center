@@ -74,7 +74,7 @@
 						<div class="flex-1">{session.RemoteEndPoint}</div>
 						<div>
 							{#if session.TranscodingInfo}
-								{formatSpeed(session.TranscodingInfo.Bitrate)}
+								{formatSpeed(session.TranscodingInfo.Bitrate / 8)}
 							{:else}
 								---
 							{/if}
