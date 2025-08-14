@@ -65,7 +65,10 @@
 	}
 </script>
 
-<div class="grid grid-cols-4 auto-rows-max gap-4" class:mt-4={error || jobs.length > 0}>
+<div
+	class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 auto-rows-max gap-4"
+	class:mt-4={error || jobs.length > 0}
+>
 	{#if error}
 		<div class="col-span-4" transition:scale>
 			<Card>

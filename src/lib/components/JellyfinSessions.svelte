@@ -32,7 +32,10 @@
 	}
 </script>
 
-<div class="grid grid-cols-4 auto-rows-max gap-4" class:mt-4={error || sessions.length > 0}>
+<div
+	class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 auto-rows-max gap-4"
+	class:mt-4={error || sessions.length > 0}
+>
 	{#if error}
 		<div transition:scale>
 			<Card class="h-full">
@@ -58,14 +61,20 @@
 				</svelte:fragment>
 
 				<div class="flex flex-col">
-					<div class="font-bold mb-4">
+					<div class="flex flex-row items-center gap-2 mb-4">
 						{#if session.NowPlayingItem}
-							{#if session.NowPlayingItem.SeriesId}
-								{session.NowPlayingItem.SeriesName} - {session.NowPlayingItem.Name} <br />
-								S{session.NowPlayingItem.ParentIndexNumber}:E{session.NowPlayingItem.IndexNumber}
-							{:else}
-								{session.NowPlayingItem.Name}
-							{/if}
+							<div class="flex-1 font-bold">
+								{#if session.NowPlayingItem.SeriesId}
+									{session.NowPlayingItem.SeriesName} - {session.NowPlayingItem.Name}
+								{:else}
+									{session.NowPlayingItem.Name}
+								{/if}
+							</div>
+							<div>
+								{#if session.NowPlayingItem.SeriesId}
+									S{session.NowPlayingItem.ParentIndexNumber}:E{session.NowPlayingItem.IndexNumber}
+								{/if}
+							</div>
 						{:else}
 							---
 						{/if}

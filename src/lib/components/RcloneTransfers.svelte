@@ -35,7 +35,7 @@
 </script>
 
 <div
-	class="grid grid-cols-1 sm:grid-cols-2 auto-rows-max gap-4"
+	class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 auto-rows-max gap-4"
 	class:mt-4={error || transfers.length > 0}
 >
 	{#if error}
