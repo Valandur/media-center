@@ -9,12 +9,12 @@
 	import OmvDevicesCard from '$lib/components/OmvDevicesCard.svelte';
 	import OmvComposeCard from '$lib/components/OmvComposeCard.svelte';
 	import OmvFileSystemsCard from '$lib/components/OmvFileSystemsCard.svelte';
-	import RcloneTransfers from '$lib/components/RcloneTransfers.svelte';
 	import SizeStatCard from '$lib/components/SizeStatCard.svelte';
 	import StatCard from '$lib/components/StatCard.svelte';
 	import TorrentList from '$lib/components/TorrentList.svelte';
 
 	import type { PageServerData } from './$types';
+	import KopiaSources from '$lib/components/KopiaSources.svelte';
 
 	const AUTO_REFRESH_INTERVAL = 10000;
 
@@ -39,9 +39,8 @@
 	$: fileSystemsPromise = data.omv.fileSystems;
 	$: zfsStats = data.omv.zfsStats;
 	$: composePromise = data.omv.compose;
-	$: statsPromise = data.rclone.stats;
-	$: transfersPromise = statsPromise.then((s) => s.transferring ?? []);
 	$: jobsPromise = data.arm.jobs;
+	$: sourcesPromise = data.kopia.sources;
 	$: torrentsPromise = data.transmission.torrents;
 	$: nextcloudPromise = data.nextcloud.info;
 	$: jellyfinPromise = data.jellyfin.info;
@@ -211,17 +210,6 @@
 				right
 			/>
 
-			<StatCard label="Rclone Checks" value={statsPromise.then((s) => s.totalChecks)} right />
-
-			<StatCard label="Rclone Transfers" value={statsPromise.then((s) => s.totalTransfers)} right />
-
-			<SizeStatCard
-				label="Rclone Speed"
-				value={statsPromise.then((s) => s.speed)}
-				unitSuffix="/s"
-				right
-			/>
-
 			<SizeStatCard
 				label="Torrent Download"
 				value={torrentsPromise.then((t) => t.reduce((acc, t) => acc + t.rateDownload, 0))}
@@ -237,11 +225,11 @@
 			/>
 		</div>
 
+		<KopiaSources {sourcesPromise} />
+
 		<TorrentList {torrentsPromise} {radarrQueuePromise} {sonarrQueuePromise} />
 
 		<JellyfinSessions {jellyfinPromise} />
-
-		<RcloneTransfers {transfersPromise} />
 
 		<ArmJobs {jobsPromise} />
 	</div>

@@ -1,10 +1,10 @@
 import { arm } from '$lib/server/arm';
 import { gpu } from '$lib/server/gpu';
 import { jellyfin } from '$lib/server/jellyfin';
+import { kopia } from '$lib/server/kopia';
 import { nextcloud } from '$lib/server/nextcloud';
 import { omv } from '$lib/server/omv';
 import { radarr } from '$lib/server/radarr';
-import { rclone } from '$lib/server/rclone';
 import { sonarr } from '$lib/server/sonarr';
 import { transmission } from '$lib/server/transmission';
 
@@ -22,11 +22,11 @@ export const load: PageServerLoad = async ({ depends }) => {
 	const smartDevices = omv.getSmartDevices();
 	const compose = omv.getCompose();
 
-	// Rclone
-	const rcloneStats = rclone.coreStats();
+	// Kopia
+	const kopiaSources = kopia.getSources();
 
 	// ARM
-	const jobs = arm.getJobList();
+	const armJobs = arm.getJobList();
 
 	// Transmission
 	const torrents = transmission.getTorrents();
@@ -56,11 +56,11 @@ export const load: PageServerLoad = async ({ depends }) => {
 			compose,
 			zfsStats
 		},
-		rclone: {
-			stats: rcloneStats
+		kopia: {
+			sources: kopiaSources
 		},
 		arm: {
-			jobs
+			jobs: armJobs
 		},
 		transmission: {
 			torrents
