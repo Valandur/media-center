@@ -17,7 +17,6 @@ class Kopia extends Service {
 	public async getSources(): Promise<Source[]> {
 		try {
 			const data: KopiaSourcesResponse = await this.request('sources');
-			console.log(data.sources);
 			return data.sources;
 		} catch (err) {
 			error(500, (err as Error).message);
