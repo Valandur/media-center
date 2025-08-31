@@ -134,7 +134,7 @@
 	<div class="flex flex-row justify-between" slot="header">
 		<div>Torrents</div>
 
-		<div class="font-normal normal-case me-2">
+		<div class="font-normal hidden sm:block normal-case me-2">
 			{#key pending}
 				<span in:fade>
 					{formatSize(pending)}
@@ -147,7 +147,7 @@
 			<span>Seeds</span>
 			<input
 				type="checkbox"
-				class="appearance-none w-10 h-6 rounded-full bg-no-repeat switch"
+				class="appearance-none w-9 h-5 rounded-full bg-no-repeat switch"
 				bind:checked={showSeeding}
 			/>
 		</label>

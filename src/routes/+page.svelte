@@ -106,20 +106,18 @@
 </script>
 
 <div class="flex flex-row items-center gap-4 mb-3 sm:mb-2 pb-2 sm:pb-0 border-b sm:border-none">
-	<h3 class="text-lg font-medium">Dashboard</h3>
+	<h3 class="text-lg font-medium hidden sm:block">Dashboard</h3>
 
-	<div>
-		<button
-			type="button"
-			class="btn btn-primary btn-small"
-			on:click={() => {
-				showAddTorrent = true;
-				requestAnimationFrame(() => torrentInput?.focus());
-			}}
-		>
-			<i class="fa-solid fa-plus"></i> Add Torrent
-		</button>
-	</div>
+	<button
+		type="button"
+		class="btn btn-primary btn-small"
+		on:click={() => {
+			showAddTorrent = true;
+			requestAnimationFrame(() => torrentInput?.focus());
+		}}
+	>
+		<i class="fa-solid fa-plus"></i> Add Torrent
+	</button>
 
 	<div class="flex-1"></div>
 
@@ -128,7 +126,7 @@
 		<input
 			type="checkbox"
 			bind:checked={autoRefresh}
-			class="appearance-none w-10 h-6 rounded-full bg-no-repeat switch"
+			class="appearance-none w-9 h-5 rounded-full bg-no-repeat switch"
 		/>
 	</label>
 
