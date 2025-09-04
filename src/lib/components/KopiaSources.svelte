@@ -8,6 +8,7 @@
 	import Card from './Card.svelte';
 	import Progress from './Progress.svelte';
 	import TextWithTooltip from './TextWithTooltip.svelte';
+	import MultiProgress from './MultiProgress.svelte';
 
 	export let sourcesPromise: Promise<Source[]>;
 
@@ -72,9 +73,9 @@
 			<div class="sm:hidden">Uploaded</div>
 			<div class="truncate text-right" transition:slide>
 				{#if item.upload}
-					{#key item.upload.hashedBytes}
+					{#key item.upload.uploadedBytes}
 						<div class="truncate" in:fade>
-							<TextWithTooltip text={formatSize(item.upload.hashedBytes)} />
+							<TextWithTooltip text={formatSize(item.upload.uploadedBytes)} />
 						</div>
 					{/key}
 				{/if}
@@ -82,7 +83,13 @@
 
 			<div class="col-span-2 sm:col-span-1" transition:slide>
 				{#if item.upload}
-					<Progress total={item.upload.estimatedBytes} progress={item.upload.hashedBytes} />
+					<MultiProgress
+						total={item.upload.estimatedBytes}
+						progress={[
+							{ color: 'bg-accent', progress: item.upload.uploadedBytes },
+							{ color: 'bg-info', progress: item.upload.hashedBytes }
+						]}
+					/>
 				{/if}
 			</div>
 

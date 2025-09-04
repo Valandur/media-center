@@ -270,7 +270,7 @@
 						{sonarrs[0].quality.quality.name}
 					</span>
 				{:else}
-					<span class="badge bg-warning">Custom</span>
+					<span class="badge bg-accent">Custom</span>
 				{/if}
 			</div>
 

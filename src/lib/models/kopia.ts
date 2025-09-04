@@ -12,6 +12,7 @@ export interface Source {
 	lastSnapshot?: LastSnapshot;
 	upload?: Upload;
 	currentTask?: string;
+	task?: KopiaTaskResponse;
 }
 
 export interface SourceLocation {
@@ -85,4 +86,94 @@ export interface Upload {
 	directory: string;
 	lastErrorPath: string;
 	lastError: string;
+}
+
+export interface KopiaTaskResponse {
+	id: string;
+	startTime: string;
+	kind: string;
+	description: string;
+	status: string;
+	progressInfo: string;
+	counters: Counters;
+}
+
+export interface Counters {
+	'Cached Bytes': CachedBytes;
+	'Cached Files': CachedFiles;
+	Errors: Errors;
+	'Estimated Bytes': EstimatedBytes;
+	'Estimated Files': EstimatedFiles;
+	'Excluded Directories': ExcludedDirectories;
+	'Excluded Files': ExcludedFiles;
+	'Hashed Bytes': HashedBytes;
+	'Hashed Files': HashedFiles;
+	'Processed Bytes': ProcessedBytes;
+	'Processed Files': ProcessedFiles;
+	'Uploaded Bytes': UploadedBytes;
+}
+
+export interface CachedBytes {
+	value: number;
+	units: string;
+	level: string;
+}
+
+export interface CachedFiles {
+	value: number;
+	level: string;
+}
+
+export interface Errors {
+	value: number;
+	level: string;
+}
+
+export interface EstimatedBytes {
+	value: number;
+	units: string;
+	level: string;
+}
+
+export interface EstimatedFiles {
+	value: number;
+	level: string;
+}
+
+export interface ExcludedDirectories {
+	value: number;
+	level: string;
+}
+
+export interface ExcludedFiles {
+	value: number;
+	level: string;
+}
+
+export interface HashedBytes {
+	value: number;
+	units: string;
+	level: string;
+}
+
+export interface HashedFiles {
+	value: number;
+	level: string;
+}
+
+export interface ProcessedBytes {
+	value: number;
+	units: string;
+	level: string;
+}
+
+export interface ProcessedFiles {
+	value: number;
+	level: string;
+}
+
+export interface UploadedBytes {
+	value: number;
+	units: string;
+	level: string;
 }
