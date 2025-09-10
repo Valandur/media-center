@@ -50,7 +50,7 @@
 				<TextWithTooltip text={item.source.path} />
 			</div>
 
-			<div class="sm:hidden">Last Backup</div>
+			<div class="sm:hidden">Last Snapshot</div>
 			<div class="truncate text-right sm:text-left" transition:slide>
 				{#if item.lastSnapshot}
 					{#key item.lastSnapshot.startTime}
@@ -70,19 +70,17 @@
 				</span>
 			</div>
 
-			<div class="sm:hidden">Uploaded</div>
-			<div class="truncate text-right" transition:slide>
-				{#if item.upload}
+			{#if item.upload}
+				<div class="sm:hidden">Uploaded</div>
+				<div class="truncate text-right" transition:slide>
 					{#key item.upload.uploadedBytes}
 						<div class="truncate" in:fade>
 							<TextWithTooltip text={formatSize(item.upload.uploadedBytes)} />
 						</div>
 					{/key}
-				{/if}
-			</div>
+				</div>
 
-			<div class="col-span-2 sm:col-span-1" transition:slide>
-				{#if item.upload}
+				<div class="col-span-2 sm:col-span-1" transition:slide>
 					<MultiProgress
 						total={item.upload.estimatedBytes}
 						progress={[
@@ -90,8 +88,29 @@
 							{ color: 'bg-info', progress: item.upload.hashedBytes }
 						]}
 					/>
-				{/if}
-			</div>
+				</div>
+			{:else}
+				<div class="sm:hidden">Next Snapshot</div>
+				<div class="truncate text-right" in:fade>
+					{#if item.nextSnapshotTime}
+						{#key item.nextSnapshotTime}
+							<TextWithTooltip
+								text={formatDistanceToNow(item.nextSnapshotTime, { addSuffix: true })}
+							/>
+						{/key}
+					{/if}
+				</div>
+
+				<div class="sm:hidden">Files</div>
+				<div class="truncate text-right" in:fade>
+					{#if item.lastSnapshot}
+						{#key item.lastSnapshot.rootEntry.summ.files}
+							<TextWithTooltip text={`${item.lastSnapshot.rootEntry.summ.files}`} />
+						{/key}
+						<span class="hidden sm:inline-block">files</span>
+					{/if}
+				</div>
+			{/if}
 
 			<div class="sm:hidden">Size</div>
 			<div class="truncate text-right" transition:slide>
@@ -99,6 +118,12 @@
 					{#key item.upload.estimatedBytes}
 						<div class="truncate" in:fade>
 							<TextWithTooltip text={formatSize(item.upload.estimatedBytes)} />
+						</div>
+					{/key}
+				{:else if item.lastSnapshot}
+					{#key item.lastSnapshot.rootEntry.summ.size}
+						<div class="truncate" in:fade>
+							<TextWithTooltip text={formatSize(item.lastSnapshot.rootEntry.summ.size)} />
 						</div>
 					{/key}
 				{/if}

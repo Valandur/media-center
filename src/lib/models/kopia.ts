@@ -13,6 +13,7 @@ export interface Source {
 	upload?: Upload;
 	currentTask?: string;
 	task?: KopiaTaskResponse;
+	nextSnapshotTime?: string;
 }
 
 export interface SourceLocation {
