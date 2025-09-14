@@ -7,6 +7,7 @@ import { omv } from '$lib/server/omv';
 import { radarr } from '$lib/server/radarr';
 import { sonarr } from '$lib/server/sonarr';
 import { transmission } from '$lib/server/transmission';
+import { unmanic } from '$lib/server/unmanic';
 
 import type { PageServerLoad } from './$types';
 
@@ -46,6 +47,9 @@ export const load: PageServerLoad = async ({ depends }) => {
 	// GPU
 	const gpuStats = gpu.getStats();
 
+	// unmanic
+	const unmanicWorkers = unmanic.getWorkersInfo();
+
 	return {
 		omv: {
 			sysInfo,
@@ -79,6 +83,9 @@ export const load: PageServerLoad = async ({ depends }) => {
 		},
 		gpu: {
 			stats: gpuStats
+		},
+		unmanic: {
+			workers: unmanicWorkers
 		}
 	};
 };

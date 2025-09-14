@@ -15,6 +15,7 @@
 
 	import type { PageServerData } from './$types';
 	import KopiaSources from '$lib/components/KopiaSources.svelte';
+	import UnmanicWorkers from '$lib/components/UnmanicWorkers.svelte';
 
 	const AUTO_REFRESH_INTERVAL = 10000;
 
@@ -47,6 +48,7 @@
 	$: radarrQueuePromise = data.radarr.queue;
 	$: sonarrQueuePromise = data.sonarr.queue;
 	$: gpuPromise = data.gpu.stats;
+	$: workersPromise = data.unmanic.workers;
 	$: autoRefresh, setupAutoRefresh();
 
 	onMount(() => {
@@ -226,6 +228,8 @@
 		<KopiaSources {sourcesPromise} />
 
 		<TorrentList {torrentsPromise} {radarrQueuePromise} {sonarrQueuePromise} />
+
+		<UnmanicWorkers {workersPromise} />
 
 		<JellyfinSessions {jellyfinPromise} />
 
